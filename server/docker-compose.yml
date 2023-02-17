@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  node:
+    image: node:19.0.0-alpine
+    #container_name: node_nest_app
+    user: node
+    stdin_open: true
+    tty: true
+    working_dir: /home/node
+    ports:
+      - 3000:3000
+    volumes:
+        - .:/home/node
+
+  npm:
+    extends:
+      service: node
+    entrypoint: npm
+
+  npx:
+    extends:
+      service: node
+    entrypoint: npx
