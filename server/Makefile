@@ -5,7 +5,7 @@ docker_run=docker compose run --name $(server)
 port=3000
 
 up: ## Start the project
-	$(docker_run) -p $(port):$(port) --rm yarn start:dev
+	$(docker_run) -p $(port):$(port) --rm node yarn start:dev
 
 stop: ## Stop the project
 	docker compose stop
