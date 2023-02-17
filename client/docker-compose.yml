@@ -1,0 +1,26 @@
+version: "3"
+
+# docker compose file for react app js client
+
+services:
+  node:
+    image: node:19.0.0-alpine
+    container_name: node_react_app
+    user: node
+    environment:
+      - NODE_ENV=development
+    command: sh -c "yarn install && yarn dev --host"
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/home/node
+    stdin_open: true
+    tty: true
+    working_dir: /home/node
+    networks:
+      - react_app_network
+
+
+
+networks:
+  react_app_network:
