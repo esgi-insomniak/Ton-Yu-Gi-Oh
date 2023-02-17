@@ -5,6 +5,7 @@ docker_run=docker compose run --name $(server)
 port=3000
 
 up: ## Start the project
+	cp -n .env.example .env.local
 	docker compose up -d
 
 stop: ## Stop the project
