@@ -1,17 +1,17 @@
-server=node-server
+server=node
 docker_exec=docker compose exec $(server)
 docker_exec_npx=$(docker_exec) npx
 docker_run=docker compose run --name $(server)
 port=3000
 
 up: ## Start the project
-	$(docker_run) -p $(port):$(port) --rm node yarn start:dev
+	docker compose up -d
 
 stop: ## Stop the project
 	docker compose stop
 
-install:
-	$(docker_run) --rm node yarn
+logs: ## Show logs
+	docker compose logs -f
 
 entity:
 	$(docker_exec_npx) nest generate module $(name)

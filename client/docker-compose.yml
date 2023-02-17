@@ -5,7 +5,11 @@ version: "3"
 services:
   node:
     image: node:19.0.0-alpine
-    #container_name: client
+    container_name: node_react_app
+    user: node
+    environment:
+      - NODE_ENV=development
+    command: sh -c "yarn install && yarn dev --host"
     ports:
       - "8080:8080"
     volumes:
@@ -13,13 +17,10 @@ services:
     stdin_open: true
     tty: true
     working_dir: /home/node
+    networks:
+      - react_app_network
 
-  npm:
-    extends:
-      service: node
-    entrypoint: npm
 
-  npx:
-    extends:
-      service: node
-    entrypoint: npx
+
+networks:
+  react_app_network:

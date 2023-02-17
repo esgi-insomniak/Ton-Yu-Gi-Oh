@@ -1,10 +1,10 @@
-server=node-client
+server=node
 docker_exec=docker compose exec $(server)
-docker_run=docker compose run --name $(server)
+docker_run=docker compose run --name $(server) --rm
 port=8080
 
 up: ## Start the project
-	$(docker_run) -p $(port):$(port) --rm node yarn dev --host 0.0.0.0
+	docker compose up -d
 
 stop: ## Stop the project
 	docker compose stop
@@ -12,6 +12,5 @@ stop: ## Stop the project
 down: ## Stop the project
 	docker compose down
 
-install:
-	$(docker_run) --rm node yarn
-
+logs: ## Show logs
+	docker compose logs -f
