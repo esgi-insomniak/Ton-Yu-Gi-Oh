@@ -1,4 +1,4 @@
-# Ton Yugioh
+# Ton Yu Gi Oh
 
 ## Objet
 
