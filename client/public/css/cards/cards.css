@@ -1,0 +1,34 @@
+.card {
+
+  --grain: url("/img/grain.webp");
+  --glitter: url("/img/glitter.png");
+  --glittersize: 25%;
+
+  --space: 5%;
+  --angle: 133deg;
+  --imgsize: cover;
+
+  --red: #f80e35;
+  --yellow: #eedf10;
+  --green: #21e985;
+  --blue: #0dbde9;
+  --violet: #c929f1;
+
+  --clip: inset(18.15% 11.6% 29.25% 11.3%);
+  --clip-invert: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0 70.75%, 88.4% 70.75%, 88.4% 18.05%, 11.4% 18.05%, 11.4% 71.15%, 0 72%);
+
+  --clip-stage: polygon(91.5% 9.85%, 57% 9.85%, 54% 12%, 17% 12%, 16% 14%, 12% 16%, 8% 16%, 8% 47.15%, 92% 47.15%);
+  --clip-stage-invert: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0 70.75%, 88.4% 70.75%, 88.4% 18.05%, 11.4% 18.05%, 11.4% 71.15%, 0 72%);
+
+  --clip-trainer: inset(18.15% 11.6% 29.25% 11.3%);
+  --clip-borders: inset(2.8% 4% round 2.55% / 1.5%);
+
+}
+
+.card__shine,
+.card__glare {
+  
+  will-change: transform, opacity, background-image, background-size,
+    background-position, background-blend-mode, filter;
+ 
+}

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
+import GameCard from './components/GameCard'
+import cards from './assets/cards.json'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -27,6 +29,27 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+      }}>
+        {cards.filter((card) => {
+          if (card.subtypes !== undefined && card.types !== undefined) {
+            return card;
+          }
+        }).map((card) => {
+          return (
+            <div style={{
+              flex: '25%',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+            }}>
+              <GameCard key={card.id} {...card} />
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
