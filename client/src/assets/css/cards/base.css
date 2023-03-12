@@ -147,15 +147,6 @@
   /* isolation: isolate; <-- this improves perf, but breaks backface visibility on Chrome. */
 }
 
-button.card__rotator {
-  /* because the card is a button, there's some default
-    browser styles which need to be subdued */
-  border: none;
-  background: transparent;
-  padding: 0;
-  -webkit-appearance: none;
-  appearance: none;
-}
 
 .card__rotator,
 .card.active .card__rotator:focus {

@@ -88,7 +88,7 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
         }
     };
 
-    const interact = (e: CardInteractPointerEvent<HTMLButtonElement> | CardInteractTouchEvent<HTMLButtonElement>) => {
+    const interact = (e: CardInteractPointerEvent<HTMLDivElement> | CardInteractTouchEvent<HTMLDivElement>) => {
         endShowcase();
 
         if (!isVisible) {
@@ -135,7 +135,7 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
         });
     }
 
-    const interactEnd = (e: React.MouseEvent<HTMLButtonElement> | null = null, delay = 500) => {
+    const interactEnd = (e: React.MouseEvent<HTMLDivElement> | null = null, delay = 500) => {
         setTimeout(function () {
             const snapStiff = 0.01;
             const snapDamp = 0.06;
@@ -148,7 +148,7 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
         }, delay);
     };
 
-    const activate = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const activate = (e: React.MouseEvent<HTMLDivElement>) => {
         if (activeCard?.current && activeCard.current === thisCard.current) {
             setActiveCard(undefined);
         } else {
@@ -157,7 +157,7 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
         }
     }
 
-    const deactivate = (e: React.FocusEvent<HTMLButtonElement>) => {
+    const deactivate = (e: React.FocusEvent<HTMLDivElement>) => {
         interactEnd();
         setActiveCard(undefined);
     }
@@ -329,14 +329,11 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
     }, [componentIsLoaded]);
 
     return (
-        <Draggable draggableId={props.id.toString()} index={0}>
-            {/* <animated.div className={`card ${props.type.replace(/\s/g, '-').toLowerCase()} / interactive ${interacting ? 'interacting' : ''} ${loading ? 'loading' : ''}`} data-number={props.id} data-set={props.setCode} data-subtypes={props.subtypes.replace(/\s/g, '-').toLowerCase()} data-supertype={props.supertype.replace(/\s/g, '-').toLowerCase()} data-rarity={props.rarity.replace(/\s/g, '-').toLowerCase()} data-trainer-gallery={false} style={dynamicStyles} ref={thisCard}> */}
+        <Draggable draggableId={props.id.toString()} index={0} isDragDisabled={!canBeDragged}>
             {provider => (
-                <div ref={provider.innerRef}
-                    {...provider.draggableProps}
-                    {...provider.dragHandleProps}>
+                <div {...provider.draggableProps} ref={provider.innerRef}>
                     <animated.div
-                        className={`card ${props.attribute ? props.attribute.replace(/\s/g, '-').toLowerCase() : ''} / interactive${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
+                        className={`card ${props.attribute ? props.attribute.replace(/\s/g, '-').toLowerCase() : ''} / interactive /${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
                         data-number={props.id}
                         data-set={props.setCode}
                         data-type={props.type.replace(/\s/g, '-').toLowerCase()}
@@ -346,18 +343,17 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
                         style={dynamicStyles}
                         ref={thisCard}>
                         <div className="card__translater">
-                            <button className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd}>
+                            <div className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd} {...provider.dragHandleProps}>
                                 <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
                                 <div className="card__front" style={staticStyles}>
                                     <img src={frontImg} onLoad={() => setLoading(false)} loading="lazy" width="660" height="921" />
                                     <div className="card__shine"></div>
                                     <div className="card__glare"></div>
                                 </div>
-                            </button>
+                            </div>
                         </div>
                     </animated.div>
                 </div>
-
             )}
         </Draggable>
     )

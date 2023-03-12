@@ -31,7 +31,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <DragDropContext onDragEnd={() => { console.log('test') }}>
+      <DragDropContext onDragEnd={() => { console.log('drag end') }}>
         <Droppable droppableId={"idx_54fdsg64"}>
           {provider => (
             <div {...provider.droppableProps} ref={provider.innerRef}>
@@ -51,7 +51,8 @@ function App() {
                 images={{
                   image_url: 'https://images.ygoprodeck.com/images/cards/10000.jpg',
                   image_url_small: 'https://images.ygoprodeck.com/images/cards_small/10000.jpg'
-                }} />
+                }}
+                canBeDragged={false} />
               <GameCard
                 id={39343610}
                 name={'Dragon du Brasier Sombre'}
@@ -68,7 +69,8 @@ function App() {
                 images={{
                   image_url: 'https://images.ygoprodeck.com/images/cards/39343610.jpg',
                   image_url_small: 'https://images.ygoprodeck.com/images/cards_small/39343610.jpg'
-                }} />
+                }}
+                canBeDragged={true} />
             </div>
           )}
         </Droppable>
