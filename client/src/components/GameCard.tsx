@@ -1,59 +1,15 @@
 
 import { useState, useEffect, useRef } from 'react'
-import { animated, useSpring, to, Interpolation, SpringValue } from '@react-spring/web'
-import { resetBaseOrientation } from "../assets/js/helpers/orientation";
+import { animated, useSpring, to } from '@react-spring/web'
+import { DragDropContext, Draggable } from 'react-beautiful-dnd';
+import { resetBaseOrientation } from '../assets/js/helpers/orientation';
 import { round, clamp, adjust } from '../assets/js/helpers/AdvancedMath';
 
 import '../assets/css/cards/loader.css'
 
-interface CardProps {
-    id: string;
-    set: string;
-    name: string;
-    supertype: string;
-    subtypes: string[];
-    types: string[];
-    number: string;
-    rarity: string;
-    images: {
-        small: string;
-        large: string;
-    };
-}
+import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, CardProps, CardStaticStyles } from '../types/GameCard';
 
-interface staticStyles extends React.CSSProperties {
-    "--seedx": number;
-    "--seedy": number;
-    "--cosmosbg": string;
-}
-
-interface dynamicStyles extends React.CSSProperties {
-    "--pointer-x": Interpolation<string, any>;
-    "--pointer-y": Interpolation<string, any>;
-    "--pointer-from-center": Interpolation<number, any>;
-    "--pointer-from-top": Interpolation<number, any>;
-    "--pointer-from-left": Interpolation<number, any>;
-    "--card-opacity": SpringValue<number>;
-    "--rotate-x": Interpolation<string, any>;
-    "--rotate-y": Interpolation<string, any>;
-    "--card-scale": SpringValue<number>;
-    "--background-x": SpringValue<number>;
-    "--background-y": SpringValue<number>;
-    "--translate-x": SpringValue<number>;
-    "--translate-y": SpringValue<number>;
-}
-
-interface interactPointerEvent<T> extends React.PointerEvent<T> {
-    clientX: number;
-    clientY: number;
-}
-
-interface interactTouchEvent<T> extends React.TouchEvent<T> {
-    clientX: number;
-    clientY: number;
-}
-
-export default (props: CardProps) => {
+export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canBeDragged = false, ...props }: CardProps) => {
     // UTILISER LE STORE POUR STOCKER LA CARTE ACTIVE !!!
     const [activeCard, setActiveCard] = useState<React.MutableRefObject<HTMLDivElement | undefined>>();
     // PAREIL POUR LE SHOWCASE
@@ -70,7 +26,7 @@ export default (props: CardProps) => {
     };
 
     const backImg = "https://images.ygoprodeck.com/images/cards/back_high.jpg";
-    const frontImg = props.images.large;
+    const frontImg = props.images.image_url;
 
     const thisCard = useRef<HTMLDivElement>();
 
@@ -98,13 +54,13 @@ export default (props: CardProps) => {
     const [springTranslate, setSpringTranslate] = useSpring(() => ({ x: 0, y: 0, ...springPopoverSettings }));
     const [springScale, setSpringScale] = useSpring(() => ({ s: 1, ...springPopoverSettings }));
 
-    const staticStyles: staticStyles = {
+    const staticStyles: CardStaticStyles = {
         "--seedx": randomSeed.x,
         "--seedy": randomSeed.y,
         "--cosmosbg": `${cosmosPosition.x}px ${cosmosPosition.y}px;`
     };
 
-    const dynamicStyles: dynamicStyles = {
+    const dynamicStyles: CardDynamicStyles = {
         "--pointer-x": to(springGlare.x, (x) => `${x}%`),
         "--pointer-y": to(springGlare.y, (y) => `${y}%`),
         "--pointer-from-center": to([springGlare.x, springGlare.y], (x, y) => clamp(Math.sqrt(
@@ -116,11 +72,11 @@ export default (props: CardProps) => {
         "--card-opacity": springGlare.o,
         "--rotate-x": to([springRotate.x, springRotateDelta.x], (rx, rdx) => `${rx + rdx}deg`),
         "--rotate-y": to([springRotate.y, springRotateDelta.y], (ry, rdy) => `${ry + rdy}deg`),
+        "--background-x": to(springBackground.x, (x) => `${x}%`),
+        "--background-y": to(springBackground.y, (y) => `${y}%`),
         "--card-scale": springScale.s,
-        "--background-x": springBackground.x,
-        "--background-y": springBackground.y,
-        "--translate-x": springTranslate.x,
-        "--translate-y": springTranslate.y
+        "--translate-x": to(springTranslate.x, (x) => `${x}px`),
+        "--translate-y": to(springTranslate.y, (y) => `${y}px`)
     }
 
     const endShowcase = () => {
@@ -132,7 +88,7 @@ export default (props: CardProps) => {
         }
     };
 
-    const interact = (e: interactPointerEvent<HTMLButtonElement> | interactTouchEvent<HTMLButtonElement>) => {
+    const interact = (e: CardInteractPointerEvent<HTMLButtonElement> | CardInteractTouchEvent<HTMLButtonElement>) => {
         endShowcase();
 
         if (!isVisible) {
@@ -322,8 +278,7 @@ export default (props: CardProps) => {
     // }, [activeCard]);
 
     useEffect(() => {
-        if(!componentIsLoaded) return;
-        console.log(componentIsLoaded);
+        if (componentIsLoaded) return;
         setComponentIsLoaded(true);
         // set the front image on mount so that
         // the lazyloading can work correctly
@@ -374,17 +329,36 @@ export default (props: CardProps) => {
     }, [componentIsLoaded]);
 
     return (
-        <animated.div className={`card ${props.types.join(' ').toLocaleLowerCase()} / interactive /${active ? ' active /' : ''}${interacting ? ' interacting /' : ''}${loading ? ' loading /' : ''}`} data-number={props.number} data-set={props.set} data-subtypes={props.subtypes.join(' ').toLowerCase()} data-supertype={props.supertype.toLowerCase()} data-rarity={props.rarity.toLowerCase()} data-trainer-gallery={false} style={dynamicStyles} ref={thisCard}>
-            <div className="card__translater">
-                <button className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd} >
-                    <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
-                    <div className="card__front" style={staticStyles}>
-                        <img src={frontImg} onLoad={() => setLoading(false)} loading="lazy" width="660" height="921" />
-                        <div className="card__shine"></div>
-                        <div className="card__glare"></div>
-                    </div>
-                </button>
-            </div>
-        </animated.div>
+        <Draggable draggableId={props.id.toString()} index={0}>
+            {/* <animated.div className={`card ${props.type.replace(/\s/g, '-').toLowerCase()} / interactive ${interacting ? 'interacting' : ''} ${loading ? 'loading' : ''}`} data-number={props.id} data-set={props.setCode} data-subtypes={props.subtypes.replace(/\s/g, '-').toLowerCase()} data-supertype={props.supertype.replace(/\s/g, '-').toLowerCase()} data-rarity={props.rarity.replace(/\s/g, '-').toLowerCase()} data-trainer-gallery={false} style={dynamicStyles} ref={thisCard}> */}
+            {provider => (
+                <div ref={provider.innerRef}
+                    {...provider.draggableProps}
+                    {...provider.dragHandleProps}>
+                    <animated.div
+                        className={`card ${props.attribute ? props.attribute.replace(/\s/g, '-').toLowerCase() : ''} / interactive${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
+                        data-number={props.id}
+                        data-set={props.setCode}
+                        data-type={props.type.replace(/\s/g, '-').toLowerCase()}
+                        data-frametype={props.frameType.replace(/\s/g, '-').toLowerCase()}
+                        data-archetype={props.archetype ? props.archetype.replace(/\s/g, '-').toLowerCase() : ''}
+                        data-rarity={props.rarity.replace(/\s/g, '-').toLowerCase()}
+                        style={dynamicStyles}
+                        ref={thisCard}>
+                        <div className="card__translater">
+                            <button className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd}>
+                                <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
+                                <div className="card__front" style={staticStyles}>
+                                    <img src={frontImg} onLoad={() => setLoading(false)} loading="lazy" width="660" height="921" />
+                                    <div className="card__shine"></div>
+                                    <div className="card__glare"></div>
+                                </div>
+                            </button>
+                        </div>
+                    </animated.div>
+                </div>
+
+            )}
+        </Draggable>
     )
 }

@@ -52,6 +52,7 @@
   
   /* make sure the card is above others if it's scaled up */
   z-index: calc(var(--card-scale) * 2);
+  position: relative;
   
   /* every little helps! */
   will-change: transform, visibility, z-index;
@@ -92,16 +93,13 @@
   
 }
 
-.card.water       { --card-glow: hsl(192, 97%,  60%); }
+.card.dark        { --card-glow: hsl(0, 0%, 0%); }
+.card.divine      { --card-glow: hsl(51, 87%, 79%); }
+.card.earth       { --card-glow: rgb(145, 90, 39); } 
 .card.fire        { --card-glow: hsl(9,   81%,  59%); }
-.card.grass       { --card-glow: hsl(96,  81%,  65%); }
-.card.lightning   { --card-glow: hsl(54,  87%,  63%); }
-.card.psychic     { --card-glow: hsl(281, 62%,  58%); }
-.card.fighting    { --card-glow: rgb(145, 90, 39); }
-.card.darkness    { --card-glow: hsl(189, 77%,  27%); }
-.card.metal       { --card-glow: hsl(184, 20%,  70%); }
-.card.dragon      { --card-glow: hsl(51, 60%, 35%); }
-.card.fairy       { --card-glow: hsl(323, 100%, 89%); }
+.card.light       { --card-glow: hsl(0, 0%, 100%); }
+.card.water       { --card-glow: hsl(192, 97%,  60%); }
+.card.wind        { --card-glow: hsl(96,  81%,  65%); }
 
 .card,
 .card__rotator {
