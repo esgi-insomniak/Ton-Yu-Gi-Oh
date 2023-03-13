@@ -26,7 +26,7 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
     };
 
     const backImg = "https://images.ygoprodeck.com/images/cards/back_high.jpg";
-    const frontImg = props.images.image_url;
+    const frontImg = props.image_large;
 
     const thisCard = useRef<HTMLDivElement>();
 
@@ -329,17 +329,17 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
     }, [componentIsLoaded]);
 
     return (
-        <Draggable draggableId={props.id.toString()} index={0} isDragDisabled={!canBeDragged}>
+        <Draggable key={props.id.toString()} draggableId={props.id.toString()} index={props.uniqueId} isDragDisabled={!canBeDragged}>
             {provider => (
-                <div {...provider.draggableProps} ref={provider.innerRef}>
+                <div ref={provider.innerRef} card-provider={1} {...provider.draggableProps}>
                     <animated.div
-                        className={`card ${props.attribute ? props.attribute.replace(/\s/g, '-').toLowerCase() : ''} / interactive /${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
+                        className={`card ${props.attribute ? props.attribute.replace(/\W/g, '-').toLowerCase() : ''} / interactive /${active ? ' active' : ''}${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
                         data-number={props.id}
                         data-set={props.setCode}
-                        data-type={props.type.replace(/\s/g, '-').toLowerCase()}
-                        data-frametype={props.frameType.replace(/\s/g, '-').toLowerCase()}
-                        data-archetype={props.archetype ? props.archetype.replace(/\s/g, '-').toLowerCase() : ''}
-                        data-rarity={props.rarity.replace(/\s/g, '-').toLowerCase()}
+                        data-type={props.type.replace(/\W/g, '-').toLowerCase()}
+                        data-frametype={props.frameType.replace(/\W/g, '-').toLowerCase()}
+                        data-archetype={props.archetype ? props.archetype.replace(/\W/g, '-').toLowerCase() : ''}
+                        data-rarity={props.rarity.replace(/\W/g, '-').toLowerCase()}
                         style={dynamicStyles}
                         ref={thisCard}>
                         <div className="card__translater">

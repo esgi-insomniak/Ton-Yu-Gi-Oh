@@ -1,13 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
+import cardsJson from './assets/cards.json'
 import GameCard from './components/GameCard'
-import cards from './assets/cards-yu-gi-oh.json'
 import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from './types/GameCard'
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
 function App() {
   const [count, setCount] = useState(0)
+  const [cards, setCards] = useState<Array<any>>([])
+
+  useEffect(() => {
+    const filteredCards = cardsJson.filter((card, index, self) => {
+      return self.findIndex(c => card.card_sets !== undefined && c.card_sets !== undefined && c.card_sets[0].set_rarity === card.card_sets[0].set_rarity) === index
+    })
+    setCards(filteredCards)
+  }, [])
+
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  };
+
+  const sortCards = (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      cards,
+      result.source.index,
+      result.destination.index
+    );
+
+    setCards(items);
+  };
 
   return (
     <div className="App">
@@ -31,46 +61,36 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <DragDropContext onDragEnd={() => { console.log('drag end') }}>
-        <Droppable droppableId={"idx_54fdsg64"}>
+      <DragDropContext onDragEnd={sortCards}>
+        <Droppable droppableId="frame_test">
           {provider => (
             <div {...provider.droppableProps} ref={provider.innerRef}>
-              <GameCard
-                id={10000}
-                name={'Dragon Dix-Mille'}
-                name_en={'Ten Thousand Dragon'}
-                type={CardType.EFFECT_MONSTER}
-                frameType={CardFrameType.EFFECT}
-                rarity={CardRarity._10000_SECRET_RARE}
-                setCode={"BLAR-EN10K"}
-                attribute={CardAttribute.DARK}
-                race={CardRace.DRAGON}
-                level={10}
-                atk={0}
-                def={0}
-                images={{
-                  image_url: 'https://images.ygoprodeck.com/images/cards/10000.jpg',
-                  image_url_small: 'https://images.ygoprodeck.com/images/cards_small/10000.jpg'
-                }}
-                canBeDragged={false} />
-              <GameCard
-                id={39343610}
-                name={'Dragon du Brasier Sombre'}
-                name_en={'Darkblaze Dragon'}
-                type={CardType.EFFECT_MONSTER}
-                frameType={CardFrameType.EFFECT}
-                rarity={CardRarity.COMMON}
-                setCode={"BLAR-EN10K"}
-                attribute={CardAttribute.FIRE}
-                race={CardRace.DRAGON}
-                level={7}
-                atk={1200}
-                def={1000}
-                images={{
-                  image_url: 'https://images.ygoprodeck.com/images/cards/39343610.jpg',
-                  image_url_small: 'https://images.ygoprodeck.com/images/cards_small/39343610.jpg'
-                }}
-                canBeDragged={true} />
+              {cards.map((card, index) => (
+                <>
+                  <h2>{card.card_sets[0].set_rarity.replace(/\W/g, '-').toLowerCase()}</h2>
+                  <GameCard
+                    key={index}
+                    uniqueId={index}
+                    id={card.id}
+                    name={card.name}
+                    name_en={card.name_en}
+                    type={Object.values(CardType).find(type => type === card.type) as CardType}
+                    frameType={Object.values(CardFrameType).find(type => type === card.frameType) as CardFrameType}
+                    rarity={Object.values(CardRarity).find(rarity => rarity === card.card_sets[0].set_rarity) as CardRarity}
+                    setCode={card.card_sets[0].set_code}
+                    attribute={Object.values(CardAttribute).find(attribute => attribute === card.attribute) as CardAttribute}
+                    race={Object.values(CardRace).find(race => race === card.race) as CardRace}
+                    level={card.level}
+                    atk={card.atk}
+                    def={card.def}
+                    image_small={card.card_images[0].image_url_small}
+                    image_large={card.card_images[0].image_url}
+                    canBeDragged={true}
+                  />
+                </>
+              ))
+              }
+              {provider.placeholder}
             </div>
           )}
         </Droppable>
