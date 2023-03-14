@@ -1,4 +1,5 @@
 import { Interpolation, SpringValue } from "@react-spring/web";
+import { DraggableProvided } from "react-beautiful-dnd";
 
 export enum CardAttribute {
   DARK = "DARK",
@@ -166,7 +167,6 @@ export enum CardRace {
 }
 
 export interface CardProps {
-  uniqueId: number;
   id: number;
   name: string;
   name_en: string;
@@ -182,9 +182,10 @@ export interface CardProps {
   def?: number;
   image_large: string;
   image_small: string;
+  dragProvided?: DraggableProvided;
   canBeSelected?: boolean;
   canPop?: boolean;
-  canBeDragged?: boolean;
+  isDragDisabled?: boolean;
   canBeRotated?: boolean;
 }
 

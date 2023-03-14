@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { animated, useSpring, to } from '@react-spring/web'
-import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { resetBaseOrientation } from '../assets/js/helpers/orientation';
 import { round, clamp, adjust } from '../assets/js/helpers/AdvancedMath';
 
@@ -9,7 +8,7 @@ import '../assets/css/cards/loader.css'
 
 import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, CardProps, CardStaticStyles } from '../types/GameCard';
 
-export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canBeDragged = false, ...props }: CardProps) => {
+export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDragDisabled = true, ...props }: CardProps) => {
     // UTILISER LE STORE POUR STOCKER LA CARTE ACTIVE !!!
     const [activeCard, setActiveCard] = useState<React.MutableRefObject<HTMLDivElement | undefined>>();
     // PAREIL POUR LE SHOWCASE
@@ -329,32 +328,26 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, canB
     }, [componentIsLoaded]);
 
     return (
-        <Draggable key={props.id.toString()} draggableId={props.id.toString()} index={props.uniqueId} isDragDisabled={!canBeDragged}>
-            {provider => (
-                <div ref={provider.innerRef} card-provider={1} {...provider.draggableProps}>
-                    <animated.div
-                        className={`card ${props.attribute ? props.attribute.replace(/\W/g, '-').toLowerCase() : ''} / interactive /${active ? ' active' : ''}${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
-                        data-number={props.id}
-                        data-set={props.setCode}
-                        data-type={props.type.replace(/\W/g, '-').toLowerCase()}
-                        data-frametype={props.frameType.replace(/\W/g, '-').toLowerCase()}
-                        data-archetype={props.archetype ? props.archetype.replace(/\W/g, '-').toLowerCase() : ''}
-                        data-rarity={props.rarity.replace(/\W/g, '-').toLowerCase()}
-                        style={dynamicStyles}
-                        ref={thisCard}>
-                        <div className="card__translater">
-                            <div className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd} {...provider.dragHandleProps}>
-                                <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
-                                <div className="card__front" style={staticStyles}>
-                                    <img src={frontImg} onLoad={() => setLoading(false)} loading="lazy" width="660" height="921" />
-                                    <div className="card__shine"></div>
-                                    <div className="card__glare"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </animated.div>
+        <animated.div
+            className={`card ${props.attribute ? props.attribute.replace(/\W/g, '-').toLowerCase() : ''} / interactive /${active ? ' active' : ''}${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
+            data-number={props.id}
+            data-set={props.setCode}
+            data-type={props.type.replace(/\W/g, '-').toLowerCase()}
+            data-frametype={props.frameType.replace(/\W/g, '-').toLowerCase()}
+            data-archetype={props.archetype ? props.archetype.replace(/\W/g, '-').toLowerCase() : ''}
+            data-rarity={props.rarity.replace(/\W/g, '-').toLowerCase()}
+            style={dynamicStyles}
+            ref={thisCard}>
+            <div className="card__translater">
+                <div className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvider?.dragHandleProps}>
+                    <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
+                    <div className="card__front" style={staticStyles}>
+                        <img src={frontImg} onLoad={() => setLoading(false)} loading="lazy" width="660" height="921" />
+                        <div className="card__shine"></div>
+                        <div className="card__glare"></div>
+                    </div>
                 </div>
-            )}
-        </Draggable>
+            </div>
+        </animated.div>
     )
 }
