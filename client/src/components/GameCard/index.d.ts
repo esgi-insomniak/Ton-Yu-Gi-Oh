@@ -1,4 +1,5 @@
 import { Interpolation, SpringValue } from "@react-spring/web";
+import React from "react";
 import { DraggableProvided } from "react-beautiful-dnd";
 
 export enum CardAttribute {
@@ -166,7 +167,8 @@ export enum CardRace {
   ZANE_TRUESDAL = "Zane Truesdal",
 }
 
-export interface CardProps {
+export interface GameCardType {
+  uniqueId: string;
   id: number;
   name: string;
   name_en: string;
@@ -183,10 +185,13 @@ export interface CardProps {
   image_large: string;
   image_small: string;
   dragProvided?: DraggableProvided;
-  canBeSelected?: boolean;
-  canPop?: boolean;
-  isDragDisabled?: boolean;
-  canBeRotated?: boolean;
+  isDraggable?: boolean;
+  isActive: boolean;
+  isHidden: boolean;
+  isFocused: boolean;
+  isLoaded: boolean;
+  canPop: boolean;
+  canFlip: boolean;
 }
 
 export interface CardStaticStyles extends React.CSSProperties {

@@ -170,8 +170,8 @@
 
 
 .card__rotator,
-.card.interacting .card__rotator,
-.card.active .card__rotator {
+.card:not(.hidden).interacting .card__rotator,
+.card:not(.hidden).active .card__rotator {
   transition: box-shadow 0.4s ease, opacity .33s ease-out;
   box-shadow:
     0 0 3px -1px transparent,
@@ -182,8 +182,8 @@
     0 0 20px 0px transparent;
 }
 
-.card.interacting .card__rotator,
-.card.active .card__rotator {
+.card:not(.hidden).interacting .card__rotator,
+.card:not(.hidden).active .card__rotator {
   box-shadow:
     0 0 3px -1px white,
     0 0 3px 1px var(--card-edge),
@@ -191,6 +191,11 @@
     0px 10px 20px -5px black,
     0 0 40px -30px var(--card-glow),
     0 0 50px -20px var(--card-glow)
+}
+
+.card.hidden .card__rotator {
+  -webkit-transform: rotateY(0deg);
+  transform: rotateY(180deg);
 }
 
 .card__rotator * {

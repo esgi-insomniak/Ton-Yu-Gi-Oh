@@ -1,17 +1,14 @@
 
-import { useState, useEffect, useRef } from 'react'
+import React from 'react'
 import { animated, useSpring, to } from '@react-spring/web'
-import { resetBaseOrientation } from '../assets/js/helpers/orientation';
-import { round, clamp, adjust } from '../assets/js/helpers/AdvancedMath';
+import { round, clamp, adjust } from '../../helpers/utils/AdvancedMath';
+import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, GameCardType, CardStaticStyles } from '.';
+import GameCardContext from '../../helpers/context/GameCardContext';
 
-import '../assets/css/cards/loader.css'
+import '../../assets/css/cards/loader.css'
 
-import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, CardProps, CardStaticStyles } from '../types/GameCard';
-
-export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDragDisabled = true, ...props }: CardProps) => {
-    // UTILISER LE STORE POUR STOCKER LA CARTE ACTIVE !!!
-    const [activeCard, setActiveCard] = useState<React.MutableRefObject<HTMLDivElement | undefined>>();
-    // PAREIL POUR LE SHOWCASE
+const GameCard = (props: GameCardType) => {
+    // CONTEXTE POUR showcase
     const showcase = false;
 
     const randomSeed = {
@@ -27,21 +24,23 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
     const backImg = "https://images.ygoprodeck.com/images/cards/back_high.jpg";
     const frontImg = props.image_large;
 
-    const thisCard = useRef<HTMLDivElement>();
+    const thisCardElement = React.useRef<HTMLDivElement>();
 
-    const [componentIsLoaded, setComponentIsLoaded] = useState(false);
+    // const [componentIsLoaded, setComponentIsLoaded] = React.useState(false);
 
-    const [repositionTimer, setRepositionTimer] = useState<number>();
-    const [active, setActive] = useState(false);
-    const [interacting, setInteracting] = useState(false);
-    const [firstPop, setFirstPop] = useState(true);
-    const [loading, setLoading] = useState(true);
-    const [isVisible, setIsVisible] = useState(document.visibilityState === "visible");
+    const { cards, setIsDraggable, setIsActive, setIsHidden, setCanFlip, setIsLoaded, deactivateAllCards } = React.useContext(GameCardContext);
+    const currentCard = cards.find((card) => card.id === props.id) as GameCardType;
 
-    const [showcaseInterval, setShowcaseInterval] = useState<number>();
-    const [showcaseTimerStart, setShowcaseTimerStart] = useState<number>();
-    const [showcaseTimerEnd, setShowcaseTimerEnd] = useState<number>();
-    const [showcaseRunning, setShowcaseRunning] = useState(showcase);
+    const [repositionTimer, setRepositionTimer] = React.useState<number>();
+    const [interacting, setInteracting] = React.useState(false);
+    const [firstPop, setFirstPop] = React.useState(true);
+    // const [loading, setLoading] = React.useState(true);
+    const [isVisible, setIsVisible] = React.useState(document.visibilityState === "visible");
+
+    const [showcaseInterval, setShowcaseInterval] = React.useState<number>();
+    const [showcaseTimerStart, setShowcaseTimerStart] = React.useState<number>();
+    const [showcaseTimerEnd, setShowcaseTimerEnd] = React.useState<number>();
+    const [showcaseRunning, setShowcaseRunning] = React.useState(showcase);
 
     const springInteractSettings = { stiffness: 0.066, damping: 0.25 };
     const springPopoverSettings = { stiffness: 0.033, damping: 0.45 };
@@ -87,17 +86,17 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
         }
     };
 
-    const interact = (e: CardInteractPointerEvent<HTMLDivElement> | CardInteractTouchEvent<HTMLDivElement>) => {
+    const interact = (e: CardInteractPointerEvent<HTMLElement> | CardInteractTouchEvent<HTMLElement>) => {
         endShowcase();
 
-        if (!isVisible) {
+        if (!isVisible || currentCard.isHidden) {
             return setInteracting(false);
         }
 
         // prevent other background cards being interacted with
-        if (activeCard?.current && activeCard.current !== thisCard.current) {
-            return setInteracting(false);
-        }
+        // if (!currentCard.isFocused) {
+        //     return setInteracting(false);
+        // }
 
         setInteracting(true);
 
@@ -134,7 +133,7 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
         });
     }
 
-    const interactEnd = (e: React.MouseEvent<HTMLDivElement> | null = null, delay = 500) => {
+    const interactEnd = (e: React.MouseEvent<HTMLElement> | null = null, delay = 500) => {
         setTimeout(function () {
             const snapStiff = 0.01;
             const snapDamp = 0.06;
@@ -143,22 +142,28 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
             setSpringRotate({ x: 0, y: 0, stiffness: snapStiff, damping: snapDamp });
             setSpringGlare({ x: 50, y: 50, o: 0, stiffness: snapStiff, damping: snapDamp });
             setSpringBackground({ x: 50, y: 50, stiffness: snapStiff, damping: snapDamp });
-
         }, delay);
     };
 
-    const activate = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (activeCard?.current && activeCard.current === thisCard.current) {
-            setActiveCard(undefined);
+    const activate = (e: React.MouseEvent<HTMLElement>) => {
+        if (currentCard.isHidden && currentCard.canFlip) {
+            deactivateAllCards();
+            setIsHidden(currentCard, false);
+            setCanFlip(currentCard, false);
+        } else if (currentCard.isActive) {
+            setIsDraggable(currentCard, true);
+            setIsActive(currentCard, false);
         } else {
-            setActiveCard(thisCard);
-            resetBaseOrientation();
+            setIsDraggable(currentCard, false);
+            deactivateAllCards();
+            setIsActive(currentCard, true);
         }
     }
 
     const deactivate = (e: React.FocusEvent<HTMLDivElement>) => {
+        setIsDraggable(currentCard, true);
+        setIsActive(currentCard, false);
         interactEnd();
-        setActiveCard(undefined);
     }
 
     // const reposition = (e) => {
@@ -172,8 +177,8 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
     // };
 
     const setCenter = () => {
-        if (!thisCard.current) return;
-        const rect = thisCard.current.getBoundingClientRect(); // get element's size/position
+        if (!thisCardElement.current) return;
+        const rect = thisCardElement.current.getBoundingClientRect(); // get element's size/position
         const view = document.documentElement; // get window/viewport size
 
         const delta = {
@@ -184,8 +189,8 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
     };
 
     const popover = () => {
-        if (!thisCard.current) return;
-        const rect = thisCard.current.getBoundingClientRect(); // get element's size/position
+        if (!thisCardElement.current) return;
+        const rect = thisCardElement.current.getBoundingClientRect(); // get element's size/position
         let delay = 100;
         let scaleW = (window.innerWidth / rect.width) * 0.9;
         let scaleH = (window.innerHeight / rect.height) * 0.9;
@@ -198,6 +203,12 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
         setFirstPop(false);
         setSpringScale({ s: Math.min(scaleW, scaleH, scaleF) });
         interactEnd(null, delay);
+    };
+
+    const hide = () => {
+        setSpringScale({ s: 1 });
+        setSpringTranslate({ x: 0, y: 0 });
+        setSpringRotateDelta({ x: 180, y: 0 });
     };
 
     const retreat = () => {
@@ -214,29 +225,6 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
         setSpringRotateDelta({ x: 0, y: 0 });
         setSpringRotate({ x: 0, y: 0 });
     };
-
-    // const orientate = (e) => {
-    //     const x = e.relative.gamma;
-    //     const y = e.relative.beta;
-    //     const limit = { x: 16, y: 18 };
-
-    //     const degrees = {
-    //         x: clamp(x, -limit.x, limit.x),
-    //         y: clamp(y, -limit.y, limit.y)
-    //     };
-
-    //     updateSprings({
-    //         x: adjust(degrees.x, -limit.x, limit.x, 37, 63),
-    //         y: adjust(degrees.y, -limit.y, limit.y, 33, 67),
-    //     }, {
-    //         x: round(degrees.x * -1),
-    //         y: round(degrees.y),
-    //     }, {
-    //         x: adjust(degrees.x, -limit.x, limit.x, 0, 100),
-    //         y: adjust(degrees.y, -limit.y, limit.y, 0, 100),
-    //         o: 1,
-    //     });
-    // };
 
     const updateSprings = (background: { x: number, y: number }, rotate: { x: number, y: number }, glare: { x: number, y: number, o: number }) => {
         setSpringBackground({
@@ -256,80 +244,85 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
     document.addEventListener("visibilitychange", (e) => {
         setIsVisible(document.visibilityState === "visible");
         endShowcase();
-        reset();
+        // reset();
     });
 
-    useEffect(() => {
-        if (activeCard?.current && activeCard.current === thisCard.current) {
-            popover();
-            setActive(true);
+    React.useEffect(() => {
+        if (currentCard.canPop && !currentCard.isHidden) {
+            if (currentCard.isActive) {
+                popover();
+                // setIsActive(currentCard, true);
+            } else {
+                retreat();
+                // setIsActive(currentCard, false);
+            }
+        }
+    }, [currentCard.canPop, currentCard.isActive, currentCard.isHidden]);
+
+    React.useEffect(() => {
+        if (currentCard.isHidden) {
+            setIsDraggable(currentCard, false);
+            hide();
         } else {
-            retreat();
-            setActive(false);
+            setIsDraggable(currentCard, true);
+            reset();
         }
-    }, [activeCard]);
+    }, [currentCard.isHidden]);
 
-    // useEffect(() => {
-    //     if (activeCard?.current && activeCard.current === thisCard.current) {
-    //         setInteracting(true);
-    //         orientate(orientation);
+    // React.useEffect(() => {
+    //     if (componentIsLoaded) return;
+    //     setComponentIsLoaded(true);
+    //     // set the front image on mount so that
+    //     // the lazyloading can work correctly
+    //     // img = props.images.large
+    //     // img = imgBase + frontImg;
+
+    //     // run a cute little animation on load
+    //     // for showcase card
+    //     if (showcase && isVisible) {
+    //         const s = 0.02;
+    //         const d = 0.5;
+    //         let r = 0;
+    //         const scts = setTimeout(() => {
+    //             setInteracting(true);
+    //             // setActive(true);
+    //             setSpringRotate({ stiffness: s, damping: d });
+    //             setSpringGlare({ stiffness: s, damping: d });
+    //             setSpringBackground({ stiffness: s, damping: d });
+    //             if (isVisible) {
+    //                 const sci = setInterval(function () {
+    //                     r += 0.05;
+    //                     setSpringRotate({ x: Math.sin(r) * 25, y: Math.cos(r) * 25 });
+    //                     setSpringGlare({
+    //                         x: 55 + Math.sin(r) * 55,
+    //                         y: 55 + Math.cos(r) * 55,
+    //                         o: 0.8,
+    //                     });
+    //                     setSpringBackground({
+    //                         x: 20 + Math.sin(r) * 20,
+    //                         y: 20 + Math.cos(r) * 20,
+    //                     });
+    //                 }, 20);
+    //                 setShowcaseInterval(sci);
+
+    //                 const scte = setTimeout(() => {
+    //                     clearInterval(showcaseInterval);
+    //                     interactEnd(null, 0);
+    //                 }, 4000);
+    //                 setShowcaseTimerEnd(scte);
+    //             } else {
+    //                 setInteracting(false);
+    //                 // setActive(false);
+    //                 return;
+    //             }
+    //         }, 2000);
+    //         setShowcaseTimerStart(scts);
     //     }
-    // }, [activeCard]);
-
-    useEffect(() => {
-        if (componentIsLoaded) return;
-        setComponentIsLoaded(true);
-        // set the front image on mount so that
-        // the lazyloading can work correctly
-        // img = props.images.large
-        // img = imgBase + frontImg;
-
-        // run a cute little animation on load
-        // for showcase card
-        if (showcase && isVisible) {
-            const s = 0.02;
-            const d = 0.5;
-            let r = 0;
-            const scts = setTimeout(() => {
-                setInteracting(true);
-                setActive(true);
-                setSpringRotate({ stiffness: s, damping: d });
-                setSpringGlare({ stiffness: s, damping: d });
-                setSpringBackground({ stiffness: s, damping: d });
-                if (isVisible) {
-                    const sci = setInterval(function () {
-                        r += 0.05;
-                        setSpringRotate({ x: Math.sin(r) * 25, y: Math.cos(r) * 25 });
-                        setSpringGlare({
-                            x: 55 + Math.sin(r) * 55,
-                            y: 55 + Math.cos(r) * 55,
-                            o: 0.8,
-                        });
-                        setSpringBackground({
-                            x: 20 + Math.sin(r) * 20,
-                            y: 20 + Math.cos(r) * 20,
-                        });
-                    }, 20);
-                    setShowcaseInterval(sci);
-
-                    const scte = setTimeout(() => {
-                        clearInterval(showcaseInterval);
-                        interactEnd(null, 0);
-                    }, 4000);
-                    setShowcaseTimerEnd(scte);
-                } else {
-                    setInteracting(false);
-                    setActive(false);
-                    return;
-                }
-            }, 2000);
-            setShowcaseTimerStart(scts);
-        }
-    }, [componentIsLoaded]);
+    // }, [componentIsLoaded]);
 
     return (
         <animated.div
-            className={`card ${props.attribute ? props.attribute.replace(/\W/g, '-').toLowerCase() : ''} / interactive /${active ? ' active' : ''}${interacting ? ' interacting' : ''}${loading ? ' loading' : ''}`}
+            className={`card ${props.attribute ? props.attribute.replace(/\W/g, '-').toLowerCase() : ''} / interactive /${currentCard.isHidden ? ' hidden' : ''}${currentCard.isActive ? ' active' : ''}${interacting ? ' interacting' : ''}${!currentCard.isLoaded ? ' loading' : ''}`}
             data-number={props.id}
             data-set={props.setCode}
             data-type={props.type.replace(/\W/g, '-').toLowerCase()}
@@ -337,12 +330,13 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
             data-archetype={props.archetype ? props.archetype.replace(/\W/g, '-').toLowerCase() : ''}
             data-rarity={props.rarity.replace(/\W/g, '-').toLowerCase()}
             style={dynamicStyles}
-            ref={thisCard}>
+            ref={thisCardElement as React.RefObject<HTMLDivElement>}>
             <div className="card__translater">
-                <div className="card__rotator" tabIndex={0} onClick={activate} onBlur={deactivate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvider?.dragHandleProps}>
+                {/* onBlur={deactivate} */}
+                <div className="card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
                     <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
                     <div className="card__front" style={staticStyles}>
-                        <img src={frontImg} onLoad={() => setLoading(false)} loading="lazy" width="660" height="921" />
+                        <img src={frontImg} onLoad={() => setIsLoaded(currentCard, true)} loading="lazy" width="660" height="921" />
                         <div className="card__shine"></div>
                         <div className="card__glare"></div>
                     </div>
@@ -351,3 +345,5 @@ export default ({ canBeSelected = true, canPop = true, canBeRotated = true, isDr
         </animated.div>
     )
 }
+
+export default GameCard;
