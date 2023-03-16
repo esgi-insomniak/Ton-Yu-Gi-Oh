@@ -43,3 +43,5 @@ yarn.lock
 .env
 .env.local
 .env.*.local
+
+package-lock.json
