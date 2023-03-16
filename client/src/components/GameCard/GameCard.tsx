@@ -100,10 +100,10 @@ const GameCard = (props: GameCardType) => {
 
         setInteracting(true);
 
-        if (e instanceof TouchEvent) {
-            e.clientX = e.touches[0].clientX;
-            e.clientY = e.touches[0].clientY;
-        }
+        // if (e instanceof TouchEvent) {
+        //     e.clientX = e.touches[0].clientX;
+        //     e.clientY = e.touches[0].clientY;
+        // }
 
         const el = e.currentTarget as HTMLElement;
         const rect = el.getBoundingClientRect(); // get element's current size/position
