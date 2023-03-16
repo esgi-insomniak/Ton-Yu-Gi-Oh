@@ -9,7 +9,7 @@ lerna-debug.log*
 .yarn
 .npm
 .cache
-
+.ash_history
 
 node_modules
 dist

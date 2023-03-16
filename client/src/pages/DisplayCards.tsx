@@ -34,7 +34,7 @@ const DisplayCards = () => {
                 image_large: card.card_images[0].image_url,
                 isDraggable: true,
                 isActive: false,
-                isHidden: card.id === 37478723 ? true : false,
+                isHidden: card.id === 37478723,
                 isFocused: false,
                 canPop: true,
                 canFlip: true

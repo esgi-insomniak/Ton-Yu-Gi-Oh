@@ -1,12 +1,11 @@
-import './App.css'
 import { GameCardProvider } from './helpers/context/GameCardContext'
-import DisplayCards from './pages/DisplayCards'
+import Home from "./pages/Home";
 
 function App() {
   return (
     <div className="App">
       <GameCardProvider>
-        <DisplayCards />
+        <Home />
       </GameCardProvider>
     </div>
   )
