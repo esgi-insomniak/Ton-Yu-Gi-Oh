@@ -4,11 +4,11 @@ services:
     build:
       context: ./server/card-service
       dockerfile: Dockerfile.test
-    restart: unless-stopped
+    command: sh -c "yarn install && yarn start:dev"
     stdin_open: true
     tty: true
     hostname: user
-    working_dir: /home/node
+    working_dir: /usr/src
     networks:
       - server
     env_file:
@@ -16,7 +16,7 @@ services:
     ports:
       - ${USER_SERVICE_PORT}:${USER_SERVICE_PORT}
     volumes:
-      - .:/home/node
+      - ./server/card-service:/usr/src
 
 networks:
     server:
