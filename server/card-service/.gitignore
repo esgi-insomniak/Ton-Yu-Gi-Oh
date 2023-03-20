@@ -10,10 +10,6 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-yarn.lock
-.yarn
-.npm
-.cache
 
 # OS
 .DS_Store
@@ -37,11 +33,3 @@ yarn.lock
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# Envs
-
-.env
-.env.local
-.env.*.local
-
-package-lock.json
