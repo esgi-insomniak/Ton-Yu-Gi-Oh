@@ -1,0 +1,17 @@
+version: "3"
+services:
+    card-service-node:
+      build:
+        context: ./server/card-service
+        dockerfile: Dockerfile
+      restart: always
+      hostname: user
+      networks:
+        - server
+      env_file:
+        - .env
+
+
+networks:
+    server:
+        driver: bridge

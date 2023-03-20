@@ -1,0 +1,5 @@
+FROM node:19.0.0-alpine
+RUN apk add yarn
+WORKDIR /home/node
+RUN yarn install
+CMD yarn start:dev

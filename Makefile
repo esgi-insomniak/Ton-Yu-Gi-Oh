@@ -1,11 +1,12 @@
 up:
 	cd client && make up
-	cd server && make up
+	cp -f .env.example .env && cp .env.test.example .env.test
+	docker compose -f ./docker-compose.test.yml up -d
 
 stop:
 	cd client && make stop
-	cd server && make stop
+	docker compose -f ./docker-compose.test.yml stop
 
 down:
 	cd client && make down
-	cd server && make down
+	docker compose -f ./docker-compose.test.yml down
