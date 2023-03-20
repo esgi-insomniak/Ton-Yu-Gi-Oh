@@ -6,6 +6,7 @@ port=8080
 up: ## Start the project
 	cp -n .env.example .env.local
 	docker compose up -d
+	$(info ************** Serveur VITE démarré sur le port $(port) **************)
 
 stop: ## Stop the project
 	docker compose stop

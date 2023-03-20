@@ -7,6 +7,7 @@ port=3000
 up: ## Start the project
 	cp -n .env.example .env.local
 	docker compose up -d
+	$(info ************** Serveur NEST démarré sur le port $(port) **************)
 
 stop: ## Stop the project
 	docker compose stop
