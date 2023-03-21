@@ -4,15 +4,13 @@ services:
       build:
         context: ./server/card-service
         dockerfile: Dockerfile
-        target: dev
+        target: prod
       networks:
         - server
       env_file:
-        - .env.dev
+        - .env
       ports:
         - "3001:3000"
-      volumes:
-        - ./server/card-service:/usr/src/app
       links:
         - card-service-postgres
 
@@ -21,7 +19,7 @@ services:
       networks:
         - server
       env_file:
-        - .env.dev
+        - .env
       environment:
         - POSTGRES_USER=${POSTGRES_USER_CARD_SERVICE}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_CARD_SERVICE}

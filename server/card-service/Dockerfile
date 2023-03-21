@@ -1,7 +1,26 @@
-FROM node:19.0.0-alpine
+FROM node:19.0.0-alpine as dev
+WORKDIR /usr/src/app
+
 RUN apk add yarn
-RUN mkdir -p /var/www/card-service
-WORKDIR /var/www/card-service
-ADD . /var/www/card-service
+
+EXPOSE 3000
+
+CMD yarn install && \
+    yarn start:dev
+
+FROM node:19.0.0-alpine as prod
+WORKDIR /usr/src/app
+
+RUN apk add yarn
+
+COPY package*.json yarn*.lock tsconfig*.json ./
 RUN yarn install
-CMD yarn build && yarn cache clean && yarn start:prod
+
+COPY . .
+
+RUN yarn build
+RUN yarn cache clean
+
+EXPOSE 3000
+
+CMD ["node", "dist/main.js"]
