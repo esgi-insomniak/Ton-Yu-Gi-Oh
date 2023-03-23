@@ -1,35 +1,54 @@
 version: "3.4"
 services:
+    gateway:
+      build:
+        context: ./server/gateway
+        dockerfile: Dockerfile
+        target: prod
+      hostname: gateway
+      env_file:
+        - .env
+      volumes:
+        - ./server/gateway:/usr/src/app
+      ports:
+        - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+      networks:
+        - backend-prod
+        - frontend-prod
     card-service-node:
       build:
         context: ./server/card-service
         dockerfile: Dockerfile
         target: prod
+      hostname: card-service-node
       networks:
-        - server
+        - backend-prod
       env_file:
         - .env
-      ports:
-        - "3001:3000"
+      volumes:
+        - ./server/card-service:/usr/src/app
       links:
         - card-service-postgres
-
     card-service-postgres:
       image: postgres:13.2-alpine
+      hostname: card-service-postgres
       networks:
-        - server
+        - backend-prod
       env_file:
         - .env
       environment:
-        - POSTGRES_USER=${POSTGRES_USER_CARD_SERVICE}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_CARD_SERVICE}
-        - POSTGRES_DB=${POSTGRES_DB_CARD_SERVICE}
+        - POSTGRES_USER=${CARD_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${CARD_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
       volumes:
-        - card-service-postgres:/var/lib/postgresql/data
+        - card-service-postgres-prod:/var/lib/postgresql/data
 
 networks:
-    server:
-        driver: bridge
+  backend-prod:
+    driver: bridge
+  frontend-prod:
+    external:
+      name: infrastructure
 
 volumes:
-    card-service-postgres:
+    card-service-postgres-prod:
