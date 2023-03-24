@@ -3,8 +3,8 @@ import { MessagePattern } from '@nestjs/microservices';
 import {
   ICardGetOneResponse,
   ICardGetResponse,
-} from './interfaces/card/card-response.interface';
-import { CardService } from './services/card.service';
+} from '../interfaces/card/card-response.interface';
+import { CardService } from '../services/card.service';
 
 @Controller('card')
 export class CardController {

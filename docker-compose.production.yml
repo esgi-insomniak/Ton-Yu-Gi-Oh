@@ -6,8 +6,12 @@ services:
         dockerfile: Dockerfile
         target: prod
       hostname: gateway
+      command: node dist/main.js
       env_file:
         - .env
+      depends_on:
+        - card-service-node
+        - user-service-node
       volumes:
         - ./server/gateway:/usr/src/app
       ports:
@@ -21,10 +25,15 @@ services:
         dockerfile: Dockerfile
         target: prod
       hostname: card-service-node
+      command: >
+        sh -c "yarn typeorm:migrate &&
+        node dist/main.js"
       networks:
         - backend-prod
       env_file:
         - .env
+      depends_on:
+        - card-service-postgres
       volumes:
         - ./server/card-service:/usr/src/app
       links:
@@ -42,7 +51,38 @@ services:
         - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
       volumes:
         - card-service-postgres-prod:/var/lib/postgresql/data
-
+    user-service-node:
+      build:
+        context: ./server/user-service
+        dockerfile: Dockerfile
+        target: prod
+      hostname: user-service-node
+      command: >
+        sh -c "yarn typeorm:migrate &&
+        node dist/main.js"
+      networks:
+        - backend-prod
+      env_file:
+        - .env
+      depends_on:
+        - user-service-postgres
+      volumes:
+        - ./server/user-service:/usr/src/app
+      links:
+        - user-service-postgres
+    user-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-service-postgres
+      networks:
+        - backend-prod
+      env_file:
+        - .env
+      environment:
+        - POSTGRES_USER=${USER_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-service-postgres-prod:/var/lib/postgresql/data
 networks:
   backend-prod:
     driver: bridge
@@ -52,3 +92,4 @@ networks:
 
 volumes:
     card-service-postgres-prod:
+    user-service-postgres-prod:

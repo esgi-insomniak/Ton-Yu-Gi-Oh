@@ -1,17 +1,17 @@
-import { Controller, Get, Inject, Req, Param, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   GetCardByIdResponseDto,
   GetCardsResponseDto,
-} from './interfaces/card-service/card/card-response.dto';
+} from '../interfaces/card-service/card/card-response.dto';
 import {
   ICardGetOneResponse,
   ICardGetResponse,
-} from './interfaces/card-service/card/card-response.interface';
-import { GetCardsQueryDto } from './interfaces/card-service/card/card-query.dto';
-import { GetCardByIdDto } from './interfaces/card-service/card/card-param.dto';
+} from '../interfaces/card-service/card/card-response.interface';
+import { GetCardsQueryDto } from '../interfaces/card-service/card/card-query.dto';
+import { GetCardByIdDto } from '../interfaces/card-service/card/card-param.dto';
 
 @Controller('cards')
 @ApiTags('cards')

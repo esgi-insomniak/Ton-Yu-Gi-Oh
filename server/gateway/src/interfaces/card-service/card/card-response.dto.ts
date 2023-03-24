@@ -74,7 +74,7 @@ export class GetCardsResponseDto {
 export class GetCardByIdResponseDto {
   @ApiProperty({
     example: {
-      cards: {
+      card: {
         id: '52264803-0e95-4591-931c-5d8fde6d2f4f',
         identifiant: 37478723,
         name: '"Armes Nobles Inferno - Durendal"',

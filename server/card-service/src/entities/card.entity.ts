@@ -50,7 +50,7 @@ export class Card {
 
   @ManyToMany(() => LinkMarker)
   @JoinTable({
-    name: 'card_linkMarker',
+    name: 'card_link_marker',
     joinColumn: {
       name: 'card_id',
       referencedColumnName: 'id',

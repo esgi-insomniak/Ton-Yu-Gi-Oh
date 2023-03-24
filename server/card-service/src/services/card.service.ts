@@ -26,9 +26,20 @@ export class CardService {
   }
 
   async getCardById(id: string): Promise<Card> {
-    const typeRepository = this.dataSource.getRepository(Card);
-    const card = await typeRepository.findOneBy({ id });
-    console.log(card);
+    const cardRepository = this.dataSource.getRepository(Card);
+    const card = await cardRepository.findOne({
+      where: { id },
+      relations: [
+        'type',
+        'frameType',
+        'race',
+        'archetype',
+        'attribute',
+        'price',
+        'cardSets',
+        'linkMarkers',
+      ],
+    });
     return card;
   }
 }
