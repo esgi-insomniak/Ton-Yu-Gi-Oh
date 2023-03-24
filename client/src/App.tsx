@@ -1,11 +1,14 @@
 import { GameCardProvider } from './helpers/context/GameCardContext'
-import Home from "./pages/Home";
+import Router from './Routes/Router';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
       <GameCardProvider>
-        <Home />
+        <BrowserRouter>
+          <Router />
+        </BrowserRouter>
       </GameCardProvider>
     </div>
   )
