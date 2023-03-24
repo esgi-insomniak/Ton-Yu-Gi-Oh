@@ -1,0 +1,108 @@
+version: "3.4"
+services:
+    gateway:
+      build:
+        context: ./server/gateway
+        dockerfile: Dockerfile
+        target: dev
+      hostname: gateway
+      command: >
+        sh -c "yarn install &&
+        yarn start:dev"
+      env_file:
+        - .env.dev
+      depends_on:
+        - card-service-node
+        - user-service-node
+      volumes:
+        - ./server/gateway:/usr/src/app
+      ports:
+        - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+      networks:
+        - backend-dev
+        - frontend-dev
+    card-service-node:
+      build:
+        context: ./server/card-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: card-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - card-service-postgres
+      volumes:
+        - ./server/card-service:/usr/src/app
+      links:
+        - card-service-postgres
+    card-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: card-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${CARD_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${CARD_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
+      volumes:
+        - card-service-postgres-dev:/var/lib/postgresql/data
+    user-service-node:
+      build:
+        context: ./server/user-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: user-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - user-service-postgres
+      volumes:
+        - ./server/user-service:/usr/src/app
+      links:
+        - user-service-postgres
+    user-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${USER_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-service-postgres-dev:/var/lib/postgresql/data
+
+    adminer:
+      image: adminer:4.8.1
+      hostname: adminer
+      networks:
+        - backend-dev
+      ports:
+        - 9000:8080
+
+networks:
+  backend-dev:
+    driver: bridge
+  frontend-dev:
+    external:
+      name: infrastructure
+
+volumes:
+    card-service-postgres-dev:
+    user-service-postgres-dev:
