@@ -4,10 +4,11 @@ import { ClientProxyFactory } from '@nestjs/microservices';
 import { CardController } from '../controllers/cards.controller';
 import { UserController } from '../controllers/users.controller';
 import { ConfigService } from '../services/config/config.service';
+import { PaymentController } from '../controllers/payment.controller';
 
 @Module({
   imports: [],
-  controllers: [CardController, UserController],
+  controllers: [CardController, UserController, PaymentController],
   providers: [
     ConfigService,
     {
@@ -23,6 +24,14 @@ import { ConfigService } from '../services/config/config.service';
       useFactory: (configService: ConfigService) => {
         const userServiceOptions = configService.get('userService');
         return ClientProxyFactory.create(userServiceOptions);
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: 'PAYMENT_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const paymentServiceOptions = configService.get('paymentService');
+        return ClientProxyFactory.create(paymentServiceOptions);
       },
       inject: [ConfigService],
     },

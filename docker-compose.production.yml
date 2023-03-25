@@ -83,6 +83,38 @@ services:
         - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
       volumes:
         - user-service-postgres-prod:/var/lib/postgresql/data
+    payment-service-node:
+      build:
+        context: ./server/payment-service
+        dockerfile: Dockerfile
+        target: prod
+      hostname: payment-service-node
+      command: >
+        sh -c "yarn typeorm:migrate &&
+        node dist/main.js"
+      networks:
+        - backend-prod
+      env_file:
+        - .env
+      depends_on:
+        - payment-service-postgres
+      volumes:
+        - ./server/payment-service:/usr/src/app
+      links:
+        - payment-service-postgres
+    payment-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: payment-service-postgres
+      networks:
+        - backend-prod
+      env_file:
+        - .env
+      environment:
+        - POSTGRES_USER=${PAYMENT_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${PAYMENT_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
+      volumes:
+        - payment-service-postgres-prod:/var/lib/postgresql/data
 networks:
   backend-prod:
     driver: bridge
@@ -93,3 +125,4 @@ networks:
 volumes:
     card-service-postgres-prod:
     user-service-postgres-prod:
+    payment-service-postgres-prod:
