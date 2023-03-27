@@ -1,26 +1,18 @@
-const BASE_URL = process.env.VITE_BASE_API_URL || null
+import { BASE_URL } from "../utils/constants"
+import { ZodSchema } from "zod"
+import { ApiRequestOptions } from "../types/api"
 
-interface RequestConfig {
-    url: string
-    method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
-    token?: string
-    payload?: any
-    params?: any
-}
+export const apiRequest = async <Body extends object, Schema extends ZodSchema>(apiRequestOptions: ApiRequestOptions<Body>, schema: Schema) => {
+    const { url, body, ...apiRequestRemainingOptions } = apiRequestOptions
+    const searchURL = new URL(url, BASE_URL).toString()
 
-export const apiRequest = ({ url, method, token, payload, params }: RequestConfig) => {
-    const searchUrl = new URL(`${BASE_URL}${url}`);
-    if (params) {
-        searchUrl.search = new URLSearchParams(params).toString();
+    const fetchOptions = {
+        ...apiRequestRemainingOptions,
+        body: JSON.stringify(body)
     }
-    return fetch(searchUrl, {
-        method,
-        headers: token ? {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        } : {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload),
-    })
+
+    const response = await fetch(searchURL, fetchOptions)
+    const json = await response.json()
+
+    return schema.parse(json)
 }

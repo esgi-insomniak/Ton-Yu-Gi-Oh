@@ -2,6 +2,7 @@ import React from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { UserType } from '../../../types/users'
 import { apiRequest } from '../../index'
+import { responseLoginSchema, responseLoginSchemaType } from '../../../utils/schema/Auth'
 
 const QUERY_URLS = {
     login: '/auth/login',
@@ -10,68 +11,27 @@ const QUERY_URLS = {
 } as const
 
 const authKeys = {
-    login: (username: string, password: string) => ['auth', 'login', username, password],
-    logout: () => ['auth', 'logout'],
-    register: () => ['auth', 'register'],
+    all: ['auth'],
+    login: (username: string, password: string) => [...authKeys.all, username, password],
+    logout: () => [...authKeys.all, 'logout'],
+    register: () => [...authKeys.all, 'register'],
 } as const
 
-export const useLogin = () => {
+const requestLogin = (username: string, password: string) => apiRequest({
+    url: QUERY_URLS.login,
+    method: 'POST',
+    body: { username, password },
+}, responseLoginSchema)
 
-    const queryClient = useQueryClient()
 
-    const { data, error } = useMutation({
-        mutationFn: ({ username, password }: { username: string, password: string }) => apiRequest({
-            url: QUERY_URLS.login,
-            method: 'POST',
-            payload: { username, password },
-        }),
-        onSuccess: (data: Response) => {
-            queryClient.setQueryData(authKeys.login("test", "tres"), Promise.resolve(data))
-        }
-    })
-
-    const value = React.useMemo(() => {
-        return { data, error }
-    }, [data, error])
-
-    return { value }
-
-}
+export const useLogin = () =>
+    useMutation<responseLoginSchemaType, Error, { username: string, password: string }>
+        ((credentials) => requestLogin(credentials.username, credentials.password))
 
 export const useLogout = () => {
     const queryClient = useQueryClient()
-    const { data, error } = useMutation(() => apiRequest({
-        url: QUERY_URLS.logout,
-        method: 'POST',
-    }), {
-        onSuccess: () => {
-            queryClient.invalidateQueries(authKeys.logout())
-        }
-    })
-
-    const value = React.useMemo(() => {
-        return { data, error }
-    }, [data, error])
-
-    return value
 }
 
 export const useRegister = (newUser: UserType) => {
     const queryClient = useQueryClient()
-    const { data, error } = useMutation(() => apiRequest({
-        url: QUERY_URLS.register,
-        method: 'POST',
-        payload: newUser,
-    }), {
-        onSuccess: (data) => {
-            queryClient.setQueryData(authKeys.register(), data)
-        }
-    })
-
-    const value = React.useMemo(() => {
-        return { data, error }
-    }, [data, error])
-
-    return value
 }
-

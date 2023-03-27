@@ -12,3 +12,5 @@ export interface UserType {
     updatedAt: string;
     username: string;
 }
+
+export type UserContextType = Omit<UserType, 'createdAt' | 'updatedAt' | 'firstName' | 'lastName'> 
