@@ -35,6 +35,14 @@ import { PaymentController } from '../controllers/payment.controller';
       },
       inject: [ConfigService],
     },
+    {
+      provide: 'AUTH_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const authServiceOptions = configService.get('authService');
+        return ClientProxyFactory.create(authServiceOptions);
+      },
+      inject: [ConfigService],
+    },
   ],
 })
 export class AppModule {}

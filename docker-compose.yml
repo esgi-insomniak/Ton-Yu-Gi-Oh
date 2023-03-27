@@ -15,7 +15,7 @@ services:
         - card-service-node
         - user-service-node
       volumes:
-        - ./server/gateway:/usr/src/app
+        - ./server/gateway:/usr/src/app:cached
       ports:
         - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
       networks:
@@ -38,7 +38,7 @@ services:
       depends_on:
         - card-service-postgres
       volumes:
-        - ./server/card-service:/usr/src/app
+        - ./server/card-service:/usr/src/app:cached
       links:
         - card-service-postgres
     card-service-postgres:
@@ -71,7 +71,7 @@ services:
       depends_on:
         - user-service-postgres
       volumes:
-        - ./server/user-service:/usr/src/app
+        - ./server/user-service:/usr/src/app:cached
       links:
         - user-service-postgres
     user-service-postgres:
@@ -104,7 +104,7 @@ services:
       depends_on:
         - payment-service-postgres
       volumes:
-        - ./server/payment-service:/usr/src/app
+        - ./server/payment-service:/usr/src/app:cached
       links:
         - payment-service-postgres
     payment-service-postgres:
@@ -120,7 +120,39 @@ services:
         - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
       volumes:
         - payment-service-postgres-dev:/var/lib/postgresql/data
-
+    auth-service-node:
+      build:
+        context: ./server/auth-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: auth-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - auth-service-postgres
+      volumes:
+        - ./server/auth-service:/usr/src/app:cached
+      links:
+        - auth-service-postgres
+    auth-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: auth-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${AUTH_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${AUTH_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
+      volumes:
+        - auth-service-postgres-dev:/var/lib/postgresql/data
     adminer:
       image: adminer:4.8.1
       hostname: adminer
@@ -128,15 +160,14 @@ services:
         - backend-dev
       ports:
         - 9000:8080
-
 networks:
   backend-dev:
     driver: bridge
   frontend-dev:
     external:
       name: infrastructure
-
 volumes:
     card-service-postgres-dev:
     user-service-postgres-dev:
     payment-service-postgres-dev:
+    auth-service-postgres-dev:
