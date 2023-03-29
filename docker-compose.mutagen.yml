@@ -15,7 +15,7 @@ services:
         - card-service-node
         - user-service-node
       volumes:
-        - ./server/gateway:/usr/src/app
+        - gateway-dev:/usr/src/app
       ports:
         - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
       networks:
@@ -38,7 +38,7 @@ services:
       depends_on:
         - card-service-postgres
       volumes:
-        - ./server/card-service:/usr/src/app
+        - card-service-node-dev:/usr/src/app
       links:
         - card-service-postgres
     card-service-postgres:
@@ -71,7 +71,7 @@ services:
       depends_on:
         - user-service-postgres
       volumes:
-        - ./server/user-service:/usr/src/app
+        - user-service-node-dev:/usr/src/app
       links:
         - user-service-postgres
     user-service-postgres:
@@ -104,7 +104,7 @@ services:
       depends_on:
         - payment-service-postgres
       volumes:
-        - ./server/payment-service:/usr/src/app
+        - payment-service-node-dev:/usr/src/app
       links:
         - payment-service-postgres
     payment-service-postgres:
@@ -137,7 +137,7 @@ services:
       depends_on:
         - auth-service-postgres
       volumes:
-        - ./server/auth-service:/usr/src/app
+        - auth-service-node-dev:/usr/src/app
       links:
         - auth-service-postgres
     auth-service-postgres:
@@ -160,14 +160,117 @@ services:
         - backend-dev
       ports:
         - 9000:8080
+
 networks:
   backend-dev:
     driver: bridge
   frontend-dev:
     external:
       name: infrastructure
+
 volumes:
     card-service-postgres-dev:
     user-service-postgres-dev:
     payment-service-postgres-dev:
     auth-service-postgres-dev:
+    gateway-dev:
+    card-service-node-dev:
+    user-service-node-dev:
+    payment-service-node-dev:
+    auth-service-node-dev:
+
+x-mutagen:
+  sync:
+    defaults:
+      scanMode: accelerated
+      ignore:
+        vcs: true
+        paths:
+          - .DS_Store
+          - .history
+          - .idea
+    gateway:
+      alpha: ./server/gateway
+      beta: volume://gateway-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    gateway-replica:
+      alpha: volume://gateway-dev
+      beta: ./server/gateway
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    card-service:
+      alpha: ./server/card-service
+      beta: volume://card-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    card-service-replica:
+      alpha: volume://card-service-node-dev
+      beta: ./server/card-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    user-service:
+      alpha: ./server/user-service
+      beta: volume://user-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    user-service-replica:
+      alpha: volume://user-service-node-dev
+      beta: ./server/user-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    payment-service:
+      alpha: ./server/payment-service
+      beta: volume://payment-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    payment-service-replica:
+      alpha: volume://payment-service-node-dev
+      beta: ./server/payment-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    auth-service:
+      alpha: ./server/auth-service
+      beta: volume://auth-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    auth-service-replica:
+      alpha: volume://auth-service-node-dev
+      beta: ./server/auth-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"

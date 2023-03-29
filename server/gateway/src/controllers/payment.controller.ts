@@ -1,16 +1,19 @@
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { GetPaymentHistoriesResponseDto } from 'src/interfaces/payment-service/paymentHistory/payment-history-response.dto';
 import { GetPaymentHistoriesQueryDto } from 'src/interfaces/payment-service/paymentHistory/payment-history-query.dto';
 import { IPaymentHistoryGetResponse } from 'src/interfaces/payment-service/paymentHistory/payment-history-response.interface';
+import { HttpStatus } from '@nestjs/common/enums';
+import { HttpException } from '@nestjs/common/exceptions';
 
 @Controller('payment')
 @ApiTags('payment')
 export class PaymentController {
   constructor(
-    @Inject('PAYMENT_SERVICE') private readonly paymentServiceClient: ClientProxy,
+    @Inject('PAYMENT_SERVICE')
+    private readonly paymentServiceClient: ClientProxy,
   ) {}
 
   @Get()
@@ -27,11 +30,14 @@ export class PaymentController {
       }),
     );
 
-    return {
-      data: {
-        payments: paymentResponse.payments,
-      },
-      errors: null,
+    if (paymentResponse.status !== HttpStatus.OK) {
+      throw new HttpException(paymentResponse.message, paymentResponse.status);
+    }
+
+    const result: GetPaymentHistoriesResponseDto = {
+      data: paymentResponse.payments,
     };
+
+    return result;
   }
 }

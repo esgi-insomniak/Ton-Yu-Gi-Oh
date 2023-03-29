@@ -4,6 +4,8 @@ export class ConfigService {
   constructor() {
     this.envConfig = {
       port: process.env.AUTH_SERVICE_PORT,
+      jwtSecret: process.env.AUTH_SERVICE_JWT_SECRET,
+      jwtExpiration: process.env.AUTH_SERVICE_JWT_EXPIRATION,
       dbHost: process.env.AUTH_SERVICE_POSTGRES_HOST,
       dbPort: process.env.AUTH_SERVICE_POSTGRES_PORT,
       dbUser: process.env.AUTH_SERVICE_POSTGRES_USER,

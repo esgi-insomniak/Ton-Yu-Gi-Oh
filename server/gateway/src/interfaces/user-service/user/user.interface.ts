@@ -4,11 +4,11 @@ import { IUserSet } from '../userSet/user-set.interface';
 
 export interface IUser extends Document {
   id: string;
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   phone: string;
   coins: number;
+  roles: string[];
   sets: IUserSet[];
   cardSets: IUserCardSet[];
   decks: IUserDeck[];

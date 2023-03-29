@@ -4,7 +4,7 @@ import { IUser } from './user.interface';
 export class GetUsersResponseDto {
   @ApiProperty({
     example: {
-      users: [
+      data: [
         {
           id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
           firstName: 'John',
@@ -37,23 +37,19 @@ export class GetUsersResponseDto {
       ],
     },
   })
-  data: {
-    users: IUser[];
-  };
-  @ApiProperty({ example: null, nullable: true })
-  errors: { [key: string]: any };
+  data: IUser[];
 }
 
 export class GetUserByIdResponseDto {
   @ApiProperty({
     example: {
-      user: {
+      data: {
         id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-        firstName: 'John',
-        lastName: 'Doe',
+        username: 'johndoe',
         email: 'john.doe@test.fr',
         phone: '0123456789',
         coins: 10,
+        roles: ['user'],
         sets: [
           {
             id: 'feba4a4a-8247-4159-be98-b6047e0698f1',
@@ -78,9 +74,31 @@ export class GetUserByIdResponseDto {
       },
     },
   })
-  data: {
-    user: IUser;
-  };
-  @ApiProperty({ example: null, nullable: true })
-  errors: { [key: string]: any };
+  data: IUser;
+}
+
+export class CreateUserResponseDto {
+  @ApiProperty({
+    example: {
+      data: {
+        id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
+        username: 'johndoe',
+        email: 'john.doe@test.fr',
+        phone: '0123456789',
+        coins: 0,
+        roles: ['user'],
+      },
+    },
+  })
+  data: IUser;
+}
+
+export class LoginUserResponseDto {
+  @ApiProperty({
+    example: {
+      token:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+    },
+  })
+  token: string;
 }
