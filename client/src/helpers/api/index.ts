@@ -1,17 +1,20 @@
-import { BASE_URL } from "../utils/constants"
+import { BASE_URL } from "@/helpers/utils/constants"
 import { ZodSchema } from "zod"
-import { ApiRequestOptions } from "../types/api"
+import { ApiRequestOptions } from "@/helpers/types/api"
 
 export const apiRequest = async <Body extends object, Schema extends ZodSchema>(apiRequestOptions: ApiRequestOptions<Body>, schema: Schema) => {
-    const { url, body, ...apiRequestRemainingOptions } = apiRequestOptions
-    const searchURL = new URL(url, BASE_URL).toString()
+    const { url, body, token, ...apiRequestRemainingOptions } = apiRequestOptions
 
     const fetchOptions = {
         ...apiRequestRemainingOptions,
-        body: JSON.stringify(body)
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` })
+        },
+        ...(body && { body: JSON.stringify(body) })
     }
 
-    const response = await fetch(searchURL, fetchOptions)
+    const response = await fetch(`${BASE_URL}${url}`, fetchOptions)
     const json = await response.json()
 
     return schema.parse(json)

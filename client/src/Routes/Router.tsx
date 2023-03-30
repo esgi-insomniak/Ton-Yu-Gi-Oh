@@ -19,10 +19,10 @@ const ProtectedRoute = ({ redirect, condition, children }: ProtectedRouteProps) 
  */
 const Router: React.FC = () => {
 
-    const HomePage = React.lazy(() => import('../pages/Home'));
-    const DisplayCards = React.lazy(() => import('../pages/DisplayCards'));
-    const ErrorPage = React.lazy(() => import('../pages/Errors/ErrorPage'));
-    const LoginPage = React.lazy(() => import('../pages/Auth/Login'));
+    const HomePage = React.lazy(() => import('@/pages/Home'));
+    const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
+    const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
+    const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
 
     const { user, isLoggedIn } = useAuth()
 

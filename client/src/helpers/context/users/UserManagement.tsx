@@ -1,6 +1,6 @@
 // create a context for user management
 import React from 'react';
-import { UserContextType } from '../../types/users';
+import { UserContextType } from '@/helpers/types/users';
 
 export const initialUserContext = {
     token: "",

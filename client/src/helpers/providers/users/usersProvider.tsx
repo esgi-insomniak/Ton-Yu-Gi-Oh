@@ -1,7 +1,7 @@
 import React from "react";
-import { UserContext } from "../../context/users/UserManagement";
-import { UserContextType, UserManagementContextProps } from "../../types/users";
-import { ROLES } from "../../utils/enum/roles";
+import { UserContext } from "@/helpers/context/users/UserManagement";
+import { UserContextType, UserManagementContextProps } from "@/helpers/types/users";
+import { ROLES } from "@/helpers/utils/enum/roles";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
 

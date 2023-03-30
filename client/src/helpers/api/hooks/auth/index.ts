@@ -1,8 +1,8 @@
 import React from 'react'
-import { useMutation, useQueryClient } from 'react-query'
-import { UserType } from '../../../types/users'
-import { apiRequest } from '../../index'
-import { responseLoginSchema, responseLoginSchemaType } from '../../../utils/schema/Auth'
+import { useMutation, useQueryClient, useQuery } from 'react-query'
+import { UserType } from '@/helpers/types/users'
+import { apiRequest } from '@/helpers/api'
+import { responseLoginSchema, responseLoginSchemaType } from '@/helpers/utils/schema/Auth'
 
 const QUERY_URLS = {
     login: '/auth/login',
@@ -12,7 +12,6 @@ const QUERY_URLS = {
 
 const authKeys = {
     all: ['auth'],
-    login: (username: string, password: string) => [...authKeys.all, username, password],
     logout: () => [...authKeys.all, 'logout'],
     register: () => [...authKeys.all, 'register'],
 } as const
@@ -21,6 +20,7 @@ const requestLogin = (username: string, password: string) => apiRequest({
     url: QUERY_URLS.login,
     method: 'POST',
     body: { username, password },
+    token: undefined,
 }, responseLoginSchema)
 
 
