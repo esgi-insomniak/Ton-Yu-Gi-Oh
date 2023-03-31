@@ -1,11 +1,11 @@
 // create a context for user management
 import React from 'react';
-import { UserContextType } from '@/helpers/types/users';
 
 export const initialUserContext = {
     token: "",
     isLoggedIn: false,
-    handleUpdateUser: (token: string) => { },
+    login: (token: string) => { },
+    logout: () => { },
     user: {
         id: "",
         email: "",
@@ -14,6 +14,6 @@ export const initialUserContext = {
     }
 }
 
-export const UserContext = React.createContext<typeof initialUserContext>(initialUserContext);
+export const UserContext = React.createContext(initialUserContext);
 
 export const UserContextConsumer = UserContext.Consumer;

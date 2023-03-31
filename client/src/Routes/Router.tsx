@@ -14,16 +14,15 @@ const ProtectedRoute = ({ redirect, condition, children }: ProtectedRouteProps) 
     else return <Navigate to={redirect} />;
 };
 
+const HomePage = React.lazy(() => import('@/pages/Home'));
+const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
+const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
+const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
+
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
  */
 const Router: React.FC = () => {
-
-    const HomePage = React.lazy(() => import('@/pages/Home'));
-    const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
-    const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
-    const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
-
     const { user, isLoggedIn } = useAuth()
 
     return (

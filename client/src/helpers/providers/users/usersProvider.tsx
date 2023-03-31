@@ -1,23 +1,29 @@
 import React from "react";
 import { UserContext } from "@/helpers/context/users/UserManagement";
-import { DecodedTokenType, UserContextType, UserManagementContextProps, UserType } from "@/helpers/types/users";
+import { DecodedTokenType, UserContextType, UserManagementContextProps } from "@/helpers/types/users";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import jwt_decode from "jwt-decode"
+import { useCookies } from "react-cookie";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
-
-    const [token, setToken] = React.useState<string>("");
-    const [isLoggedIn, setIsLoggedIn] = React.useState<boolean>(false);
-    const [user, setUser] = React.useState<UserContextType>({
-        id: "",
-        email: "",
-        roles: [ROLES.USER],
-        username: "",
-    });
+    const [cookies, setCookies, removeCookies] = useCookies(["token"]);
+    const token = cookies.token || "";
+    const defaultUser = React.useMemo(() => {
+        if (token) {
+            const decodedToken = jwt_decode<DecodedTokenType>(token);
+            return {
+                id: decodedToken.userId,
+                email: decodedToken.email,
+                roles: decodedToken.roles,
+                username: decodedToken.username,
+            }
+        }
+        return { id: "", email: "", roles: [ROLES.USER], username: "" }
+    }, [token])
+    const [user, setUser] = React.useState<UserContextType>(defaultUser);
 
     const handleUpdateUser = React.useCallback((token: string) => {
-        setToken(token);
-        setIsLoggedIn(true);
+        setCookies("token", token, { path: "/" });
         const decodedToken = jwt_decode<DecodedTokenType>(token);
         setUser({
             id: decodedToken.userId,
@@ -25,14 +31,17 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
             roles: decodedToken.roles,
             username: decodedToken.username,
         })
-    }, [setIsLoggedIn, setToken, setUser])
+    }, [setUser])
+
+    const logout = React.useCallback(() => { }, [])
 
     const value = React.useMemo(() => ({
         token,
-        isLoggedIn,
+        isLoggedIn: user.id !== "",
         user,
-        handleUpdateUser
-    }), [token, isLoggedIn, user, handleUpdateUser])
+        login: handleUpdateUser,
+        logout
+    }), [token, user, handleUpdateUser])
 
     return (
         <UserContext.Provider value={value}>

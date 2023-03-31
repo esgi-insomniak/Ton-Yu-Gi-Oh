@@ -2,8 +2,8 @@ import { useAuth } from "@/helpers/api/hooks";
 import React from "react";
 
 const Home = () => {
-    const { user } = useAuth()
-    console.log(user)
+    const { user, isLoggedIn } = useAuth()
+    //console.log(user, isLoggedIn)
     return (
         <div className="hero min-h-screen bg-base-200">
             <div className="hero-content flex-col lg:flex-row">

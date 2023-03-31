@@ -15,7 +15,7 @@ export interface UserType {
 
 export type UserContextType = Omit<UserType, 'createdAt' | 'updatedAt' | 'firstName' | 'lastName'>
 
-export type DecodedTokenType = Omit<UserType, 'createdAt' | 'updatedAt' | 'firstName' | 'lastName' | 'id'> & {
+export type DecodedTokenType = Omit<UserContextType, 'id'> & {
     userId: string
     iat: number
     exp: number

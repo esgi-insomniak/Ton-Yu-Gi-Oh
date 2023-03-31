@@ -19,28 +19,26 @@ import {
 } from "reactjs-social-login"
 import { useNavigate } from "react-router-dom";
 
-
 const Login = () => {
-    const { handleUpdateUser } = useAuth();
+    const { login } = useAuth();
     const loginQuery = useLogin();
+    const router = useNavigate()
+
+    const [error, setError] = React.useState<string>("");
     const { register, handleSubmit, formState: {
         errors, isSubmitting
     } } = useForm<{ username: string, password: string }>({
         resolver: zodResolver<typeof loginSchema>(loginSchema)
     });
-    const [error, setError] = React.useState<string>("");
-    const router = useNavigate()
 
     const onSubmit = (data: { username: string, password: string }) => {
         const { username, password } = data;
         loginQuery.mutate({ username, password }, {
             onSuccess: (data) => {
-                handleUpdateUser(data.token);
+                login(data.token);
                 router('/');
             },
-            onError: (error) => {
-                setError(error.message);
-            }
+            onError: (error) => setError(error.message)
         });
     }
 
@@ -63,7 +61,7 @@ const Login = () => {
                         disabled={isSubmitting}
                     />
                     {errors.password && <p>{errors.password.message}</p>}
-                    <button type="submit" className="t-btn">Login</button>
+                    <button type="submit" className="t-btn">Se connecter</button>
                     {error && <p>{error}</p>}
                     <p>Don't have an account? <a href="/register" className="text-blue-500">Register</a></p>
                 </div>
