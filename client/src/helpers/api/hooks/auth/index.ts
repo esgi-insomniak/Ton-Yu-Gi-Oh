@@ -5,9 +5,9 @@ import { apiRequest } from '@/helpers/api'
 import { responseLoginSchema, responseLoginSchemaType } from '@/helpers/utils/schema/Auth'
 
 const QUERY_URLS = {
-    login: '/auth/login',
-    logout: '/auth/logout',
-    register: '/auth/register',
+    login: '/users/login',
+    logout: '/users/logout',
+    register: '/users',
 } as const
 
 const authKeys = {
@@ -20,7 +20,6 @@ const requestLogin = (username: string, password: string) => apiRequest({
     url: QUERY_URLS.login,
     method: 'POST',
     body: { username, password },
-    token: undefined,
 }, responseLoginSchema)
 
 

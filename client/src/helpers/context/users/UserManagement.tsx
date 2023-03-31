@@ -5,11 +5,11 @@ import { UserContextType } from '@/helpers/types/users';
 export const initialUserContext = {
     token: "",
     isLoggedIn: false,
-    setUser: (user: UserContextType, token: string) => { },
+    handleUpdateUser: (token: string) => { },
     user: {
         id: "",
         email: "",
-        role: "",
+        roles: [""],
         username: "",
     }
 }

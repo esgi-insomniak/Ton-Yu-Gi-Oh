@@ -1,9 +1,10 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { loginSchema, responseLoginSchema } from "@/helpers/utils/schema/Auth";
+import { loginSchema } from "@/helpers/utils/schema/Auth";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useAuth } from "@/helpers/api/hooks";
 import { useLogin } from "@/helpers/api/hooks/auth";
+import { FACEBOOK_APP_ID } from "@/helpers/utils/constants";
 import {
     FacebookLoginButton,
     GoogleLoginButton,
@@ -16,8 +17,11 @@ import {
     LoginSocialGithub,
     LoginSocialApple,
 } from "reactjs-social-login"
+import { useNavigate } from "react-router-dom";
+
+
 const Login = () => {
-    const { setUser } = useAuth();
+    const { handleUpdateUser } = useAuth();
     const loginQuery = useLogin();
     const { register, handleSubmit, formState: {
         errors, isSubmitting
@@ -25,17 +29,14 @@ const Login = () => {
         resolver: zodResolver<typeof loginSchema>(loginSchema)
     });
     const [error, setError] = React.useState<string>("");
+    const router = useNavigate()
 
     const onSubmit = (data: { username: string, password: string }) => {
         const { username, password } = data;
         loginQuery.mutate({ username, password }, {
             onSuccess: (data) => {
-                setUser({
-                    id: data.id,
-                    email: data.email,
-                    role: data.role,
-                    username: data.username,
-                }, data.token);
+                handleUpdateUser(data.token);
+                router('/');
             },
             onError: (error) => {
                 setError(error.message);
@@ -48,10 +49,10 @@ const Login = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="flex w-2/3 h-2/4 p-5 rounded-md bg-black/60 justify-start">
                 <div className="space-y-5 w-1/2">
                     <input
-                        {...register("username")}
                         placeholder="Username"
                         className="t-input"
                         disabled={isSubmitting}
+                        {...register("username")}
                     />
                     {errors.username && <p>{errors.username.message}</p>}
                     <input
@@ -69,7 +70,7 @@ const Login = () => {
                 <div className="divider divider-horizontal" />
                 <div className="flex justify-start items-center w-1/2 flex-col space-y-4">
                     <LoginSocialFacebook
-                        appId={""}
+                        appId={FACEBOOK_APP_ID}
                         fieldsProfile={"id,firstName,lastName,email,picture"}
                         onLoginStart={() => alert('start')}
                         onReject={() => alert('rejected')}

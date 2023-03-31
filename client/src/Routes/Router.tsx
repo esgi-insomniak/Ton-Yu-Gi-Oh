@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
-import { useAuth } from "../helpers/api/hooks";
-import { GameCardProvider } from "../helpers/providers/cards/cardsProvider";
+import { useAuth } from "@/helpers/api/hooks";
+import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
 
 interface ProtectedRouteProps {
     redirect: string;
@@ -33,7 +33,7 @@ const Router: React.FC = () => {
                     element={
                         <ProtectedRoute
                             condition={isLoggedIn}
-                            redirect="/error"
+                            redirect="/login"
                         >
                             <Outlet />
                         </ProtectedRoute>
@@ -44,8 +44,8 @@ const Router: React.FC = () => {
                             <DisplayCards />
                         </GameCardProvider>
                     } />
+                    <Route path="/" element={<HomePage />} />
                 </Route>
-                <Route path="/" element={<HomePage />} />
                 <Route path="/error" element={<ErrorPage />} />
                 <Route path="/login" element={<LoginPage />} />
             </Routes>

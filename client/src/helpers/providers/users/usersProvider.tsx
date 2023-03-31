@@ -1,7 +1,8 @@
 import React from "react";
 import { UserContext } from "@/helpers/context/users/UserManagement";
-import { UserContextType, UserManagementContextProps } from "@/helpers/types/users";
+import { DecodedTokenType, UserContextType, UserManagementContextProps, UserType } from "@/helpers/types/users";
 import { ROLES } from "@/helpers/utils/enum/roles";
+import jwt_decode from "jwt-decode"
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
 
@@ -10,29 +11,28 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
     const [user, setUser] = React.useState<UserContextType>({
         id: "",
         email: "",
-        role: ROLES.ANONYMOUS,
+        roles: [ROLES.USER],
         username: "",
     });
 
-    const handleUpdateUser = React.useCallback((user: UserContextType, token: string) => {
-        setUser(user);
+    const handleUpdateUser = React.useCallback((token: string) => {
         setToken(token);
         setIsLoggedIn(true);
-    }, [setIsLoggedIn, setToken])
+        const decodedToken = jwt_decode<DecodedTokenType>(token);
+        setUser({
+            id: decodedToken.userId,
+            email: decodedToken.email,
+            roles: decodedToken.roles,
+            username: decodedToken.username,
+        })
+    }, [setIsLoggedIn, setToken, setUser])
 
     const value = React.useMemo(() => ({
         token,
         isLoggedIn,
         user,
-        setUser: handleUpdateUser
-    }),
-        [
-            token,
-            isLoggedIn,
-            user,
-            handleUpdateUser
-        ]
-    )
+        handleUpdateUser
+    }), [token, isLoggedIn, user, handleUpdateUser])
 
     return (
         <UserContext.Provider value={value}>
