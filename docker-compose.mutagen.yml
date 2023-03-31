@@ -1,0 +1,276 @@
+version: "3.4"
+services:
+    gateway:
+      build:
+        context: ./server/gateway
+        dockerfile: Dockerfile
+        target: dev
+      hostname: gateway
+      command: >
+        sh -c "yarn install &&
+        yarn start:dev"
+      env_file:
+        - .env.dev
+      depends_on:
+        - card-service-node
+        - user-service-node
+      volumes:
+        - gateway-dev:/usr/src/app
+      ports:
+        - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+      networks:
+        - backend-dev
+        - frontend-dev
+    card-service-node:
+      build:
+        context: ./server/card-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: card-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - card-service-postgres
+      volumes:
+        - card-service-node-dev:/usr/src/app
+      links:
+        - card-service-postgres
+    card-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: card-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${CARD_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${CARD_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
+      volumes:
+        - card-service-postgres-dev:/var/lib/postgresql/data
+    user-service-node:
+      build:
+        context: ./server/user-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: user-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - user-service-postgres
+      volumes:
+        - user-service-node-dev:/usr/src/app
+      links:
+        - user-service-postgres
+    user-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${USER_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-service-postgres-dev:/var/lib/postgresql/data
+    payment-service-node:
+      build:
+        context: ./server/payment-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: payment-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - payment-service-postgres
+      volumes:
+        - payment-service-node-dev:/usr/src/app
+      links:
+        - payment-service-postgres
+    payment-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: payment-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${PAYMENT_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${PAYMENT_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
+      volumes:
+        - payment-service-postgres-dev:/var/lib/postgresql/data
+    auth-service-node:
+      build:
+        context: ./server/auth-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: auth-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - auth-service-postgres
+      volumes:
+        - auth-service-node-dev:/usr/src/app
+      links:
+        - auth-service-postgres
+    auth-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: auth-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${AUTH_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${AUTH_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
+      volumes:
+        - auth-service-postgres-dev:/var/lib/postgresql/data
+    adminer:
+      image: adminer:4.8.1
+      hostname: adminer
+      networks:
+        - backend-dev
+      ports:
+        - 9000:8080
+
+networks:
+  backend-dev:
+    driver: bridge
+  frontend-dev:
+    external:
+      name: infrastructure
+
+volumes:
+    card-service-postgres-dev:
+    user-service-postgres-dev:
+    payment-service-postgres-dev:
+    auth-service-postgres-dev:
+    gateway-dev:
+    card-service-node-dev:
+    user-service-node-dev:
+    payment-service-node-dev:
+    auth-service-node-dev:
+
+x-mutagen:
+  sync:
+    defaults:
+      scanMode: accelerated
+      ignore:
+        vcs: true
+        paths:
+          - .DS_Store
+          - .history
+          - .idea
+    gateway:
+      alpha: ./server/gateway
+      beta: volume://gateway-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    gateway-replica:
+      alpha: volume://gateway-dev
+      beta: ./server/gateway
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    card-service:
+      alpha: ./server/card-service
+      beta: volume://card-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    card-service-replica:
+      alpha: volume://card-service-node-dev
+      beta: ./server/card-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    user-service:
+      alpha: ./server/user-service
+      beta: volume://user-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    user-service-replica:
+      alpha: volume://user-service-node-dev
+      beta: ./server/user-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    payment-service:
+      alpha: ./server/payment-service
+      beta: volume://payment-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    payment-service-replica:
+      alpha: volume://payment-service-node-dev
+      beta: ./server/payment-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    auth-service:
+      alpha: ./server/auth-service
+      beta: volume://auth-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    auth-service-replica:
+      alpha: volume://auth-service-node-dev
+      beta: ./server/auth-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"

@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(private dataSource: DataSource) {}
+  private userRepository: Repository<User>;
+
+  constructor(dataSource: DataSource) {
+    this.userRepository = dataSource.getRepository(User);
+  }
 
   async getUsers(query: { limit: number; offset: number }): Promise<User[]> {
-    const userRepository = this.dataSource.getRepository(User);
-    const users = await userRepository.find({
+    const users = await this.userRepository.find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
       relations: ['sets', 'cardSets', 'decks'],
@@ -17,11 +20,41 @@ export class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const userRepository = this.dataSource.getRepository(User);
-    const user = await userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id },
       relations: ['sets', 'cardSets', 'decks'],
     });
     return user;
+  }
+
+  async getUserByCredentials(data: {
+    email?: string;
+    username?: string;
+    phone?: string;
+  }): Promise<User> {
+    if (!data.email && !data.username && !data.phone) {
+      return null;
+    }
+    const user = await this.userRepository.findOne({
+      where: [
+        data.email ? { email: data.email } : null,
+        data.username ? { username: data.username } : null,
+        data.phone ? { phone: data.phone } : null,
+      ],
+    });
+    return user;
+  }
+
+  async createUser(params: {
+    username: string;
+    email: string;
+    phone: string;
+  }): Promise<User> {
+    const user = this.userRepository.create({
+      username: params.username,
+      email: params.email,
+      phone: params.phone,
+    });
+    return this.userRepository.save(user);
   }
 }

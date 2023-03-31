@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import {
   ICardGetOneResponse,
@@ -16,10 +16,12 @@ export class CardController {
     offset: number;
   }): Promise<ICardGetResponse> {
     const cards = await this.cardService.getCards(query);
-
-    return {
+    const result: ICardGetResponse = {
+      status: HttpStatus.OK,
       cards: cards,
     };
+
+    return result;
   }
 
   @MessagePattern('get_card_by_id')
@@ -27,9 +29,12 @@ export class CardController {
     id: string;
   }): Promise<ICardGetOneResponse> {
     const card = await this.cardService.getCardById(params.id);
-
-    return {
+    const result: ICardGetOneResponse = {
+      status: card ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: card ? null : 'Card not found',
       card: card,
     };
+
+    return result;
   }
 }

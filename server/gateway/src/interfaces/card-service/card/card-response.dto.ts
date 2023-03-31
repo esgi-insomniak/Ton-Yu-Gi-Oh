@@ -4,7 +4,7 @@ import { ICard } from './card.interface';
 export class GetCardsResponseDto {
   @ApiProperty({
     example: {
-      cards: [
+      data: [
         {
           id: '52264803-0e95-4591-931c-5d8fde6d2f4f',
           identifiant: 37478723,
@@ -64,17 +64,13 @@ export class GetCardsResponseDto {
       ],
     },
   })
-  data: {
-    cards: ICard[];
-  };
-  @ApiProperty({ example: null, nullable: true })
-  errors: { [key: string]: any };
+  data: ICard[];
 }
 
 export class GetCardByIdResponseDto {
   @ApiProperty({
     example: {
-      card: {
+      data: {
         id: '52264803-0e95-4591-931c-5d8fde6d2f4f',
         identifiant: 37478723,
         name: '"Armes Nobles Inferno - Durendal"',
@@ -132,9 +128,5 @@ export class GetCardByIdResponseDto {
       },
     },
   })
-  data: {
-    card: ICard;
-  };
-  @ApiProperty({ example: null, nullable: true })
-  errors: { [key: string]: any };
+  data: ICard;
 }

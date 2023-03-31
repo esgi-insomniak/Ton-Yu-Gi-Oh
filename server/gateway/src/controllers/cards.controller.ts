@@ -1,4 +1,12 @@
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -34,12 +42,15 @@ export class CardController {
       }),
     );
 
-    return {
-      data: {
-        cards: cardResponse.cards,
-      },
-      errors: null,
+    if (cardResponse.status !== HttpStatus.OK) {
+      throw new HttpException(cardResponse.message, cardResponse.status);
+    }
+
+    const result: GetCardsResponseDto = {
+      data: cardResponse.cards,
     };
+
+    return result;
   }
 
   @Get(':id')
@@ -55,11 +66,18 @@ export class CardController {
       }),
     );
 
-    return {
-      data: {
-        card: cardResponse.card,
-      },
-      errors: null,
+    if (cardResponse.status !== HttpStatus.OK) {
+      throw new HttpException(cardResponse.message, cardResponse.status);
+    }
+
+    const result: GetCardByIdResponseDto = {
+      data: cardResponse.card,
     };
+
+    if (cardResponse.status !== HttpStatus.OK) {
+      throw new HttpException(result, cardResponse.status);
+    }
+
+    return result;
   }
 }
