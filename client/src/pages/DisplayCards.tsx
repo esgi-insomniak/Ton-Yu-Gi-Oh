@@ -1,10 +1,11 @@
 import React from "react"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
-import { CardAttribute, CardFrameType, GameCardType, CardRace, CardRarity, CardType } from "../components/GameCard/index.d"
 import GameCard from "../components/GameCard/GameCard"
 import cardsJson from '../assets/cards.json'
-import GameCardContext from "../helpers/context/GameCardContext"
+import GameCardContext from "../helpers/context/cards/GameCardContext"
 import { v4 as uuidv4 } from "uuid"
+import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "../helpers/utils/enum/card"
+import { GameCardType } from "../helpers/types/cards"
 
 const DisplayCards = () => {
     const { cards, setCards, sortCards } = React.useContext(GameCardContext)
@@ -16,17 +17,18 @@ const DisplayCards = () => {
             if (card.card_sets !== undefined)
                 return card;
         }).map((card) => {
+
             return {
                 uniqueId: uuidv4(),
                 id: card.id,
                 name: card.name,
                 name_en: card.name_en,
-                type: Object.values(CardType).find(type => type === card.type) as CardType,
-                frameType: Object.values(CardFrameType).find(frameType => frameType === card.frameType) as CardFrameType,
-                rarity: Object.values(CardRarity).find(rarity => rarity === card.card_sets[0].set_rarity) as CardRarity,
-                attribute: Object.values(CardAttribute).find(attribute => attribute === card.attribute) as CardAttribute,
+                type: Object.values(CardType).find(type => type === card.type),
+                frameType: Object.values(CardFrameType).find(frameType => frameType === card.frameType),
+                rarity: Object.values(CardRarity).find(rarity => rarity === card.card_sets[0].set_rarity),
+                attribute: Object.values(CardAttribute).find(attribute => attribute === card.attribute),
                 setCode: card.card_sets[0].set_code,
-                race: Object.values(CardRace).find(race => race === card.race) as CardRace,
+                race: Object.values(CardRace).find(race => race === card.race),
                 level: card.level,
                 atk: card.atk,
                 def: card.def,
@@ -38,34 +40,36 @@ const DisplayCards = () => {
                 isFocused: false,
                 canPop: true,
                 canFlip: true
-            } as GameCardType
+            } as unknown as GameCardType
         })
 
         setCards(filteredCards.slice(0, 10))
     }, [cards.length])
 
     return (
-        <DragDropContext onDragEnd={sortCards}>
-            <Droppable droppableId="drop_test">
-                {dropProvided => (
-                    <div {...dropProvided.droppableProps} ref={dropProvided.innerRef}>
-                        {cards.map((card, index) => (
-                            <div key={index}>
-                                <h2>{card.rarity.replace(/\W/g, '-').toLowerCase()}</h2>
-                                <Draggable key={card.id} draggableId={card.id.toString()} index={index} isDragDisabled={!card.isDraggable}>
-                                    {dragProvided => (
-                                        <div ref={dragProvided.innerRef} {...dragProvided.draggableProps}>
-                                            <GameCard {...card} dragProvided={dragProvided} />
-                                        </div>
-                                    )}
-                                </Draggable>
-                            </div>
-                        ))}
-                        {dropProvided.placeholder}
-                    </div>
-                )}
-            </Droppable>
-        </DragDropContext>
+        <div className="w-full flex justify-center items-center px-32">
+            <DragDropContext onDragEnd={sortCards}>
+                <Droppable droppableId="drop_test">
+                    {dropProvided => (
+                        <div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className="grid grid-cols-3 grid-flow-dense gap-5">
+                            {cards.map((card, index) => (
+                                <div key={index}>
+                                    <h2>{card.rarity.replace(/\W/g, '-').toLowerCase()}</h2>
+                                    <Draggable key={card.id} draggableId={card.id.toString()} index={index} isDragDisabled={!card.isDraggable}>
+                                        {dragProvided => (
+                                            <div ref={dragProvided.innerRef} {...dragProvided.draggableProps}>
+                                                <GameCard {...card} dragProvided={dragProvided} />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                </div>
+                            ))}
+                            {dropProvided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        </div>
     )
 }
 

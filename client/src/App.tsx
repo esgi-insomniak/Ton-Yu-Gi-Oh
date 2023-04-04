@@ -1,12 +1,19 @@
-import { GameCardProvider } from './helpers/context/GameCardContext'
-import Home from "./pages/Home";
+import Router from './Routes/Router';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { UserContextProvider } from '@/helpers/providers/users/usersProvider';
 
 function App() {
+  const queryClient = new QueryClient()
   return (
     <div className="App">
-      <GameCardProvider>
-        <Home />
-      </GameCardProvider>
+      <QueryClientProvider client={queryClient}>
+        <UserContextProvider>
+          <BrowserRouter>
+            <Router />
+          </BrowserRouter>
+        </UserContextProvider>
+      </QueryClientProvider>
     </div>
   )
 }
