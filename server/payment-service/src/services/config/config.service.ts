@@ -9,6 +9,7 @@ export class ConfigService {
       dbUser: process.env.PAYMENT_SERVICE_POSTGRES_USER,
       dbPassword: process.env.PAYMENT_SERVICE_POSTGRES_PASSWORD,
       dbDatabase: process.env.PAYMENT_SERVICE_POSTGRES_DB,
+      stripeSecretKey: process.env.PAYMENT_SERVICE_STRIPE_SECRET,
     };
     this.envConfig.baseUri = process.env.BASE_URI;
     this.envConfig.gatewayPort = process.env.API_GATEWAY_PORT;

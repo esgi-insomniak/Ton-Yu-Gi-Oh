@@ -6,7 +6,7 @@ services:
   node:
     image: node:19.0.0-alpine
     container_name: node_react_app
-    user: node
+    #user: node
     environment:
       - NODE_ENV=development
     command: sh -c "yarn install && yarn dev --host"

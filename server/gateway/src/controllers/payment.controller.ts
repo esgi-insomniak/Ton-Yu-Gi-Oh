@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Query, Post, Param } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
@@ -39,5 +39,11 @@ export class PaymentController {
     };
 
     return result;
+  }
+
+  @Post(':id')
+  public async createPayment(@Param("id") productId: string): Promise<any> {
+    const payment = await this.paymentServiceClient.send('create_payment', productId);
+    return payment;
   }
 }
