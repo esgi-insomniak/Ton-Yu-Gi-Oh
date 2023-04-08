@@ -3,53 +3,14 @@ import { IUser } from './user.interface';
 
 export class GetUsersResponseDto {
   @ApiProperty({
-    example: {
-      data: [
-        {
-          id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@test.fr',
-          phone: '0123456789',
-          coins: 10,
-          sets: [
-            {
-              id: 'feba4a4a-8247-4159-be98-b6047e0698f1',
-              setId: '45598ae5-db16-4518-8478-fc5832b0929b',
-            },
-          ],
-          cardSets: [
-            {
-              id: 'cf76007f-3541-4c92-8355-dd9d904b49e0',
-              cardSetId: 'd526c008-da60-4b81-9317-397efa120ea0',
-            },
-            {
-              id: 'f2ff7a7f-a1aa-4ca7-b3e4-bd5d1e996df9',
-              cardSetId: '7a031bf8-0e11-4339-aae0-167c7855a01a',
-            },
-          ],
-          decks: [
-            {
-              id: 'fa3a51e4-8a61-4a4a-b2a6-404405b02ebe',
-            },
-          ],
-        },
-      ],
-    },
-  })
-  data: IUser[];
-}
-
-export class GetUserByIdResponseDto {
-  @ApiProperty({
-    example: {
-      data: {
+    example: [
+      {
         id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-        username: 'johndoe',
+        firstName: 'John',
+        lastName: 'Doe',
         email: 'john.doe@test.fr',
         phone: '0123456789',
         coins: 10,
-        roles: ['user'],
         sets: [
           {
             id: 'feba4a4a-8247-4159-be98-b6047e0698f1',
@@ -72,6 +33,41 @@ export class GetUserByIdResponseDto {
           },
         ],
       },
+    ],
+  })
+  data: IUser[];
+}
+
+export class GetUserByIdResponseDto {
+  @ApiProperty({
+    example: {
+      id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
+      username: 'johndoe',
+      email: 'john.doe@test.fr',
+      phone: '0123456789',
+      coins: 10,
+      roles: ['user'],
+      sets: [
+        {
+          id: 'feba4a4a-8247-4159-be98-b6047e0698f1',
+          setId: '45598ae5-db16-4518-8478-fc5832b0929b',
+        },
+      ],
+      cardSets: [
+        {
+          id: 'cf76007f-3541-4c92-8355-dd9d904b49e0',
+          cardSetId: 'd526c008-da60-4b81-9317-397efa120ea0',
+        },
+        {
+          id: 'f2ff7a7f-a1aa-4ca7-b3e4-bd5d1e996df9',
+          cardSetId: '7a031bf8-0e11-4339-aae0-167c7855a01a',
+        },
+      ],
+      decks: [
+        {
+          id: 'fa3a51e4-8a61-4a4a-b2a6-404405b02ebe',
+        },
+      ],
     },
   })
   data: IUser;
@@ -80,14 +76,12 @@ export class GetUserByIdResponseDto {
 export class CreateUserResponseDto {
   @ApiProperty({
     example: {
-      data: {
-        id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-        username: 'johndoe',
-        email: 'john.doe@test.fr',
-        phone: '0123456789',
-        coins: 0,
-        roles: ['user'],
-      },
+      id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
+      username: 'johndoe',
+      email: 'john.doe@test.fr',
+      phone: '0123456789',
+      coins: 0,
+      roles: ['user'],
     },
   })
   data: IUser;
@@ -95,10 +89,8 @@ export class CreateUserResponseDto {
 
 export class LoginUserResponseDto {
   @ApiProperty({
-    example: {
-      token:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-    },
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
   })
   token: string;
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Inject, Query, Post, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Query,
+  Post,
+  Param,
+  Req,
+} from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
@@ -7,6 +15,10 @@ import { GetPaymentHistoriesQueryDto } from 'src/interfaces/payment-service/paym
 import { IPaymentHistoryGetResponse } from 'src/interfaces/payment-service/paymentHistory/payment-history-response.interface';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
+import { CreateCheckoutResponseDto } from 'src/interfaces/payment-service/checkout/checkout-response.dto';
+import { ICheckoutCreateResponse } from 'src/interfaces/payment-service/checkout/checkout-response.interface';
+import { Authorization } from 'src/decorators/authorization.decorator';
+import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 
 @Controller('payment')
 @ApiTags('payment')
@@ -41,9 +53,30 @@ export class PaymentController {
     return result;
   }
 
-  @Post(':id')
-  public async createPayment(@Param("id") productId: string): Promise<any> {
-    const payment = await this.paymentServiceClient.send('create_payment', productId);
-    return payment;
+  @Authorization(true)
+  @Post('checkout/:id')
+  @ApiCreatedResponse({
+    type: CreateCheckoutResponseDto,
+  })
+  public async createCheckout(
+    @Param('id') productId: string,
+    @Req() request: IAuthorizedRequest,
+  ): Promise<CreateCheckoutResponseDto> {
+    const paymentResponse: ICheckoutCreateResponse = await firstValueFrom(
+      this.paymentServiceClient.send('create_checkout', productId),
+    );
+
+    if (paymentResponse.status !== HttpStatus.CREATED) {
+      throw new HttpException(paymentResponse.message, paymentResponse.status);
+    }
+
+    // !! call the payment service, create checkout and add the user id !!
+    // get userId from request with request.user.id
+
+    const result: CreateCheckoutResponseDto = {
+      data: paymentResponse.session,
+    };
+
+    return result;
   }
 }

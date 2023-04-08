@@ -5,3 +5,13 @@ export interface IPaymentHistoryGetResponse {
   message?: string;
   payments: PaymentHistory[];
 }
+
+export interface ICheckoutCreateResponse {
+  status: number;
+  message?: string;
+  session: {
+    sessionId: string;
+    paymentStatus: string;
+    url: string;
+  };
+}
