@@ -33,7 +33,10 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
         })
     }, [setUser])
 
-    const logout = React.useCallback(() => { }, [])
+    const logout = React.useCallback(() => {
+        removeCookies("token", { path: "/" });
+        setUser({ id: "", email: "", roles: [ROLES.USER], username: "" })
+    }, [setUser])
 
     const value = React.useMemo(() => ({
         token,
