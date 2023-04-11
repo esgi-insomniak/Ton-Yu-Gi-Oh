@@ -23,7 +23,7 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
     const [user, setUser] = React.useState<UserContextType>(defaultUser);
 
     const handleUpdateUser = React.useCallback((token: string) => {
-        setCookies("token", token, { path: "/" });
+        setCookies("token", token, { path: "/", maxAge: 7200 });
         const decodedToken = jwt_decode<DecodedTokenType>(token);
         setUser({
             id: decodedToken.userId,
