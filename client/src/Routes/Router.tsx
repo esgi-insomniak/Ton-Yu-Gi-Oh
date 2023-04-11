@@ -18,6 +18,7 @@ const HomePage = React.lazy(() => import('@/pages/Home'));
 const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
 const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
 const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
+const LogoutPage = React.lazy(() => import('@/pages/Auth/Logout'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -47,6 +48,7 @@ const Router: React.FC = () => {
                 </Route>
                 <Route path="/error" element={<ErrorPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/logout" element={<LogoutPage />} />
             </Routes>
         </React.Suspense>
     );
