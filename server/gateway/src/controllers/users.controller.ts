@@ -44,7 +44,7 @@ export class UserController {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
     @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
-  ) {}
+  ) { }
 
   @Get()
   @Authorization(true)
@@ -121,6 +121,9 @@ export class UserController {
     const tokenResponse: ITokenCreateResponse = await firstValueFrom(
       this.authServiceClient.send('compare_user_password', {
         userId: userResponse.user.id,
+        username: userResponse.user.username,
+        email: userResponse.user.email,
+        roles: userResponse.user.roles,
         password: loginRequest.password,
       }),
     );

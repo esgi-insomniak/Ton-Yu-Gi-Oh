@@ -10,7 +10,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
-  ) {}
+  ) { }
 
   @MessagePattern('create_basic_auth')
   public async createBasicAuth(data: {
@@ -32,7 +32,7 @@ export class AuthController {
         status: HttpStatus.CREATED,
         auth: basicAuthResult,
       };
-    } catch (e) {}
+    } catch (e) { }
 
     return result;
   }
@@ -41,6 +41,9 @@ export class AuthController {
   public async compareUserPassword(data: {
     userId: string;
     password: string;
+    username: string;
+    roles: string[];
+    email: string;
   }): Promise<ITokenCreateResponse> {
     let result: ITokenCreateResponse = {
       status: HttpStatus.BAD_REQUEST,
@@ -55,15 +58,18 @@ export class AuthController {
       );
 
       if (isValidPassword) {
-        const createTokenResult = await this.tokenService.createToken(
-          data.userId,
-        );
+        const createTokenResult = await this.tokenService.createToken({
+          userId: data.userId,
+          username: data.username,
+          roles: data.roles,
+          email: data.email,
+        });
         result = {
           status: HttpStatus.CREATED,
           token: createTokenResult,
         };
       }
-    } catch (e) {}
+    } catch (e) { }
 
     return result;
   }

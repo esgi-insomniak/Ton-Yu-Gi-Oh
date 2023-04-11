@@ -9,11 +9,14 @@ import { TokenService } from '../services/token.service';
 
 @Controller('token')
 export class TokenController {
-  constructor(private readonly tokenService: TokenService) {}
+  constructor(private readonly tokenService: TokenService) { }
 
   @MessagePattern('token_create')
   public async createToken(data: {
     userId: string;
+    username: string;
+    roles: string[];
+    email: string;
   }): Promise<ITokenCreateResponse> {
     let result: ITokenCreateResponse = {
       status: HttpStatus.BAD_REQUEST,
@@ -22,14 +25,17 @@ export class TokenController {
     };
 
     try {
-      const createTokenResult = await this.tokenService.createToken(
-        data.userId,
-      );
+      const createTokenResult = await this.tokenService.createToken({
+        userId: data.userId,
+        username: data.username,
+        roles: data.roles,
+        email: data.email,
+      });
       result = {
         status: HttpStatus.CREATED,
         token: createTokenResult,
       };
-    } catch (e) {}
+    } catch (e) { }
 
     return result;
   }
@@ -48,7 +54,7 @@ export class TokenController {
       result = {
         status: HttpStatus.OK,
       };
-    } catch (e) {}
+    } catch (e) { }
 
     return result;
   }

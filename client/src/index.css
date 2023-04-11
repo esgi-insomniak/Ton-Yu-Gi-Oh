@@ -10,4 +10,8 @@
     .t-btn {
         @apply px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-600
     }
+
+    .t-nav-items {
+        @apply w-96 h-64 rounded-lg drop-shadow-md border-none bg-white hover:scale-110 duration-75 ease-in-out cursor-pointer
+    }
 }

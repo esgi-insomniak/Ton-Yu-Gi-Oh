@@ -23,7 +23,7 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
     const [user, setUser] = React.useState<UserContextType>(defaultUser);
 
     const handleUpdateUser = React.useCallback((token: string) => {
-        setCookies("token", token, { path: "/" });
+        setCookies("token", token, { path: "/", maxAge: 7200 });
         const decodedToken = jwt_decode<DecodedTokenType>(token);
         setUser({
             id: decodedToken.userId,
@@ -33,7 +33,10 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
         })
     }, [setUser])
 
-    const logout = React.useCallback(() => { }, [])
+    const logout = React.useCallback(() => {
+        removeCookies("token", { path: "/" });
+        setUser({ id: "", email: "", roles: [ROLES.USER], username: "" })
+    }, [setUser])
 
     const value = React.useMemo(() => ({
         token,
