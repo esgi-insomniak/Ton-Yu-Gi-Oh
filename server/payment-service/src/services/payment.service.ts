@@ -2,16 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { PaymentHistory } from '../entities/payment-history.entity';
 import { DataSource } from 'typeorm';
 import { ConfigService } from './config/config.service';
+import { PaymentCheckout } from 'src/entities/payment-checkout.entity';
 import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
   private stripe: any;
+  private successUrl: string;
+  private cancelUrl: string;
 
   constructor(private dataSource: DataSource, configService: ConfigService) {
     this.stripe = new Stripe(configService.get('stripeSecretKey'), {
       apiVersion: '2022-11-15',
     });
+    this.successUrl = configService.get('successUrl');
+    this.cancelUrl = configService.get('cancelUrl');
   }
 
   async getPaymentHistories(query: {
@@ -26,7 +31,7 @@ export class PaymentService {
     return payments;
   }
 
-  async createCheckout(productId: string): Promise<any> {
+  async createCheckout(productId: string, userId: string): Promise<PaymentCheckout> {
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -36,10 +41,33 @@ export class PaymentService {
         },
       ],
       mode: 'payment',
-      success_url: 'https://example.com/success',
-      cancel_url: 'https://example.com/cancel',
+      success_url: this.successUrl,
+      cancel_url: this.cancelUrl,
     });
+    const paymentCheckoutRepository = this.dataSource.getRepository(PaymentCheckout);
+    const paymentCheckout = paymentCheckoutRepository.create({
+      userId: userId,
+      sessionId: session.id,
+      paymentStatus: session.payment_status,
+      url: session.url,
+    })
+    paymentCheckoutRepository.save(paymentCheckout);
 
     return session;
   }
+
+  async updateCheckout(sessionId: string, userId: string): Promise<PaymentCheckout> {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    const paymentCheckoutRepository = this.dataSource.getRepository(PaymentCheckout);
+    console.log("Payment Service : ", userId)
+    const paymentCheckout = paymentCheckoutRepository.findOneBy({
+      sessionId: sessionId,
+      userId: userId,
+    });
+    (await paymentCheckout).paymentStatus = session.payment_status;
+    paymentCheckoutRepository.save((await paymentCheckout));
+    return session;
+  }
 }
+
+

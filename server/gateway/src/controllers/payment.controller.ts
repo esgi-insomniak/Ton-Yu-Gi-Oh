@@ -19,6 +19,7 @@ import { CreateCheckoutResponseDto } from 'src/interfaces/payment-service/checko
 import { ICheckoutCreateResponse } from 'src/interfaces/payment-service/checkout/checkout-response.interface';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
+import { UpdateCheckoutResponse } from 'src/interfaces/payment-service/update/update-response.dto';
 
 @Controller('payment')
 @ApiTags('payment')
@@ -63,17 +64,41 @@ export class PaymentController {
     @Req() request: IAuthorizedRequest,
   ): Promise<CreateCheckoutResponseDto> {
     const paymentResponse: ICheckoutCreateResponse = await firstValueFrom(
-      this.paymentServiceClient.send('create_checkout', productId),
+      this.paymentServiceClient.send('create_checkout', {
+        productId,
+        userId: request.user.id,
+      }),
     );
 
     if (paymentResponse.status !== HttpStatus.CREATED) {
       throw new HttpException(paymentResponse.message, paymentResponse.status);
     }
 
-    // !! call the payment service, create checkout and add the user id !!
-    // get userId from request with request.user.id
-
     const result: CreateCheckoutResponseDto = {
+      data: paymentResponse.session,
+    };
+
+    return result;
+  }
+
+  @Authorization(true)
+  @Post('checkout/:id/update')
+  @ApiCreatedResponse({
+    type: UpdateCheckoutResponse,
+  })
+  public async updateCheckout(
+    @Param('id') sessionId: string,
+    @Req() request: IAuthorizedRequest,
+  ): Promise<UpdateCheckoutResponse> {
+    const paymentResponse: ICheckoutCreateResponse = await firstValueFrom(
+      this.paymentServiceClient.send('update_checkout', {sessionId, userId: request.user.id}),
+    );
+
+    if (paymentResponse.status !== HttpStatus.ACCEPTED) {
+      throw new HttpException(paymentResponse.message, paymentResponse.status);
+    }
+
+    const result: UpdateCheckoutResponse = {
       data: paymentResponse.session,
     };
 
