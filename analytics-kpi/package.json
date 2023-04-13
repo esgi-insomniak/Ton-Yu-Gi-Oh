@@ -1,0 +1,22 @@
+{
+    "name": "ink-analytics",
+    "version": "0.0.1",
+    "description": "ink-analytics",
+    "private": true,
+    "workspaces": {
+        "packages": [
+            "api",
+            "back-office",
+            "sdk"
+        ]
+    },
+    "scripts": {
+        "start:dev": "concurrently \"cd api && npm run start:dev\" \"cd back-office && npm run start:dev\" \"cd sdk && npm run start:dev\"",
+        "start:prod": "concurrently \"cd api && npm run start:prod\" \"cd back-office && npm run start:prod\" \"cd sdk && npm run start:prod\"",
+        "build": "concurrently \"cd api && npm run build\" \"cd back-office && npm run build\" \"cd sdk && npm run build\"",
+        "test": "concurrently \"cd api && npm run test\" \"cd back-office && npm run test\" \"cd sdk && npm run test\""
+    },
+    "devDependencies": {
+        "concurrently": "^6.2.0"
+    }
+}

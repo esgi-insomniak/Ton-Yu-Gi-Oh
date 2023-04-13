@@ -19,6 +19,7 @@ const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
 const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
 const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
 const LogoutPage = React.lazy(() => import('@/pages/Auth/Logout'));
+const BoosterPage = React.lazy(() => import('@/pages/Booster'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -45,6 +46,7 @@ const Router: React.FC = () => {
                         </GameCardProvider>
                     } />
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/opening" element={<BoosterPage />} />
                 </Route>
                 <Route path="/error" element={<ErrorPage />} />
                 <Route path="/login" element={<LoginPage />} />

@@ -1,11 +1,11 @@
 import React from "react"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
-import GameCard from "../components/GameCard/GameCard"
-import cardsJson from '../assets/cards.json'
+import GameCard from "@/components/GameCard/GameCard"
+import cardsJson from '@/assets/cards.json'
 import GameCardContext from "../helpers/context/cards/GameCardContext"
 import { v4 as uuidv4 } from "uuid"
-import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "../helpers/utils/enum/card"
-import { GameCardType } from "../helpers/types/cards"
+import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "@/helpers/utils/enum/card"
+import { GameCardType } from "@/helpers/types/cards"
 
 const DisplayCards = () => {
     const { cards, setCards, sortCards } = React.useContext(GameCardContext)
