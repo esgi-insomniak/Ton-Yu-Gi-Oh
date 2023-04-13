@@ -65,4 +65,6 @@ const useMouseTrack = (
     return [mouseTrackData];
 };
 
-export { useTrackEvent, useMouseTrack, MousePosition };
+export { useTrackEvent, useMouseTrack };
+export type { MousePosition };
+
