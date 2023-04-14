@@ -9,6 +9,6 @@ export class Race {
   @OneToMany(() => Card, (card) => card.race)
   cards: Card[];
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 }

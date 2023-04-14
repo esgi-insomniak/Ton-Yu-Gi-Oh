@@ -9,6 +9,6 @@ export class FrameType {
   @OneToMany(() => Card, (card) => card.frameType)
   cards: Card[];
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 }

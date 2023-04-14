@@ -6,6 +6,6 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('auth')
 export class CardController {
   constructor(
-    @Inject('AUTH_SERVICE') private readonly cardServiceClient: ClientProxy,
+    @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
   ) {}
 }

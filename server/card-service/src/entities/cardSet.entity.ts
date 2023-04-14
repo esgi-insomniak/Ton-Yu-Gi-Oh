@@ -4,6 +4,7 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Card } from './card.entity';
@@ -16,10 +17,12 @@ export class CardSet {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @PrimaryColumn('uuid')
   @ManyToOne(() => Card, (card) => card.cardSets)
   @JoinColumn()
   card: Card;
 
+  @PrimaryColumn('uuid')
   @ManyToOne(() => Set, (set) => set.cardSets)
   @JoinColumn()
   set: Set;

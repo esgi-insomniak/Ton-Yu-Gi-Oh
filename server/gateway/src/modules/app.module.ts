@@ -8,12 +8,14 @@ import { ConfigService } from '../services/config/config.service';
 import { PaymentController } from '../controllers/payment.controller';
 import { AuthGuard } from 'src/services/guard/authorization.guard';
 import { PermissionGuard } from 'src/services/guard/permission.guard';
+import { LogService } from 'src/services/config/logger.service';
 
 @Module({
   imports: [],
   controllers: [CardController, UserController, PaymentController],
   providers: [
     ConfigService,
+    LogService,
     {
       provide: 'CARD_SERVICE',
       useFactory: (configService: ConfigService) => {

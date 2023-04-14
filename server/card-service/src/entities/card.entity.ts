@@ -6,8 +6,8 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
-  JoinTable,
   OneToMany,
+  JoinTable,
 } from 'typeorm';
 import { CardSet } from './cardSet.entity';
 import { Archetype } from './archetype.entity';
@@ -42,7 +42,7 @@ export class Card {
   attribute: Attribute;
 
   @OneToOne(() => Price)
-  @JoinColumn({ name: 'priceId' })
+  @JoinColumn()
   price: Price;
 
   @OneToMany(() => CardSet, (cardSet) => cardSet.card)
@@ -50,14 +50,12 @@ export class Card {
 
   @ManyToMany(() => LinkMarker)
   @JoinTable({
-    name: 'card_link_marker',
+    name: 'card_linkMarker',
     joinColumn: {
-      name: 'card_id',
-      referencedColumnName: 'id',
+      name: 'cardId',
     },
     inverseJoinColumn: {
-      name: 'linkMarker_id',
-      referencedColumnName: 'id',
+      name: 'linkMarkerId',
     },
   })
   linkMarkers: LinkMarker[];
