@@ -3,15 +3,6 @@ export interface DefaultResponse {
   message?: string;
 }
 
-export interface QueryGetItems {
-  limit: number;
-  offset: number;
-}
-
-export interface ParamGetItemById {
-  id: string;
-}
-
 export interface GetResponseArray<T> extends DefaultResponse {
   items: T[];
 }
