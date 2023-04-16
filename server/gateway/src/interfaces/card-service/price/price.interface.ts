@@ -1,6 +1,6 @@
 import { ICard } from '../card/card.interface';
 
-export interface ICardPrice extends Document {
+export interface ICardPrice {
   id: string;
   card: ICard;
   cardMarketPrice: number;

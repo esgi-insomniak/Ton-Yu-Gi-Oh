@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Token } from 'src/entities/token.entity';
-import { DataSource, DeleteResult, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from './config/config.service';
 import { ITokenParamsType } from 'src/interfaces/token/token-params.interface';
 
@@ -40,7 +40,7 @@ export class TokenService {
     return this.tokenRepository.remove(tokens);
   }
 
-  public async decodeToken(token: string) {
+  public async decodeToken(token: string): Promise<{ userId: string }> {
     const result = {
       userId: null,
     };

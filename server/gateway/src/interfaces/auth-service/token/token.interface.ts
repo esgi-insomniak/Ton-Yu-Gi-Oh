@@ -1,4 +1,4 @@
-export interface IToken extends Document {
+export interface IToken {
   userId: string;
   token: string;
 }

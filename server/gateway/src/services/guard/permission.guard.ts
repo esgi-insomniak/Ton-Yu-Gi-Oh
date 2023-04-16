@@ -10,7 +10,8 @@ import { firstValueFrom } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
-import { IUserGetOneResponse } from 'src/interfaces/user-service/user/user-response.interface';
+import { GetResponseOne } from 'src/interfaces/common/common.response';
+import { IUser } from 'src/interfaces/user-service/user/user.interface';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -32,7 +33,7 @@ export class PermissionGuard implements CanActivate {
 
     const request: IAuthorizedRequest = context.switchToHttp().getRequest();
 
-    const userInfo: IUserGetOneResponse = await firstValueFrom(
+    const userInfo: GetResponseOne<IUser> = await firstValueFrom(
       this.userService.send('get_user_by_id', {
         id: request.user.id,
       }),
@@ -47,7 +48,7 @@ export class PermissionGuard implements CanActivate {
 
     if (permission.areAuthorized) {
       if (
-        !userInfo.user.roles.some((role) => permission.roles.includes(role))
+        !userInfo.item.roles.some((role) => permission.roles.includes(role))
       ) {
         throw new HttpException(
           'User is not authorized to access this resource',
@@ -55,7 +56,7 @@ export class PermissionGuard implements CanActivate {
         );
       }
     } else {
-      if (userInfo.user.roles.some((role) => permission.roles.includes(role))) {
+      if (userInfo.item.roles.some((role) => permission.roles.includes(role))) {
         throw new HttpException(
           'User is not authorized to access this resource',
           HttpStatus.UNAUTHORIZED,

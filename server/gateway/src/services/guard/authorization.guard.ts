@@ -9,8 +9,8 @@ import { firstValueFrom } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 import { HttpStatus } from '@nestjs/common/enums';
-import { ITokenDecodeResponse } from 'src/interfaces/auth-service/token/token-response.interface';
-import { IUserGetOneResponse } from 'src/interfaces/user-service/user/user-response.interface';
+import { GetResponseOne } from 'src/interfaces/common/common.response';
+import { IUser } from 'src/interfaces/user-service/user/user.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -32,11 +32,12 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    const userTokenInfo: ITokenDecodeResponse = await firstValueFrom(
-      this.authServiceClient.send('token_decode', {
-        token: request.headers.authorization,
-      }),
-    );
+    const userTokenInfo: GetResponseOne<{ userId: string }> =
+      await firstValueFrom(
+        this.authServiceClient.send('token_decode', {
+          token: request.headers.authorization,
+        }),
+      );
     if (userTokenInfo.status !== HttpStatus.OK) {
       throw new HttpException(
         {
@@ -47,11 +48,11 @@ export class AuthGuard implements CanActivate {
       );
     }
 
-    const userInfo: IUserGetOneResponse = await firstValueFrom(
-      this.userServiceClient.send('get_user_by_id', userTokenInfo.data.userId),
+    const userInfo: GetResponseOne<IUser> = await firstValueFrom(
+      this.userServiceClient.send('get_user_by_id', userTokenInfo.item.userId),
     );
 
-    request.user = userInfo.user;
+    request.user = userInfo.item;
     return true;
   }
 }

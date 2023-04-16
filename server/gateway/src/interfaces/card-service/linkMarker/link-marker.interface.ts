@@ -1,6 +1,6 @@
 import { ICard } from '../card/card.interface';
 
-export interface ICardLinkMarker extends Document {
+export interface ICardLinkMarker {
   id: string;
   cards: ICard[];
   name: string;

@@ -1,6 +1,6 @@
 import { IUser } from '../user/user.interface';
 
-export interface IUserCardSet extends Document {
+export interface IUserCardSet {
   id: string;
   user: IUser;
   cardSetId: string;

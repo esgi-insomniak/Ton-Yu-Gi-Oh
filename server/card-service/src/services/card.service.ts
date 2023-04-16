@@ -10,7 +10,7 @@ import { Race } from 'src/entities/race.entity';
 import { Rarity } from 'src/entities/rarity.entity';
 import { Set } from 'src/entities/set.entity';
 import { Type } from 'src/entities/type.entity';
-import { QueryGetItems } from 'src/interfaces/card/card-response.interface';
+import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
 import { DataSource } from 'typeorm';
 
 @Injectable()

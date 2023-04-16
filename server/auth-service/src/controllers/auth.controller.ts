@@ -1,26 +1,27 @@
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { IAuthCreateResponse } from 'src/interfaces/token/auth-response.interface';
-import { ITokenCreateResponse } from 'src/interfaces/token/token-response.interface';
 import { TokenService } from 'src/services/token.service';
 import { AuthService } from '../services/auth.service';
+import { GetResponseOne } from 'src/interfaces/common/common.response.interface';
+import { BasicAuth } from 'src/entities/basic-auth.entity';
+import { Token } from 'src/entities/token.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
-  ) { }
+  ) {}
 
   @MessagePattern('create_basic_auth')
   public async createBasicAuth(data: {
     userId: string;
     password: string;
-  }): Promise<IAuthCreateResponse> {
-    let result: IAuthCreateResponse = {
+  }): Promise<GetResponseOne<BasicAuth>> {
+    let result: GetResponseOne<BasicAuth> = {
       status: HttpStatus.BAD_REQUEST,
       message: 'Failed to create basic auth',
-      auth: null,
+      item: null,
     };
 
     try {
@@ -30,9 +31,9 @@ export class AuthController {
       );
       result = {
         status: HttpStatus.CREATED,
-        auth: basicAuthResult,
+        item: basicAuthResult,
       };
-    } catch (e) { }
+    } catch (e) {}
 
     return result;
   }
@@ -44,11 +45,11 @@ export class AuthController {
     username: string;
     roles: string[];
     email: string;
-  }): Promise<ITokenCreateResponse> {
-    let result: ITokenCreateResponse = {
+  }): Promise<GetResponseOne<Token>> {
+    let result: GetResponseOne<Token> = {
       status: HttpStatus.BAD_REQUEST,
       message: 'Bad password provided',
-      token: null,
+      item: null,
     };
 
     try {
@@ -66,10 +67,10 @@ export class AuthController {
         });
         result = {
           status: HttpStatus.CREATED,
-          token: createTokenResult,
+          item: createTokenResult,
         };
       }
-    } catch (e) { }
+    } catch (e) {}
 
     return result;
   }

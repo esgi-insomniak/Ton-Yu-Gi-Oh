@@ -1,38 +1,38 @@
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import {
-  IUserGetOneResponse,
-  IUserGetResponse,
-} from '../interfaces/user/user-response.interface';
 import { UserService } from '../services/user.service';
+import {
+  GetResponseArray,
+  GetResponseOne,
+  ParamGetItemById,
+  QueryGetItems,
+} from 'src/interfaces/common/common.response.interface';
+import { User } from 'src/entities/user.entity';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @MessagePattern('get_users')
-  public async getUsers(query: {
-    limit: number;
-    offset: number;
-  }): Promise<IUserGetResponse> {
+  public async getUsers(query: QueryGetItems): Promise<GetResponseArray<User>> {
     const users = await this.userService.getUsers(query);
-    const result: IUserGetResponse = {
+    const result: GetResponseArray<User> = {
       status: HttpStatus.OK,
-      users: users,
+      items: users,
     };
 
     return result;
   }
 
   @MessagePattern('get_user_by_id')
-  public async getCardById(params: {
-    id: string;
-  }): Promise<IUserGetOneResponse> {
-    const user = await this.userService.getUserById(params.id);
-    const result = {
+  public async getCardById(
+    params: ParamGetItemById,
+  ): Promise<GetResponseOne<User>> {
+    const user = await this.userService.getUserById(params);
+    const result: GetResponseOne<User> = {
       status: user ? HttpStatus.OK : HttpStatus.NOT_FOUND,
       message: user ? null : 'User not found',
-      user: user,
+      item: user,
     };
 
     return result;
@@ -43,16 +43,16 @@ export class UserController {
     email?: string;
     username?: string;
     phone?: string;
-  }): Promise<IUserGetOneResponse> {
+  }): Promise<GetResponseOne<User>> {
     const user = await this.userService.getUserByCredentials({
       email: params.email,
       username: params.username,
       phone: params.phone,
     });
-    const result = {
+    const result: GetResponseOne<User> = {
       status: user ? HttpStatus.OK : HttpStatus.UNAUTHORIZED,
       message: user ? null : 'Invalid credentials provided',
-      user: user,
+      item: user,
     };
 
     return result;
@@ -64,11 +64,11 @@ export class UserController {
     email: string;
     phone: string;
     password: string;
-  }): Promise<IUserGetOneResponse> {
-    let result: IUserGetOneResponse = {
+  }): Promise<GetResponseOne<User>> {
+    let result: GetResponseOne<User> = {
       status: HttpStatus.CONFLICT,
       message: 'User already exists',
-      user: null,
+      item: null,
     };
 
     try {
@@ -76,7 +76,7 @@ export class UserController {
 
       result = {
         status: HttpStatus.CREATED,
-        user: user,
+        item: user,
       };
     } catch (e) {}
 

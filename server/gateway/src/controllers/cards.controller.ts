@@ -13,7 +13,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   GetCardByIdResponseDto,
   GetCardsResponseDto,
-} from '../interfaces/card-service/card/card-response.dto';
+} from '../interfaces/card-service/card/card.response.dto';
 import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
   GetResponseArray,
@@ -24,52 +24,52 @@ import { GetItemByIdDto } from 'src/interfaces/common/common.params.dto';
 import {
   GetCardArchetypeByIdResponseDto,
   GetCardArchetypesResponseDto,
-} from 'src/interfaces/card-service/archetype/archetype-response.dto';
+} from 'src/interfaces/card-service/archetype/archetype.response.dto';
 import { ICardArchetype } from 'src/interfaces/card-service/archetype/archetype.interface';
 import {
   GetCardAttributeByIdResponseDto,
   GetCardAttributesResponseDto,
-} from 'src/interfaces/card-service/attribute/attribute-response.dto';
+} from 'src/interfaces/card-service/attribute/attribute.response.dto';
 import { ICardAttribute } from 'src/interfaces/card-service/attribute/attribute.interface';
 import {
   GetCardCardSetByIdResponseDto,
   GetCardCardSetsResponseDto,
-} from 'src/interfaces/card-service/cardSet/card-set-response.dto';
+} from 'src/interfaces/card-service/cardSet/card-set.response.dto';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
 import {
   GetCardFrameTypeByIdResponseDto,
   GetCardFrameTypesResponseDto,
-} from 'src/interfaces/card-service/frameType/frame-type-response.dto';
+} from 'src/interfaces/card-service/frameType/frame-type.response.dto';
 import { ICardFrameType } from 'src/interfaces/card-service/frameType/frame-type.interface';
 import {
   GetCardLinkMarkerByIdResponseDto,
   GetCardLinkMarkersResponseDto,
-} from 'src/interfaces/card-service/linkMarker/link-marker-response.dto';
+} from 'src/interfaces/card-service/linkMarker/link-marker.response.dto';
 import { ICardLinkMarker } from 'src/interfaces/card-service/linkMarker/link-marker.interface';
 import {
   GetCardPriceByIdResponseDto,
   GetCardPricesResponseDto,
-} from 'src/interfaces/card-service/price/price-response.dto';
+} from 'src/interfaces/card-service/price/price.response.dto';
 import { ICardPrice } from 'src/interfaces/card-service/price/price.interface';
 import {
   GetCardRaceByIdResponseDto,
   GetCardRacesResponseDto,
-} from 'src/interfaces/card-service/race/race-response.dto';
+} from 'src/interfaces/card-service/race/race.response.dto';
 import { ICardRace } from 'src/interfaces/card-service/race/race.interface';
 import {
   GetCardRaritiesResponseDto,
   GetCardRarityByIdResponseDto,
-} from 'src/interfaces/card-service/rarity/rarity-response.dto';
+} from 'src/interfaces/card-service/rarity/rarity.response.dto';
 import { ICardRarity } from 'src/interfaces/card-service/rarity/rarity.interface';
 import {
   GetCardSetByIdResponseDto,
   GetCardSetsResponseDto,
-} from 'src/interfaces/card-service/set/set-response.dto';
+} from 'src/interfaces/card-service/set/set.response.dto';
 import { ICardSet } from 'src/interfaces/card-service/set/set.interface';
 import {
   GetCardTypeByIdResponseDto,
   GetCardTypesResponseDto,
-} from 'src/interfaces/card-service/type/type-response.dto';
+} from 'src/interfaces/card-service/type/type.response.dto';
 import { ICardType } from 'src/interfaces/card-service/type/type.interface';
 
 @Controller('cards')

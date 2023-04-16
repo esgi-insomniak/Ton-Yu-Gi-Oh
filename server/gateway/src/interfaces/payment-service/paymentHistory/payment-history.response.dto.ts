@@ -3,9 +3,7 @@ import { IPaymentHistory } from './payment-history.interface';
 
 export class GetPaymentHistoriesResponseDto {
   @ApiProperty({
-    example: {
-      data: [],
-    },
+    example: [],
   })
   data: IPaymentHistory[];
 }

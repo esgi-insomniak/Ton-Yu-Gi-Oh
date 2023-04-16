@@ -5,7 +5,7 @@ import {
   GetResponseOne,
   ParamGetItemById,
   QueryGetItems,
-} from '../interfaces/card/card-response.interface';
+} from '../interfaces/common/common.response.interface';
 import { CardService } from '../services/card.service';
 import { DBFeederService } from 'src/services/dbFeeder.service';
 import { Card } from 'src/entities/card.entity';

@@ -17,26 +17,25 @@ import {
   GetUserByIdResponseDto,
   GetUsersResponseDto,
   LoginUserResponseDto,
-} from '../interfaces/user-service/user/user-response.dto';
-import {
-  IUserGetOneResponse,
-  IUserGetResponse,
-} from '../interfaces/user-service/user/user-response.interface';
-import { GetUsersQueryDto } from '../interfaces/user-service/user/user-query.dto';
-import { GetUserByIdDto } from '../interfaces/user-service/user/user-param.dto';
+} from '../interfaces/user-service/user/user.response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
 import {
   CreateUserBodyDto,
   LoginUserBodyDto,
-} from 'src/interfaces/user-service/user/user-body.dto';
-import {
-  ITokenCreateResponse,
-  ITokenDestroyResponse,
-} from 'src/interfaces/auth-service/token/token-response.interface';
+} from 'src/interfaces/user-service/user/user.body.dto';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { Permission } from 'src/decorators/permission.decorator';
+import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
+import {
+  DefaultResponse,
+  GetResponseArray,
+  GetResponseOne,
+} from 'src/interfaces/common/common.response';
+import { IUser } from 'src/interfaces/user-service/user/user.interface';
+import { GetItemByIdDto } from 'src/interfaces/common/common.params.dto';
+import { IToken } from 'src/interfaces/auth-service/token/token.interface';
 
 @Controller('users')
 @ApiTags('users')
@@ -44,7 +43,7 @@ export class UserController {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
     @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
-  ) { }
+  ) {}
 
   @Get()
   @Authorization(true)
@@ -53,9 +52,9 @@ export class UserController {
   })
   public async getUsers(
     @Req() request: IAuthorizedRequest,
-    @Query() query: GetUsersQueryDto,
+    @Query() query: GetItemsPaginationDto,
   ): Promise<GetUsersResponseDto> {
-    const userResponse: IUserGetResponse = await firstValueFrom(
+    const userResponse: GetResponseArray<IUser> = await firstValueFrom(
       this.userServiceClient.send('get_users', {
         limit: query.limit,
         offset: query.offset,
@@ -67,7 +66,7 @@ export class UserController {
     }
 
     const result: GetUsersResponseDto = {
-      data: userResponse.users,
+      data: userResponse.items,
     };
 
     return result;
@@ -80,9 +79,9 @@ export class UserController {
   })
   public async getUserById(
     @Req() request: IAuthorizedRequest,
-    @Param() params: GetUserByIdDto,
+    @Param() params: GetItemByIdDto,
   ): Promise<GetUserByIdResponseDto> {
-    const userResponse: IUserGetOneResponse = await firstValueFrom(
+    const userResponse: GetResponseOne<IUser> = await firstValueFrom(
       this.userServiceClient.send('get_user_by_id', {
         id: params.id,
       }),
@@ -93,7 +92,7 @@ export class UserController {
     }
 
     const result: GetUserByIdResponseDto = {
-      data: userResponse.user,
+      data: userResponse.item,
     };
 
     return result;
@@ -106,7 +105,7 @@ export class UserController {
   public async loginUser(
     @Body() loginRequest: LoginUserBodyDto,
   ): Promise<LoginUserResponseDto> {
-    const userResponse: IUserGetOneResponse = await firstValueFrom(
+    const userResponse: GetResponseOne<IUser> = await firstValueFrom(
       this.userServiceClient.send('get_user_by_credentials', {
         email: loginRequest.email,
         username: loginRequest.username,
@@ -118,12 +117,12 @@ export class UserController {
       throw new HttpException(userResponse.message, userResponse.status);
     }
 
-    const tokenResponse: ITokenCreateResponse = await firstValueFrom(
+    const tokenResponse: GetResponseOne<IToken> = await firstValueFrom(
       this.authServiceClient.send('compare_user_password', {
-        userId: userResponse.user.id,
-        username: userResponse.user.username,
-        email: userResponse.user.email,
-        roles: userResponse.user.roles,
+        userId: userResponse.item.id,
+        username: userResponse.item.username,
+        email: userResponse.item.email,
+        roles: userResponse.item.roles,
         password: loginRequest.password,
       }),
     );
@@ -133,7 +132,7 @@ export class UserController {
     }
 
     const result: LoginUserResponseDto = {
-      token: tokenResponse.token.token,
+      token: tokenResponse.item.token,
     };
 
     return result;
@@ -146,7 +145,7 @@ export class UserController {
   public async createUser(
     @Body() userRequest: CreateUserBodyDto,
   ): Promise<CreateUserResponseDto> {
-    const userResponse: IUserGetOneResponse = await firstValueFrom(
+    const userResponse: GetResponseOne<IUser> = await firstValueFrom(
       this.userServiceClient.send('user_create', userRequest),
     );
 
@@ -156,13 +155,13 @@ export class UserController {
 
     await firstValueFrom(
       this.authServiceClient.send('create_basic_auth', {
-        userId: userResponse.user.id,
+        userId: userResponse.item.id,
         password: userRequest.password,
       }),
     );
 
     const result: CreateUserResponseDto = {
-      data: userResponse.user,
+      data: userResponse.item,
     };
 
     return result;
@@ -176,7 +175,7 @@ export class UserController {
   public async logoutUser(@Req() request: IAuthorizedRequest): Promise<void> {
     const userInfo = request.user;
 
-    const destroyTokenResponse: ITokenDestroyResponse = await firstValueFrom(
+    const destroyTokenResponse: DefaultResponse = await firstValueFrom(
       this.authServiceClient.send('token_destroy', {
         userId: userInfo.id,
       }),

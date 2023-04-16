@@ -1,6 +1,6 @@
 import { IUser } from '../user/user.interface';
 
-export interface IUserDeck extends Document {
+export interface IUserDeck {
   id: string;
   user: IUser;
   setId: string;

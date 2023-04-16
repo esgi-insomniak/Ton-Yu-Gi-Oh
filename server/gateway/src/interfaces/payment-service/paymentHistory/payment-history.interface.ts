@@ -1,4 +1,4 @@
-export interface IPaymentHistory extends Document {
+export interface IPaymentHistory {
   id: string;
   userId: string;
   coinsAmount: number;
