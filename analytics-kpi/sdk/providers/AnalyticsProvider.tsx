@@ -1,42 +1,29 @@
-import React, { createContext, ReactNode, RefObject, useRef } from 'react';
-import { useTrackEvent, useMouseTrack, ScreenSizeType, MousePosition } from '../hooks';
-import createAnalyticsSDK from '../services/AnalyticsSDK';
+import React from "react";
+import { generateId } from "../common";
 
-interface AnalyticsContextValue {
-    trackEvent: (event: string, payload?: Record<string, unknown>) => void;
-    mousePosition: MousePosition;
-}
-
-interface AnalyticsProviderProps {
-    children: ReactNode;
+type TrackingContextType = {
+    clientId: string;
     appId: string;
-}
+};
 
-export const AnalyticsContext = createContext<AnalyticsContextValue>({
-    trackEvent: () => { },
-    mousePosition: { x: -1, y: -1, screenSize: 'md' },
-});
+const TrackingContext = React.createContext<TrackingContextType>({ clientId: "", appId: "" });
 
-function AnalyticsProvider({ children, appId }: AnalyticsProviderProps) {
-    const trackEventRef = useRef<(event: string, payload?: Record<string, unknown>) => void>(() => { });
-    const [mousePosition] = useMouseTrack();
+const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
 
-    React.useEffect(() => {
-        const analyticsSDK = createAnalyticsSDK(appId);
-        trackEventRef.current = analyticsSDK.track;
-    }, [appId]);
-
-    const trackEvent = React.useCallback((event: string, payload?: Record<string, unknown>) => {
-        trackEventRef.current(event, payload);
+    const trackingContext = React.useMemo(() => {
+        return {
+            clientId: localStorage.getItem("clientId") || generateId('clientId'),
+            appId: localStorage.getItem("appId") || generateId('appId'),
+        };
     }, []);
 
-    const value = React.useMemo(() => ({ trackEvent, mousePosition }), [trackEvent, mousePosition]);
+    React.useEffect(() => {
+        localStorage.setItem("clientId", trackingContext.clientId);
+        localStorage.setItem("appId", trackingContext.appId);
+    }, [trackingContext]);
 
-    return (
-        <AnalyticsContext.Provider value={value}>
-            {children}
-        </AnalyticsContext.Provider>
-    );
-}
+    return <TrackingContext.Provider value={trackingContext}>{children}</TrackingContext.Provider>;
+};
 
-export default AnalyticsProvider;
+
+export { TrackingProvider };
