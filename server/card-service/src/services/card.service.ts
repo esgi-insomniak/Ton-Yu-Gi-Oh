@@ -4,11 +4,10 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class CardService {
-  constructor(private dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) {}
 
   async getCards(query: { limit: number; offset: number }): Promise<Card[]> {
-    const typeRepository = this.dataSource.getRepository(Card);
-    const cards = await typeRepository.find({
+    const cards = await this.dataSource.getRepository(Card).find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
       relations: [
@@ -26,8 +25,7 @@ export class CardService {
   }
 
   async getCardById(id: string): Promise<Card> {
-    const cardRepository = this.dataSource.getRepository(Card);
-    const card = await cardRepository.findOne({
+    const card = await this.dataSource.getRepository(Card).findOne({
       where: { id },
       relations: [
         'type',

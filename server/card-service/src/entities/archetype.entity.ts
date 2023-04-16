@@ -9,6 +9,6 @@ export class Archetype {
   @OneToMany(() => Card, (card) => card.archetype)
   cards: Card[];
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 }

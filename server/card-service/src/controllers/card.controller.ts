@@ -5,10 +5,14 @@ import {
   ICardGetResponse,
 } from '../interfaces/card/card-response.interface';
 import { CardService } from '../services/card.service';
+import { DBFeederService } from 'src/services/dbFeeder.service';
 
 @Controller('card')
 export class CardController {
-  constructor(private readonly cardService: CardService) {}
+  constructor(
+    private readonly cardService: CardService,
+    private readonly dbFeederService: DBFeederService,
+  ) {}
 
   @MessagePattern('get_cards')
   public async getCards(query: {
@@ -36,5 +40,10 @@ export class CardController {
     };
 
     return result;
+  }
+
+  @MessagePattern('feed_database')
+  public async feedDatabase(params: { chunk: number }): Promise<string> {
+    return await this.dbFeederService.feedDatabase(params.chunk);
   }
 }
