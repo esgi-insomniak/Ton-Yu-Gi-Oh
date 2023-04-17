@@ -25,5 +25,12 @@ const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
     return <TrackingContext.Provider value={trackingContext}>{children}</TrackingContext.Provider>;
 };
 
+const useTrackingContext = () => {
+    const context = React.useContext(TrackingContext);
+    if (context === undefined) {
+        throw new Error("useTrackingContext must be used within a TrackingProvider");
+    }
+    return context;
+};
 
-export { TrackingProvider };
+export { TrackingProvider, useTrackingContext };

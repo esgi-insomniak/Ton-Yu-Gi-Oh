@@ -1,0 +1,9 @@
+{
+    "name": "@inso/yugioh",
+    "version": "1.0.0",
+    "description": "A simple yugioh card search",
+    "workspaces": [
+        "./*"
+    ],
+    "private": true
+}

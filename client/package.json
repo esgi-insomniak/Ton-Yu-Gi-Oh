@@ -1,5 +1,5 @@
 {
-  "name": "insomniak-yugioh",
+  "name": "@inso/client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
