@@ -3,7 +3,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
-  Column
+  Column,
 } from 'typeorm';
 import { UserCardSet } from './user-card-set.entity';
 
@@ -27,4 +27,3 @@ export class UserDeck {
   })
   cardSets: UserCardSet[];
 }
-

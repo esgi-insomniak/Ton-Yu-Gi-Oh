@@ -13,8 +13,8 @@ import { UserSet } from 'src/entities/user-set.entity';
 
 @Controller('user')
 export class UserDeckController {
-  constructor(private readonly userDeckService: UserDeckService) { }
-  
+  constructor(private readonly userDeckService: UserDeckService) {}
+
   @MessagePattern('get_usercardsets')
   public async getUserCardSets(
     query: QueryGetItems,
@@ -32,7 +32,9 @@ export class UserDeckController {
   public async getUserCardSetById(
     params: ParamGetItemById,
   ): Promise<GetResponseOne<UserCardSet>> {
-    const userCardSet = await this.userDeckService.getUserCardSetById(params.id);
+    const userCardSet = await this.userDeckService.getUserCardSetById(
+      params.id,
+    );
     const result: GetResponseOne<UserCardSet> = {
       status: userCardSet ? HttpStatus.OK : HttpStatus.NOT_FOUND,
       message: userCardSet ? null : 'UserCardSet not found',

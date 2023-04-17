@@ -1,6 +1,6 @@
 export interface ICheckout {
   sessionId: string;
   paymentStatus: string;
-  url: string;
-  coins: number;
+  url?: string;
+  coins?: number;
 }

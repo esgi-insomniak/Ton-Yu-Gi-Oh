@@ -15,7 +15,12 @@ export class TokenService {
     this.tokenRepository = dataSource.getRepository(Token);
   }
 
-  public async createToken({ username, userId, roles, email }: ITokenParamsType): Promise<Token> {
+  public async createToken({
+    username,
+    userId,
+    roles,
+    email,
+  }: ITokenParamsType): Promise<Token> {
     const token = this.jwtService.sign(
       {
         userId,
@@ -57,7 +62,7 @@ export class TokenService {
         if (tokenData.exp > Math.floor(Date.now() / 1000)) {
           result.userId = tokenData.userId;
         }
-      } catch (e) { }
+      } catch (e) {}
     }
     return result;
   }

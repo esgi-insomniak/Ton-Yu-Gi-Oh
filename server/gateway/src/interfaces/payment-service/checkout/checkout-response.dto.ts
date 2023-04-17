@@ -13,3 +13,14 @@ export class CreateCheckoutResponseDto {
   })
   data: ICheckout;
 }
+
+export class UpdateCheckoutResponseDto {
+  @ApiProperty({
+    example: {
+      sessionId:
+        'cs_test_a1oZuBfNi4fLBgoZfiHGNzOVhrrefs2kbwxGsxS12UX7Zx45TnBs1sMWbj',
+      paymentStatus: 'paid',
+    },
+  })
+  data: ICheckout;
+}

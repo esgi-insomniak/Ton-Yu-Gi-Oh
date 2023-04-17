@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class PaymentCheckout {
@@ -17,6 +17,6 @@ export class PaymentCheckout {
   @Column()
   url: string;
 
-  @Column({nullable: true})
-  coins: number
+  @Column({ nullable: true })
+  coins: number;
 }

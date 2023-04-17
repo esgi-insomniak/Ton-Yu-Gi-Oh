@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserCardSet } from 'src/entities/user-card-set.entity';
 import { UserDeck } from 'src/entities/user-deck.entity';
 import { UserSet } from 'src/entities/user-set.entity';
-import {
-  ParamGetItemById,
-  QueryGetItems,
-} from 'src/interfaces/common/common.response.interface';
+import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -21,9 +18,11 @@ export class UserDeckService {
   }
 
   async getUserCardSetById(id: string): Promise<UserCardSet> {
-    const userCardSet = await this.dataSource.getRepository(UserCardSet).findOne({
-      where: { id },
-    });
+    const userCardSet = await this.dataSource
+      .getRepository(UserCardSet)
+      .findOne({
+        where: { id },
+      });
     return userCardSet;
   }
 

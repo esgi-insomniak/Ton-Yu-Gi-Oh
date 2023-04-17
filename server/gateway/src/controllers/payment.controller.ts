@@ -14,13 +14,18 @@ import { GetPaymentHistoriesResponseDto } from 'src/interfaces/payment-service/p
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
 import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
-import { GetResponseArray } from 'src/interfaces/common/common.response';
+import {
+  GetResponseArray,
+  GetResponseOne,
+} from 'src/interfaces/common/common.response';
 import { IPaymentHistory } from 'src/interfaces/payment-service/paymentHistory/payment-history.interface';
-import { CreateCheckoutResponseDto } from 'src/interfaces/payment-service/checkout/checkout-response.dto';
-import { ICheckoutCreateResponse } from 'src/interfaces/payment-service/checkout/checkout-response.interface';
+import {
+  CreateCheckoutResponseDto,
+  UpdateCheckoutResponseDto,
+} from 'src/interfaces/payment-service/checkout/checkout-response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
-import { UpdateCheckoutResponse } from 'src/interfaces/payment-service/update/update-response.dto';
+import { ICheckout } from 'src/interfaces/payment-service/checkout/checkout.interface';
 
 @Controller('payment')
 @ApiTags('payment')
@@ -67,7 +72,7 @@ export class PaymentController {
     @Param('id') productId: string,
     @Req() request: IAuthorizedRequest,
   ): Promise<CreateCheckoutResponseDto> {
-    const paymentResponse: ICheckoutCreateResponse = await firstValueFrom(
+    const paymentResponse: GetResponseOne<ICheckout> = await firstValueFrom(
       this.paymentServiceClient.send('create_checkout', {
         productId,
         userId: request.user.id,
@@ -79,7 +84,7 @@ export class PaymentController {
     }
 
     const result: CreateCheckoutResponseDto = {
-      data: paymentResponse.session,
+      data: paymentResponse.item,
     };
 
     return result;
@@ -88,13 +93,13 @@ export class PaymentController {
   @Authorization(true)
   @Post('checkout/:id/update')
   @ApiCreatedResponse({
-    type: UpdateCheckoutResponse,
+    type: UpdateCheckoutResponseDto,
   })
   public async updateCheckout(
     @Param('id') sessionId: string,
     @Req() request: IAuthorizedRequest,
-  ): Promise<UpdateCheckoutResponse> {
-    const paymentResponse: ICheckoutCreateResponse = await firstValueFrom(
+  ): Promise<UpdateCheckoutResponseDto> {
+    const paymentResponse: GetResponseOne<ICheckout> = await firstValueFrom(
       this.paymentServiceClient.send('update_checkout', {
         sessionId,
         userId: request.user.id,
@@ -105,18 +110,18 @@ export class PaymentController {
       throw new HttpException(paymentResponse.message, paymentResponse.status);
     }
 
-    if (paymentResponse.session.paymentStatus === 'paid') {
-      console.log(paymentResponse.session.coins);
+    if (paymentResponse.item.paymentStatus === 'paid') {
+      console.log(paymentResponse.item.coins);
       await firstValueFrom(
         this.userServiceClient.send('add_coins_user', {
           userId: request.user.id,
-          coins: paymentResponse.session.coins,
+          coins: paymentResponse.item.coins,
         }),
       );
     }
 
-    const result: UpdateCheckoutResponse = {
-      data: paymentResponse.session,
+    const result: UpdateCheckoutResponseDto = {
+      data: paymentResponse.item,
     };
 
     return result;

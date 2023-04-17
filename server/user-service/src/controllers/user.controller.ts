@@ -87,19 +87,22 @@ export class UserController {
   public async addCoinsUser(params: {
     userId: string;
     coins: number;
-  }): Promise<IUserGetOneResponse> {
-    let result: IUserGetOneResponse = {
+  }): Promise<GetResponseOne<User>> {
+    let result: GetResponseOne<User> = {
       status: HttpStatus.NOT_FOUND,
       message: 'User not found',
-      user: null,
+      item: null,
     };
 
     try {
-      const user = await this.userService.addCoinsUser(params.userId, params.coins);
+      const user = await this.userService.addCoinsUser(
+        params.userId,
+        params.coins,
+      );
 
       result = {
         status: HttpStatus.OK,
-        user: user,
+        item: user,
       };
     } catch (e) {}
 
