@@ -61,4 +61,12 @@ export class UserService {
     });
     return this.userRepository.save(user);
   }
+
+  async addCoinsUser(userId: string, coins: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    user.coins += coins;
+    return this.userRepository.save(user);
+  }
 }

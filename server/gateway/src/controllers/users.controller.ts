@@ -26,7 +26,6 @@ import {
   LoginUserBodyDto,
 } from 'src/interfaces/user-service/user/user.body.dto';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
-import { Permission } from 'src/decorators/permission.decorator';
 import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
   DefaultResponse,
