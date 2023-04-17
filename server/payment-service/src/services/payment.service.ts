@@ -59,14 +59,14 @@ export class PaymentService {
   async updateCheckout(sessionId: string, userId: string): Promise<PaymentCheckout> {
     const session = await this.stripe.checkout.sessions.retrieve(sessionId);
     const paymentCheckoutRepository = this.dataSource.getRepository(PaymentCheckout);
-    console.log("Payment Service : ", userId)
-    const paymentCheckout = paymentCheckoutRepository.findOneBy({
+    const paymentCheckout = await paymentCheckoutRepository.findOneBy({
       sessionId: sessionId,
       userId: userId,
     });
-    (await paymentCheckout).paymentStatus = session.payment_status;
-    paymentCheckoutRepository.save((await paymentCheckout));
-    return session;
+    paymentCheckout.paymentStatus = session.payment_status;
+    paymentCheckout.coins = session.amount_total;
+    paymentCheckoutRepository.save(paymentCheckout);
+    return paymentCheckout;
   }
 }
 

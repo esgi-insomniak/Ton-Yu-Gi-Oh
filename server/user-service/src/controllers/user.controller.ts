@@ -82,4 +82,27 @@ export class UserController {
 
     return result;
   }
+
+  @MessagePattern('add_coins_user')
+  public async addCoinsUser(params: {
+    userId: string;
+    coins: number;
+  }): Promise<IUserGetOneResponse> {
+    let result: IUserGetOneResponse = {
+      status: HttpStatus.NOT_FOUND,
+      message: 'User not found',
+      user: null,
+    };
+
+    try {
+      const user = await this.userService.addCoinsUser(params.userId, params.coins);
+
+      result = {
+        status: HttpStatus.OK,
+        user: user,
+      };
+    } catch (e) {}
+
+    return result;
+  }
 }

@@ -70,12 +70,13 @@ export class PaymentController {
       const session = await this.paymentService.updateCheckout(params.sessionId, params.userId);
 
       result = {
-        status: HttpStatus.OK,
+        status: HttpStatus.ACCEPTED,
         message: "Session updated",
         session: {
           sessionId: session.id,
           paymentStatus: session.paymentStatus,
           url: session.url,
+          coins: session.coins,
         },
       };
     } catch (e) {

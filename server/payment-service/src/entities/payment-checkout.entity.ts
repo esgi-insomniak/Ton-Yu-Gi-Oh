@@ -16,4 +16,7 @@ export class PaymentCheckout {
 
   @Column()
   url: string;
+
+  @Column({nullable: true})
+  coins: number
 }

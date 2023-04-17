@@ -13,5 +13,6 @@ export interface ICheckoutCreateResponse {
     sessionId: string;
     paymentStatus: string;
     url: string;
+    coins?: number;
   };
 }

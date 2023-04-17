@@ -27,6 +27,8 @@ export class PaymentController {
   constructor(
     @Inject('PAYMENT_SERVICE')
     private readonly paymentServiceClient: ClientProxy,
+    @Inject('USER_SERVICE')
+    private readonly userServiceClient: ClientProxy,
   ) {}
 
   @Get()
@@ -91,11 +93,24 @@ export class PaymentController {
     @Req() request: IAuthorizedRequest,
   ): Promise<UpdateCheckoutResponse> {
     const paymentResponse: ICheckoutCreateResponse = await firstValueFrom(
-      this.paymentServiceClient.send('update_checkout', {sessionId, userId: request.user.id}),
+      this.paymentServiceClient.send('update_checkout', {
+        sessionId,
+        userId: request.user.id,
+      }),
     );
 
     if (paymentResponse.status !== HttpStatus.ACCEPTED) {
       throw new HttpException(paymentResponse.message, paymentResponse.status);
+    }
+
+    if (paymentResponse.session.paymentStatus === 'paid') {
+      console.log(paymentResponse.session.coins)
+      await firstValueFrom(
+        this.userServiceClient.send('add_coins_user', {
+          userId: request.user.id,
+          coins: paymentResponse.session.coins,
+        }),
+      );
     }
 
     const result: UpdateCheckoutResponse = {
