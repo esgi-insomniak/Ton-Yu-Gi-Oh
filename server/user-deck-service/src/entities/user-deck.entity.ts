@@ -1,32 +1,30 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  ManyToOne,
   ManyToMany,
   JoinTable,
+  Column
 } from 'typeorm';
 import { UserCardSet } from './user-card-set.entity';
-import { User } from './user.entity';
 
 @Entity()
 export class UserDeck {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.decks)
-  user: User;
+  @Column('uuid')
+  userId: string;
 
   @ManyToMany(() => UserCardSet)
   @JoinTable({
-    name: 'deck_card_set',
+    name: 'deck_cardSet',
     joinColumn: {
-      name: 'deck_id',
-      referencedColumnName: 'id',
+      name: 'userDeckId',
     },
     inverseJoinColumn: {
-      name: 'userCardSet_id',
-      referencedColumnName: 'id',
+      name: 'userCardSetId',
     },
   })
   cardSets: UserCardSet[];
 }
+

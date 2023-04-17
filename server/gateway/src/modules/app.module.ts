@@ -49,6 +49,14 @@ import { LogService } from 'src/services/config/logger.service';
       inject: [ConfigService],
     },
     {
+      provide: 'USER_DECK_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const userDeckServiceOptions = configService.get('userDeckService');
+        return ClientProxyFactory.create(userDeckServiceOptions);
+      },
+      inject: [ConfigService],
+    },
+    {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },

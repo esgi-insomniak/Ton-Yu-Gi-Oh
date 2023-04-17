@@ -71,12 +71,29 @@ import {
   GetCardTypesResponseDto,
 } from 'src/interfaces/card-service/type/type.response.dto';
 import { ICardType } from 'src/interfaces/card-service/type/type.interface';
+import { IUserCardSet } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
+import {
+  GetUserCardSetByIdResponseDto,
+  GetUserCardSetsResponseDto,
+} from 'src/interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
+import { IUserDeck } from 'src/interfaces/user-deck-service/userDeck/user-deck.interface';
+import {
+  GetUserDeckByIdResponseDto,
+  GetUserDecksResponseDto,
+} from 'src/interfaces/user-deck-service/userDeck/user-card-set.response.dto';
+import {
+  GetUserSetByIdResponseDto,
+  GetUserSetsResponseDto,
+} from 'src/interfaces/user-deck-service/userSet/user-card-set.response.dto';
+import { IUserSet } from 'src/interfaces/user-deck-service/userSet/user-set.interface';
 
 @Controller('cards')
 @ApiTags('cards')
 export class CardController {
   constructor(
     @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
+    @Inject('USER_DECK_SERVICE')
+    private readonly userDeckServiceClient: ClientProxy,
   ) {}
 
   @Get('archetypes')
@@ -672,6 +689,179 @@ export class CardController {
 
     if (cardTypeResponse.status !== HttpStatus.OK) {
       throw new HttpException(result, cardTypeResponse.status);
+    }
+
+    return result;
+  }
+
+  @Get('user_card_sets')
+  @ApiOkResponse({
+    type: GetUserCardSetsResponseDto,
+  })
+  public async getUserCardSets(
+    @Query() query: GetItemsPaginationDto,
+  ): Promise<GetUserCardSetsResponseDto> {
+    const userCardSetResponse: GetResponseArray<IUserCardSet> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardsets', {
+          limit: query.limit,
+          offset: query.offset,
+        }),
+      );
+
+    if (userCardSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetResponse.message,
+        userCardSetResponse.status,
+      );
+    }
+
+    const result: GetUserCardSetsResponseDto = {
+      data: userCardSetResponse.items,
+    };
+
+    return result;
+  }
+
+  @Get('user_card_sets/:id')
+  @ApiOkResponse({
+    type: GetUserCardSetByIdResponseDto,
+  })
+  public async getUserCardSetById(
+    @Param() params: GetItemByIdDto,
+  ): Promise<GetUserCardSetByIdResponseDto> {
+    const userCardSetResponse: GetResponseOne<IUserCardSet> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardset_by_id', {
+          id: params.id,
+        }),
+      );
+
+    if (userCardSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetResponse.message,
+        userCardSetResponse.status,
+      );
+    }
+
+    const result: GetUserCardSetByIdResponseDto = {
+      data: userCardSetResponse.item,
+    };
+
+    if (userCardSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(result, userCardSetResponse.status);
+    }
+
+    return result;
+  }
+
+  @Get('user_decks')
+  @ApiOkResponse({
+    type: GetUserDecksResponseDto,
+  })
+  public async getUserDecks(
+    @Query() query: GetItemsPaginationDto,
+  ): Promise<GetUserDecksResponseDto> {
+    const userDeckResponse: GetResponseArray<IUserDeck> = await firstValueFrom(
+      this.userDeckServiceClient.send('get_userdecks', {
+        limit: query.limit,
+        offset: query.offset,
+      }),
+    );
+
+    if (userDeckResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userDeckResponse.message,
+        userDeckResponse.status,
+      );
+    }
+
+    const result: GetUserDecksResponseDto = {
+      data: userDeckResponse.items,
+    };
+
+    return result;
+  }
+
+  @Get('user_decks/:id')
+  @ApiOkResponse({
+    type: GetUserDeckByIdResponseDto,
+  })
+  public async getUserDeckById(
+    @Param() params: GetItemByIdDto,
+  ): Promise<GetUserDeckByIdResponseDto> {
+    const userDeckResponse: GetResponseOne<IUserDeck> = await firstValueFrom(
+      this.userDeckServiceClient.send('get_userdeck_by_id', {
+        id: params.id,
+      }),
+    );
+
+    if (userDeckResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userDeckResponse.message,
+        userDeckResponse.status,
+      );
+    }
+
+    const result: GetUserDeckByIdResponseDto = {
+      data: userDeckResponse.item,
+    };
+
+    if (userDeckResponse.status !== HttpStatus.OK) {
+      throw new HttpException(result, userDeckResponse.status);
+    }
+
+    return result;
+  }
+
+  @Get('user_sets')
+  @ApiOkResponse({
+    type: GetUserSetsResponseDto,
+  })
+  public async getUserSets(
+    @Query() query: GetItemsPaginationDto,
+  ): Promise<GetUserSetsResponseDto> {
+    const userSetResponse: GetResponseArray<IUserSet> = await firstValueFrom(
+      this.userDeckServiceClient.send('get_usersets', {
+        limit: query.limit,
+        offset: query.offset,
+      }),
+    );
+
+    if (userSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(userSetResponse.message, userSetResponse.status);
+    }
+
+    const result: GetUserSetsResponseDto = {
+      data: userSetResponse.items,
+    };
+
+    return result;
+  }
+
+  @Get('user_sets/:id')
+  @ApiOkResponse({
+    type: GetUserSetByIdResponseDto,
+  })
+  public async getUserSetById(
+    @Param() params: GetItemByIdDto,
+  ): Promise<GetUserSetByIdResponseDto> {
+    const userSetResponse: GetResponseOne<IUserSet> = await firstValueFrom(
+      this.userDeckServiceClient.send('get_userset_by_id', {
+        id: params.id,
+      }),
+    );
+
+    if (userSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(userSetResponse.message, userSetResponse.status);
+    }
+
+    const result: GetUserSetByIdResponseDto = {
+      data: userSetResponse.item,
+    };
+
+    if (userSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(result, userSetResponse.status);
     }
 
     return result;

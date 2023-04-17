@@ -153,6 +153,39 @@ services:
         - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
       volumes:
         - auth-service-postgres-dev:/var/lib/postgresql/data
+    user-deck-service-node:
+      build:
+        context: ./server/user-deck-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: user-deck-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - user-deck-service-postgres
+      volumes:
+        - user-deck-service-node-dev:/usr/src/app
+      links:
+        - user-deck-service-postgres
+    user-deck-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-deck-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${USER_DECK_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_DECK_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-deck-service-postgres-dev:/var/lib/postgresql/data
     adminer:
       image: adminer:4.8.1
       hostname: adminer
@@ -173,11 +206,13 @@ volumes:
     user-service-postgres-dev:
     payment-service-postgres-dev:
     auth-service-postgres-dev:
+    user-deck-service-postgres-dev:
     gateway-dev:
     card-service-node-dev:
     user-service-node-dev:
     payment-service-node-dev:
     auth-service-node-dev:
+    user-deck-service-node-dev:
 
 x-mutagen:
   sync:
@@ -268,6 +303,23 @@ x-mutagen:
     auth-service-replica:
       alpha: volume://auth-service-node-dev
       beta: ./server/auth-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    user-deck-service:
+      alpha: ./server/user-deck-service
+      beta: volume://user-deck-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    user-deck-service-replica:
+      alpha: volume://user-deck-service-node-dev
+      beta: ./server/user-deck-service
       mode: one-way-replica
       ignore:
         paths:
