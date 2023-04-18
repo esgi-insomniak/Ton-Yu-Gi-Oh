@@ -6,3 +6,8 @@ export interface IUser {
   coins: number;
   roles: string[];
 }
+
+export enum IUserRoles {
+  'admin',
+  'user',
+}

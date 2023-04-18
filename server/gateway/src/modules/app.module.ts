@@ -2,17 +2,17 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
-import { CardController } from '../controllers/cards.controller';
-import { UserController } from '../controllers/users.controller';
 import { ConfigService } from '../services/config/config.service';
-import { PaymentController } from '../controllers/payment.controller';
 import { AuthGuard } from 'src/services/guard/authorization.guard';
 import { PermissionGuard } from 'src/services/guard/permission.guard';
 import { LogService } from 'src/services/config/logger.service';
+import { CardModule } from './card.module';
+import { PaymentModule } from './payment.module';
+import { UserModule } from './user.module';
+import { AuthModule } from './auth.module';
 
 @Module({
-  imports: [],
-  controllers: [CardController, UserController, PaymentController],
+  imports: [CardModule, PaymentModule, UserModule, AuthModule],
   providers: [
     ConfigService,
     LogService,
@@ -64,6 +64,13 @@ import { LogService } from 'src/services/config/logger.service';
       provide: APP_GUARD,
       useClass: PermissionGuard,
     },
+  ],
+  exports: [
+    'CARD_SERVICE',
+    'USER_SERVICE',
+    'PAYMENT_SERVICE',
+    'AUTH_SERVICE',
+    'USER_DECK_SERVICE',
   ],
 })
 export class AppModule {}

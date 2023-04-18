@@ -18,7 +18,6 @@ export class UserService {
     const users = await this.userRepository.find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
-      relations: ['sets', 'cardSets', 'decks'],
     });
     return users;
   }
@@ -26,7 +25,6 @@ export class UserService {
   async getUserById(param: ParamGetItemById): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: param.id },
-      relations: ['sets', 'cardSets', 'decks'],
     });
     return user;
   }
