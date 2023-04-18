@@ -2,6 +2,8 @@ import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
 import React from "react";
 import { Link } from "react-router-dom";
+// @ts-ignore
+import { useTrackEvent } from "@inso/sdk";
 
 const navs = [
     { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
@@ -13,6 +15,7 @@ const navs = [
 
 const Home = () => {
     const { user, isLoggedIn } = useAuth()
+    const { ref } = useTrackEvent<HTMLButtonElement>('t-btn-home-page')
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
@@ -30,6 +33,7 @@ const Home = () => {
                         <NavItem key={index} animatedBackground={nav.animatedBackground} path={nav.path} poster={nav.poster} />
                     ))}
                 </div>
+                <button ref={ref}>click me</button>
             </div>
             <div className="h-20 w-full bottom-0 absolute flex px-5 items-center">
                 <div className="dropdown dropdown-right dropdown-end">
