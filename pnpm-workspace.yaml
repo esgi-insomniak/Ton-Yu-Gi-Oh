@@ -1,3 +1,2 @@
 packages:
-  - client
-  - analytics-kpi/*
+  - app/*

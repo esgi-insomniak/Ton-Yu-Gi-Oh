@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { UserContextProvider } from '@/helpers/providers/users/usersProvider';
 // @ts-ignore
-import { TrackingProvider } from '@inso/sdk'
+import { TrackingProvider } from '@app/sdk'
 
 function App() {
   const queryClient = new QueryClient()

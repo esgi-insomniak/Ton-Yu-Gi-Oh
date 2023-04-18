@@ -3,7 +3,7 @@ import { useAuth } from "@/helpers/api/hooks";
 import React from "react";
 import { Link } from "react-router-dom";
 // @ts-ignore
-import { useTrackEvent } from "@inso/sdk";
+import { useTrackEvent } from "@app/sdk";
 
 const navs = [
     { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
