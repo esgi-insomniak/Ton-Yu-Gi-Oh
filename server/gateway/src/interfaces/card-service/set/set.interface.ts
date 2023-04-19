@@ -1,6 +1,6 @@
 import { ICardCardSet } from '../cardSet/card-set.interface';
 
-export interface ICardSet extends Document {
+export interface ICardSet {
   id: string;
   cardSets: ICardCardSet[];
   name: string;

@@ -1,15 +1,15 @@
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import {
-  ITokenCreateResponse,
-  ITokenDecodeResponse,
-  ITokenDestroyResponse,
-} from 'src/interfaces/token/token-response.interface';
 import { TokenService } from '../services/token.service';
+import {
+  DefaultResponse,
+  GetResponseOne,
+} from 'src/interfaces/common/common.response.interface';
+import { Token } from 'src/entities/token.entity';
 
 @Controller('token')
 export class TokenController {
-  constructor(private readonly tokenService: TokenService) { }
+  constructor(private readonly tokenService: TokenService) {}
 
   @MessagePattern('token_create')
   public async createToken(data: {
@@ -17,11 +17,11 @@ export class TokenController {
     username: string;
     roles: string[];
     email: string;
-  }): Promise<ITokenCreateResponse> {
-    let result: ITokenCreateResponse = {
+  }): Promise<GetResponseOne<Token>> {
+    let result: GetResponseOne<Token> = {
       status: HttpStatus.BAD_REQUEST,
       message: 'Failed to create token',
-      token: null,
+      item: null,
     };
 
     try {
@@ -33,9 +33,9 @@ export class TokenController {
       });
       result = {
         status: HttpStatus.CREATED,
-        token: createTokenResult,
+        item: createTokenResult,
       };
-    } catch (e) { }
+    } catch (e) {}
 
     return result;
   }
@@ -43,8 +43,8 @@ export class TokenController {
   @MessagePattern('token_destroy')
   public async destroyToken(data: {
     userId: string;
-  }): Promise<ITokenDestroyResponse> {
-    let result: ITokenDestroyResponse = {
+  }): Promise<DefaultResponse> {
+    let result: DefaultResponse = {
       status: HttpStatus.BAD_REQUEST,
       message: 'Failed to destroy token',
     };
@@ -54,7 +54,7 @@ export class TokenController {
       result = {
         status: HttpStatus.OK,
       };
-    } catch (e) { }
+    } catch (e) {}
 
     return result;
   }
@@ -62,10 +62,11 @@ export class TokenController {
   @MessagePattern('token_decode')
   public async decodeToken(data: {
     token: string;
-  }): Promise<ITokenDecodeResponse> {
-    let result: ITokenDecodeResponse = {
+  }): Promise<GetResponseOne<{ userId: string }>> {
+    let result: GetResponseOne<{ userId: string }> = {
       status: HttpStatus.UNAUTHORIZED,
       message: 'Invalid token provided or token not found',
+      item: null,
     };
 
     if (!data.token || !data.token.startsWith('Bearer')) {
@@ -78,7 +79,7 @@ export class TokenController {
     if (decodeTokenResult.userId !== null) {
       result = {
         status: HttpStatus.OK,
-        data: decodeTokenResult,
+        item: decodeTokenResult,
       };
     }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Token } from 'src/entities/token.entity';
-import { DataSource, DeleteResult, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from './config/config.service';
 import { ITokenParamsType } from 'src/interfaces/token/token-params.interface';
 
@@ -15,7 +15,12 @@ export class TokenService {
     this.tokenRepository = dataSource.getRepository(Token);
   }
 
-  public async createToken({ username, userId, roles, email }: ITokenParamsType): Promise<Token> {
+  public async createToken({
+    username,
+    userId,
+    roles,
+    email,
+  }: ITokenParamsType): Promise<Token> {
     const token = this.jwtService.sign(
       {
         userId,
@@ -40,7 +45,7 @@ export class TokenService {
     return this.tokenRepository.remove(tokens);
   }
 
-  public async decodeToken(token: string) {
+  public async decodeToken(token: string): Promise<{ userId: string }> {
     const result = {
       userId: null,
     };
@@ -57,7 +62,7 @@ export class TokenService {
         if (tokenData.exp > Math.floor(Date.now() / 1000)) {
           result.userId = tokenData.userId;
         }
-      } catch (e) { }
+      } catch (e) {}
     }
     return result;
   }

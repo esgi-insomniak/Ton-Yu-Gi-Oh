@@ -14,6 +14,7 @@ export class DatabaseFeederCommand extends CommandRunner {
   }
 
   async run(): Promise<void> {
+    this.logService.log('Feeding database...');
     const cardDBFeedResponse = await firstValueFrom(
       this.cardServiceClient.send('feed_database', { chunk: 1000 }),
     );

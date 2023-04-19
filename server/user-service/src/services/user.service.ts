@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
+import {
+  ParamGetItemById,
+  QueryGetItems,
+} from 'src/interfaces/common/common.response.interface';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -10,19 +14,17 @@ export class UserService {
     this.userRepository = dataSource.getRepository(User);
   }
 
-  async getUsers(query: { limit: number; offset: number }): Promise<User[]> {
+  async getUsers(query: QueryGetItems): Promise<User[]> {
     const users = await this.userRepository.find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
-      relations: ['sets', 'cardSets', 'decks'],
     });
     return users;
   }
 
-  async getUserById(id: string): Promise<User> {
+  async getUserById(param: ParamGetItemById): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { id },
-      relations: ['sets', 'cardSets', 'decks'],
+      where: { id: param.id },
     });
     return user;
   }
@@ -55,6 +57,14 @@ export class UserService {
       email: params.email,
       phone: params.phone,
     });
+    return this.userRepository.save(user);
+  }
+
+  async addCoinsUser(userId: string, coins: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    user.coins += coins;
     return this.userRepository.save(user);
   }
 }

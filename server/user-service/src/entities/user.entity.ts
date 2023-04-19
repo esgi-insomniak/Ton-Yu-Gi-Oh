@@ -1,13 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  BeforeInsert,
-} from 'typeorm';
-import { UserCardSet } from './user-card-set.entity';
-import { UserDeck } from './user-deck.entity';
-import { UserSet } from './user-set.entity';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 
 @Entity()
 export class User {
@@ -28,15 +19,6 @@ export class User {
 
   @Column({ default: 0 })
   coins: number;
-
-  @OneToMany(() => UserSet, (userSet) => userSet.user)
-  sets: UserSet[];
-
-  @OneToMany(() => UserCardSet, (userCardSet) => userCardSet.user)
-  cardSets: UserCardSet[];
-
-  @OneToMany(() => UserDeck, (userDeck) => userDeck.user)
-  decks: UserDeck[];
 
   @BeforeInsert()
   setDefaultRoles() {

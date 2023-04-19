@@ -1,6 +1,6 @@
 import { ICard } from '../card/card.interface';
 
-export interface ICardAttribute extends Document {
+export interface ICardAttribute {
   id: string;
   cards: ICard[];
   name: string;

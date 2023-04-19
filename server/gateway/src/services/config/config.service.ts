@@ -34,6 +34,13 @@ export class ConfigService {
       },
       transport: Transport.TCP,
     };
+    this.envConfig.userDeckService = {
+      options: {
+        port: process.env.USER_DECK_SERVICE_PORT,
+        host: process.env.USER_DECK_SERVICE_HOST,
+      },
+      transport: Transport.TCP,
+    };
   }
 
   get(key: string): any {

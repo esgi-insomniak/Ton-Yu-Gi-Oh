@@ -147,6 +147,38 @@ services:
         - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
       volumes:
         - auth-service-postgres-prod:/var/lib/postgresql/data
+    user-deck-service-node:
+      build:
+        context: ./server/user-deck-service
+        dockerfile: Dockerfile
+        target: prod
+      hostname: user-deck-service-node
+      command: >
+        sh -c "yarn typeorm:migrate &&
+        node dist/main.js"
+      networks:
+        - backend-prod
+      env_file:
+        - .env
+      depends_on:
+        - user-deck-service-postgres
+      volumes:
+        - ./server/user-deck-service:/usr/src/app
+      links:
+        - user-deck-service-postgres
+    user-deck-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-deck-service-postgres
+      networks:
+        - backend-prod
+      env_file:
+        - .env
+      environment:
+        - POSTGRES_USER=${USER_DECK_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_DECK_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-deck-service-postgres-prod:/var/lib/postgresql/data
 networks:
   backend-prod:
     driver: bridge
@@ -158,3 +190,4 @@ volumes:
     user-service-postgres-prod:
     payment-service-postgres-prod:
     auth-service-postgres-prod:
+    user-deck-service-postgres-prod:

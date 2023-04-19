@@ -7,7 +7,7 @@ import { ICardPrice } from '../price/price.interface';
 import { ICardRace } from '../race/race.interface';
 import { ICardType } from '../type/type.interface';
 
-export interface ICard extends Document {
+export interface ICard {
   id: string;
   identifiant: string;
   type: ICardType;

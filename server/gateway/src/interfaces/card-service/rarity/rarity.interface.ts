@@ -1,4 +1,4 @@
-export interface ICardRarity extends Document {
+export interface ICardRarity {
   id: string;
   name: string;
   code: string;
