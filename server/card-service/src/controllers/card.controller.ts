@@ -133,6 +133,21 @@ export class CardController {
     return result;
   }
 
+  @MessagePattern('get_cardsets_by_ids')
+  public async getCardSetsByIds(params: {
+    ids: string[];
+  }): Promise<GetResponseArray<CardSet>> {
+    console.log(params.ids);
+    const cardSets = await this.cardService.getCardSetsByIds(params.ids);
+    const result: GetResponseArray<CardSet> = {
+      status: cardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: cardSets ? null : 'CardSets not found',
+      items: cardSets,
+    };
+
+    return result;
+  }
+
   @MessagePattern('get_frametypes')
   public async getFrameTypes(
     query: QueryGetItems,

@@ -99,6 +99,18 @@ export class CardService {
     return cardSet;
   }
 
+  async getCardSetsByIds(ids: string[]): Promise<CardSet[]> {
+    const cardSets: CardSet[] = [];
+    for (const id of ids) {
+      const cardSet = await this.dataSource.getRepository(CardSet).findOne({
+        where: { id },
+        relations: ['card', 'set', 'rarity'],
+      });
+      cardSets.push(cardSet);
+    }
+    return cardSets;
+  }
+
   async getFrameTypes(query: QueryGetItems): Promise<FrameType[]> {
     const frameTypes = await this.dataSource.getRepository(FrameType).find({
       take: query.limit || 10,
