@@ -2,7 +2,6 @@ import Router from './Routes/Router';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { UserContextProvider } from '@/helpers/providers/users/usersProvider';
-// @ts-ignore
 import { TrackingProvider } from '@app/sdk'
 
 function App() {
@@ -10,13 +9,13 @@ function App() {
   return (
     <div className="App">
       <QueryClientProvider client={queryClient}>
-        <UserContextProvider>
-          <TrackingProvider>
+        <TrackingProvider>
+          <UserContextProvider>
             <BrowserRouter>
               <Router />
             </BrowserRouter>
-          </TrackingProvider>
-        </UserContextProvider>
+          </UserContextProvider>
+        </TrackingProvider>
       </QueryClientProvider>
     </div>
   )

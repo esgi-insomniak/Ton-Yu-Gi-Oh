@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@app/sdk": "workspace:0.1.0",
+    "@app/sdk": "workspace:*",
     "@hookform/resolvers": "^3.0.0",
     "@react-spring/web": "^9.7.1",
     "@types/node": "^18.15.7",

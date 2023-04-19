@@ -1,3 +1,3 @@
 export * from './hooks';
 export * from './common';
-export * from './providers/AnalyticsProvider';
+export * from './providers';

@@ -11,9 +11,11 @@ const TrackingContext = React.createContext<TrackingContextType>({ clientId: "",
 const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
 
     const trackingContext = React.useMemo(() => {
+        const ls_clientId = localStorage.getItem("clientId");
+        const ls_appId = localStorage.getItem("appId");
         return {
-            clientId: localStorage.getItem("clientId") || generateId('clientId'),
-            appId: localStorage.getItem("appId") || generateId('appId'),
+            clientId: !!ls_clientId ? ls_clientId : generateId('clientId'),
+            appId: !!ls_appId ? ls_appId : generateId('appId')
         };
     }, []);
 

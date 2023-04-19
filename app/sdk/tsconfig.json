@@ -1,0 +1,23 @@
+{
+    "include": [
+      "main.ts"
+    ],
+    "exclude": [
+      "node_modules",
+      "dist",
+      "vite.config.ts"
+    ],
+    "compilerOptions": {
+      "target": "esnext",
+      "jsx": "react",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "strict": true,
+      "skipLibCheck": true,
+      "skipDefaultLibCheck": true,
+      "declaration": true,
+      "composite": true,
+      "declarationDir": "dist",
+      "allowSyntheticDefaultImports": true
+    }
+}
