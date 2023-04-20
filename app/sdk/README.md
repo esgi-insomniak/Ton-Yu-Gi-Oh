@@ -36,10 +36,12 @@ You can then start tracking user events by calling the track method on the analy
 ```javascript
 // some page.tsx
 import { useTrackEvent, useTrackingContext } from 'insomniak-sdk-analytics'
-const { clientId, appId } = useTrackingContext()
-const { ref } = useTrackEvent<HTMLButtonElement>({ tag: 'your-tag', type: 'click', clientId, appId })
 
 fuction Page() {
+
+    const { clientId, appId } = useTrackingContext()
+    const { ref } = useTrackEvent<HTMLButtonElement>({ tag: 'your-tag', type: 'click', clientId, appId })
+
     return (
         <button ref={ref}>Click me</button>
     )

@@ -16,7 +16,6 @@ const Home = () => {
     const { user, isLoggedIn } = useAuth()
     const { clientId, appId } = useTrackingContext()
     const { ref } = useTrackEvent<HTMLButtonElement>({ tag: 'test-btn-home-page', type: 'click', clientId, appId })
-    const { ref: mouseRef } = useTrackMouseMovement({ x: 0, y: 0 })
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">

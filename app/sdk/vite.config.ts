@@ -3,11 +3,11 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
-    plugins: [react()],
+
     build: {
         lib: {
             entry: resolve(__dirname, 'main.ts'), // entry file of the library
-            name: '@app/sdk', // name of the library
+            name: 'insomniak-sdk-analytics', // name of the library
             fileName: (format) => `main.${format}.js`, // file name of the output bundle
         },
         rollupOptions: {
@@ -22,4 +22,5 @@ export default defineConfig({
             },
         },
     },
+    plugins: [react],
 });
