@@ -1,32 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentHistory } from '../entities/payment-history.entity';
 import { DataSource } from 'typeorm';
-import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
 import { ConfigService } from './config/config.service';
 import { PaymentCheckout } from 'src/entities/payment-checkout.entity';
 import Stripe from 'stripe';
 
 @Injectable()
-export class PaymentService {
+export class PaymentCheckoutService {
   private stripe: any;
   private successUrl: string;
   private cancelUrl: string;
 
-  constructor(private dataSource: DataSource, configService: ConfigService) {
+  constructor(
+    private readonly dataSource: DataSource,
+    configService: ConfigService,
+  ) {
     this.stripe = new Stripe(configService.get('stripeSecretKey'), {
       apiVersion: '2022-11-15',
     });
     this.successUrl = configService.get('successUrl');
     this.cancelUrl = configService.get('cancelUrl');
-  }
-
-  async getPaymentHistories(query: QueryGetItems): Promise<PaymentHistory[]> {
-    const paymentRepository = this.dataSource.getRepository(PaymentHistory);
-    const payments = await paymentRepository.find({
-      take: query.limit || 10,
-      skip: query.offset * query.limit || 0,
-    });
-    return payments;
   }
 
   async createCheckout(

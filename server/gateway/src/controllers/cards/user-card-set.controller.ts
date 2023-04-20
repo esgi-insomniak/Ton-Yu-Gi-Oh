@@ -1,35 +1,29 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   HttpException,
   HttpStatus,
   Inject,
   Param,
-  Post,
   Query,
   Request,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { GetItemsPaginationDto } from '../../interfaces/common/common.query.dto';
 import {
   GetResponseArray,
   GetResponseOne,
-} from 'src/interfaces/common/common.response';
-import { GetItemByIdDto } from 'src/interfaces/common/common.params.dto';
-import { IUserCardSet } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
-import {
-  GetUserCardSetByIdResponseDto,
-  GetUserCardSetsResponseDto,
-} from 'src/interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
+} from '../../interfaces/common/common.response';
+import { GetItemByIdDto } from '../../interfaces/common/common.params.dto';
+import { IUserCardSet } from '../../interfaces/user-deck-service/userCardSet/user-card-set.interface';
+import { GetUserCardSetByIdResponseDto } from '../../interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { Permission } from 'src/decorators/permission.decorator';
 import { ICardSet } from 'src/interfaces/card-service/set/set.interface';
-import { GetCardSetsResponseDto } from 'src/interfaces/card-service/set/set.response.dto';
+import { GetCardSetsResponseDto } from '../../interfaces/card-service/set/set.response.dto';
 
 @Controller('user_card_sets')
 @ApiTags('UserCardSet')
