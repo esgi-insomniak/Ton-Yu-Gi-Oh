@@ -2,7 +2,7 @@ import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
 import React from "react";
 import { Link } from "react-router-dom";
-import { useTrackEvent, useTrackMouseMovement, useTrackingContext } from "@app/sdk";
+import { useTrackEvent, useTrackMouseMovement, useTrackingContext } from "insomniak-sdk-analytics";
 
 const navs = [
     { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },

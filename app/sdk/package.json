@@ -1,7 +1,7 @@
 {
-  "name": "@app/sdk",
-  "version": "0.1.0",
-  "private": true,
+  "name": "insomniak-sdk-analytics",
+  "version": "0.1.1",
+  "private": false,
   "main": "dist/main.es.js",
   "module": "dist/main.es.js",
   "typings": "dist/main.d.ts",

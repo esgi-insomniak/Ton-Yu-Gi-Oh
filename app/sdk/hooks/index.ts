@@ -1,4 +1,4 @@
-import React from "react"
+import React, { RefObject } from "react"
 import { getScreenSize } from "../common";
 
 type TypeOfEvent = "click" | "hover" | "scroll" | "time";
@@ -12,8 +12,14 @@ interface TrackEventProps {
 interface TrackMouseMovementProps {
     x: number;
     y: number;
-    clientId?: string;
-    appId?: string;
+    timestamp: number;
+    screenSize: ReturnType<typeof getScreenSize>;
+}
+
+interface TrackMouseMouvementType {
+    ref: RefObject<Element>;
+    appId: string;
+    clientId: string;
 }
 
 /**
@@ -56,49 +62,61 @@ const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type, clientId,
     };
 }
 
+
 /**
- * This function tracks mouse movement on a specified target element and sends the data to a server for
- * tracking purposes.
- * @param {TrackMouseMovementProps}  - - `TargetElement`: a generic type parameter that extends
- * `HTMLElement`, which represents the type of the element that the mouse movement is being tracked on.
- * @returns The `useTrackMouseMovement` function returns an object with a single property `ref`, which
- * is a `React.RefObject` that can be attached to a DOM element. This ref is used to track mouse
- * movement on the element and send data to a server using the `navigator.sendBeacon` method.
+ * This function tracks mouse movement and sends data to a server for analytics purposes.
+ * @param {TrackMouseMouvementType}  - - `ref`: a reference to the DOM element that the mouse movement
+ * is being tracked on
+ * @returns The function `useTrackMouseMovement` returns an object of type `TrackMouseMovementProps`,
+ * which contains the current mouse position, timestamp, and screen size.
  */
-const useTrackMouseMovement = <TargetElement extends HTMLElement>({ x, y, clientId, appId }: TrackMouseMovementProps) => {
-    const ref = React.useRef<TargetElement | null>(null);
+const useTrackMouseMovement = ({ ref, appId, clientId }: TrackMouseMouvementType): TrackMouseMovementProps => {
+    const [mousePosition, setMousePosition] = React.useState<TrackMouseMovementProps>({
+        x: 0,
+        y: 0,
+        timestamp: 0,
+        screenSize: getScreenSize(window)
+    });
+
+    const handleMouseMove = (event: MouseEvent) => {
+        const { clientX, clientY, timeStamp } = event;
+        setMousePosition({
+            x: clientX,
+            y: clientY,
+            timestamp: timeStamp,
+            screenSize: getScreenSize(window)
+        });
+    };
 
     React.useEffect(() => {
         const track = () => {
-            const screenSize = getScreenSize(window);
             navigator.sendBeacon("/api/track", JSON.stringify({
-                event: "mouse-movement",
-                x,
-                y,
-                screenSize,
-                timestamp: Date.now(),
+                event: "mouseMovement",
+                tag: "mouseMovement",
+                timestamp: mousePosition.timestamp,
                 clientId,
-                appId
+                appId,
+                mousePosition
             }));
-
         };
 
         if (ref.current) {
-            ref.current.addEventListener("mousemove", track);
+            ref.current.addEventListener("mousemove", () => handleMouseMove);
+            ref.current.addEventListener("mouseleave", track);
         }
 
         return () => {
             if (ref.current) {
-                ref.current.removeEventListener("mousemove", track);
+                ref.current.removeEventListener("mousemove", () => handleMouseMove);
+                ref.current.removeEventListener("mouseleave", track);
             }
         }
-    }, [ref]);
+    }, [mousePosition]);
 
-    return {
-        ref
-    };
+    return mousePosition;
+
 }
 
 
 export { useTrackEvent, useTrackMouseMovement }
-export type { TrackEventProps, TrackMouseMovementProps }
+export type { TrackEventProps, TrackMouseMovementProps, TrackMouseMouvementType }

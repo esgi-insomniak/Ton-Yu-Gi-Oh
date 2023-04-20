@@ -1,46 +1,73 @@
-# Getting Started with Create React App
+# Insomniak SDK Analytics
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Insomniak SDK Analytics is a powerful analytics tool for mobile apps that allows developers to track various user activities within their app. It provides insights into user behavior, allowing developers to make data-driven decisions for improving their app's user experience.
 
-## Available Scripts
+## Installation
 
-In the project directory, you can run:
+To install the Insomniak SDK Analytics package, simply run the following command:
 
-### `npm start`
+```bash
+npm install insomniak-sdk-analytics
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+pnpm install insomniak-sdk-analytics
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+yarn add insomniak-sdk-analytics
+```
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Usage
 
-### `npm run build`
+Once you have installed the package, you can import it into your project as follows:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```javascript
+import InsomniakAnalytics from 'insomniak-sdk-analytics';
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+To start tracking user activities, you need to initialize the InsomniakAnalytics object with your app's API key, like so:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```javascript
+<TrackingProvider>
+    <App />
+</TrackingProvider>
+```
 
-### `npm run eject`
+You can then start tracking user events by calling the track method on the analytics object, like this:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```javascript
+// some page.tsx
+import { useTrackEvent, useTrackingContext } from 'insomniak-sdk-analytics'
+const { clientId, appId } = useTrackingContext()
+const { ref } = useTrackEvent<HTMLButtonElement>({ tag: 'your-tag', type: 'click', clientId, appId })
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+fuction Page() {
+    return (
+        <button ref={ref}>Click me</button>
+    )
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Features
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Insomniak SDK Analytics provides the following features:
 
-## Learn More
+- **User activity tracking:** Track user activities within your app, such as button clicks, page views, and more.
+- **Event properties:** Add additional properties to your tracked events to provide more context and insights into user behavior.
+- **Real-time data:** View analytics data in real-time through the Insomniak dashboard.
+- **Customizable dashboard:** Customize the Insomniak dashboard to show only the data you want to see.
+- **Easy integration:** Integrates seamlessly with any mobile app, with just a few lines of code.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Support
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+If you have any questions or issues with the Insomniak SDK Analytics package, please open an issues on the [GitHub repository](https://github.com/esgi-insomniak/Ton-Yu-Gi-Oh).
+
+## License
+
+This package is licensed under the MIT License. See the LICENSE file for more information.
+
+## Contributing
+
+We welcome contributions from the Insomniak team on GitHub. To contribute, please fork this repository, make your changes, and submit a pull request.
+
+For more information on contributing to this repository, please contact the [Insomniak team](https://github.com/orgs/esgi-insomniak/teams/insominak).
+
+

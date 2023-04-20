@@ -1,13 +1,11 @@
-const getScreenSize = (window: Window): string => {
-    if (window.innerWidth < 768) {
-        return 'sm';
-    } else if (window.innerWidth < 992) {
-        return 'md';
-    } else if (window.innerWidth < 1200) {
-        return 'lg';
-    } else {
-        return 'xl';
-    }
+type TypeofSizes = 'sm' | 'md' | 'lg' | 'xl';
+
+const getScreenSize = (window: Window): TypeofSizes => {
+    const { innerWidth } = window;
+    if (innerWidth < 576) return 'sm'
+    if (innerWidth < 768) return 'md'
+    if (innerWidth < 992) return 'lg'
+    return 'xl'
 }
 
 const generateId = (type: 'clientId' | 'appId'): string => {

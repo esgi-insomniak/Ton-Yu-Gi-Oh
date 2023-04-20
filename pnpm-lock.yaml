@@ -6,9 +6,6 @@ importers:
 
   app/client:
     dependencies:
-      '@app/sdk':
-        specifier: workspace:*
-        version: link:../sdk
       '@hookform/resolvers':
         specifier: ^3.0.0
         version: 3.1.0(react-hook-form@7.43.9)
@@ -30,6 +27,9 @@ importers:
       daisyui:
         specifier: ^2.51.4
         version: 2.51.5(autoprefixer@10.4.14)(postcss@8.4.22)
+      insomniak-sdk-analytics:
+        specifier: ^0.1.1
+        version: link:../sdk
       jwt-decode:
         specifier: ^3.1.2
         version: 3.1.2
@@ -66,9 +66,6 @@ importers:
       reactjs-social-login:
         specifier: ^2.6.2
         version: 2.6.2(react-dom@18.2.0)(react@18.2.0)
-      sdk:
-        specifier: link:@types/@app/sdk
-        version: link:@types/@app/sdk
       sort-by:
         specifier: ^1.2.0
         version: 1.2.0
