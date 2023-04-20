@@ -1,23 +1,18 @@
 {
-    "include": [
-      "main.ts"
-    ],
-    "exclude": [
-      "node_modules",
-      "dist",
-      "vite.config.ts"
-    ],
-    "compilerOptions": {
-      "target": "esnext",
-      "jsx": "react",
-      "module": "esnext",
-      "moduleResolution": "node",
-      "strict": true,
-      "skipLibCheck": true,
-      "skipDefaultLibCheck": true,
-      "declaration": true,
-      "composite": true,
-      "declarationDir": "dist",
-      "allowSyntheticDefaultImports": true
-    }
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "jsx": "react",
+    "outDir": "dist",
+    "declaration": true,
+    "sourceMap": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["react", "react-dom"],
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["./**/*.ts"],
 }

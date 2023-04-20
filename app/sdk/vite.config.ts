@@ -1,18 +1,25 @@
-import { resolve } from 'path'
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
-    plugins: [
-        react()
-    ],
+    plugins: [react()],
     build: {
         lib: {
-            // Could also be a dictionary or array of multiple entry points
-            entry: resolve(__dirname, 'main.ts'),
-            name: '@inso/sdk',
-            // the proper extensions will be added
-            fileName: 'main',
+            entry: resolve(__dirname, 'main.ts'), // entry file of the library
+            name: '@app/sdk', // name of the library
+            fileName: (format) => `main.${format}.js`, // file name of the output bundle
+        },
+        rollupOptions: {
+            // make sure to externalize dependencies
+            external: ['react'],
+            output: {
+                // Provide global variables to use in the UMD build
+                // for externalized deps
+                globals: {
+                    react: 'React',
+                },
+            },
         },
     },
-})
+});

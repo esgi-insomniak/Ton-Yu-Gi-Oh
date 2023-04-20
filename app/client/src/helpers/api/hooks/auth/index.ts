@@ -5,7 +5,7 @@ import { apiRequest } from '@/helpers/api'
 import { responseLoginSchema, responseLoginSchemaType } from '@/helpers/utils/schema/Auth'
 
 const QUERY_URLS = {
-    login: '/users/login',
+    login: '/login',
     logout: '/users/logout',
     register: '/users',
 } as const

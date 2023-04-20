@@ -2,7 +2,7 @@ import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
 import React from "react";
 import { Link } from "react-router-dom";
-import { useTrackEvent, useTrackingContext } from "@app/sdk";
+import { useTrackEvent, useTrackMouseMovement, useTrackingContext } from "@app/sdk";
 
 const navs = [
     { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
@@ -16,6 +16,7 @@ const Home = () => {
     const { user, isLoggedIn } = useAuth()
     const { clientId, appId } = useTrackingContext()
     const { ref } = useTrackEvent<HTMLButtonElement>({ tag: 'test-btn-home-page', type: 'click', clientId, appId })
+    const { ref: mouseRef } = useTrackMouseMovement({ x: 0, y: 0 })
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
