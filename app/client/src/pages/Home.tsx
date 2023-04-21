@@ -2,20 +2,18 @@ import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
 import React from "react";
 import { Link } from "react-router-dom";
-import { useTrackEvent, useTrackMouseMovement, useTrackingContext } from "insomniak-sdk-analytics";
-
-const navs = [
-    { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
-    { animatedBackground: "/opening.mp4", path: "/duel", poster: "/duel.png" },
-    { animatedBackground: "/opening.mp4", path: "/opening", poster: "/booster.png" },
-    { animatedBackground: "/opening.mp4", path: "/shop", poster: "/shop.png" },
-    { animatedBackground: "/opening.mp4", path: "/settings", poster: "/settings.png" },
-]
 
 const Home = () => {
     const { user, isLoggedIn } = useAuth()
-    const { clientId, appId } = useTrackingContext()
-    const { ref } = useTrackEvent<HTMLButtonElement>({ tag: 'test-btn-home-page', type: 'click', clientId, appId })
+
+    const navs = React.useMemo(() => [
+        { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
+        { animatedBackground: "/opening.mp4", path: "/duel", poster: "/duel.png" },
+        { animatedBackground: "/opening.mp4", path: "/opening", poster: "/booster.png" },
+        { animatedBackground: "/opening.mp4", path: "/shop", poster: "/shop.png" },
+        { animatedBackground: "/opening.mp4", path: "/settings", poster: "/settings.png" },
+    ], [])
+
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
@@ -33,7 +31,6 @@ const Home = () => {
                         <NavItem key={index} animatedBackground={nav.animatedBackground} path={nav.path} poster={nav.poster} />
                     ))}
                 </div>
-                <button ref={ref}>click me</button>
             </div>
             <div className="h-20 w-full bottom-0 absolute flex px-5 items-center">
                 <div className="dropdown dropdown-right dropdown-end">

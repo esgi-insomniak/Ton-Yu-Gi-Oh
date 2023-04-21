@@ -1,6 +1,6 @@
 {
   "name": "insomniak-sdk-analytics",
-  "version": "0.1.3",
+  "version": "0.1.13",
   "private": false,
   "main": "dist/main.es.js",
   "module": "dist/main.es.js",
