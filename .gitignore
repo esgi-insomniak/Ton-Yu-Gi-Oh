@@ -79,3 +79,7 @@ fabric.properties
 
 .env*
 !.env.example
+
+node_modules
+yarn.lock
+pnpm-lock.yaml
