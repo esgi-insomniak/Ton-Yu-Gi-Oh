@@ -30,6 +30,7 @@ const Router: React.FC = () => {
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
             <Routes>
+
                 <Route
                     element={
                         <ProtectedRoute
@@ -48,9 +49,23 @@ const Router: React.FC = () => {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/opening" element={<BoosterPage />} />
                 </Route>
-                <Route path="/error" element={<ErrorPage />} />
-                <Route path="/login" element={<LoginPage />} />
+
+                <Route
+                    element={
+                        <ProtectedRoute
+                            condition={!isLoggedIn}
+                            redirect="/"
+                        >
+                            <Outlet />
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/login" element={<LoginPage />} />
+                </Route>
+
                 <Route path="/logout" element={<LogoutPage />} />
+                <Route path="/error" element={<ErrorPage />} />
+
             </Routes>
         </React.Suspense>
     );

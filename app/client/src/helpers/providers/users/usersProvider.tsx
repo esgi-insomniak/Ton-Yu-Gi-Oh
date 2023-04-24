@@ -3,14 +3,14 @@ import { UserContext } from "@/helpers/context/users/UserManagement";
 import { DecodedTokenType, UserContextType, UserManagementContextProps } from "@/helpers/types/users";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import jwt_decode from "jwt-decode"
-import { useCookies } from "react-cookie";
+import { useLocalStorage } from "react-use";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
-    const [cookies, setCookies, removeCookies] = useCookies(["token"]);
-    const token = cookies.token || "";
+    const [tokenLs, setToken, removeToken] = useLocalStorage("token", "");
+    const token = tokenLs || "";
     const defaultUser = React.useMemo(() => {
-        if (token) {
-            const decodedToken = jwt_decode<DecodedTokenType>(token);
+        if (tokenLs) {
+            const decodedToken = jwt_decode<DecodedTokenType>(tokenLs);
             return {
                 id: decodedToken.userId,
                 email: decodedToken.email,
@@ -19,11 +19,11 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
             }
         }
         return { id: "", email: "", roles: [ROLES.USER], username: "" }
-    }, [token])
+    }, [tokenLs])
     const [user, setUser] = React.useState<UserContextType>(defaultUser);
 
     const handleUpdateUser = React.useCallback((token: string) => {
-        setCookies("token", token, { path: "/", maxAge: 7200 });
+        setToken(token);
         const decodedToken = jwt_decode<DecodedTokenType>(token);
         setUser({
             id: decodedToken.userId,
@@ -34,8 +34,9 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
     }, [setUser])
 
     const logout = React.useCallback(() => {
-        removeCookies("token", { path: "/" });
+        removeToken();
         setUser({ id: "", email: "", roles: [ROLES.USER], username: "" })
+        localStorage.clear();
     }, [setUser])
 
     const value = React.useMemo(() => ({
