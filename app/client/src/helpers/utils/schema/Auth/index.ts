@@ -17,4 +17,14 @@ export const responseLoginSchema = zod.object({
     token: zod.string(),
 });
 
+export const responseRegisterSchema = zod.object({
+    id: zod.string(),
+    username: zod.string(),
+    email: zod.string(),
+    phone: zod.string(),
+    coins: zod.number(),
+    roles: zod.array(zod.string()),
+});
+
 export type responseLoginSchemaType = zod.infer<typeof responseLoginSchema>;
+export type responseRegisterSchemaType = zod.infer<typeof responseRegisterSchema>;

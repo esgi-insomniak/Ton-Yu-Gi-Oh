@@ -1,18 +1,16 @@
 import React from 'react'
-import { useMutation, useQueryClient, useQuery } from 'react-query'
-import { UserType } from '@/helpers/types/users'
+import { useMutation } from 'react-query'
+import { AuthRegisterType } from '@/helpers/types/users'
 import { apiRequest } from '@/helpers/api'
-import { responseLoginSchema, responseLoginSchemaType } from '@/helpers/utils/schema/Auth'
+import { responseLoginSchema, responseLoginSchemaType, responseRegisterSchema, responseRegisterSchemaType } from '@/helpers/utils/schema/Auth'
 
 const QUERY_URLS = {
     login: '/login',
-    logout: '/users/logout',
     register: '/users',
 } as const
 
 const authKeys = {
     all: ['auth'],
-    logout: () => [...authKeys.all, 'logout'],
     register: () => [...authKeys.all, 'register'],
 } as const
 
@@ -22,15 +20,15 @@ const requestLogin = (username: string, password: string) => apiRequest({
     body: { username, password },
 }, responseLoginSchema)
 
+const requestRegister = (newUser: AuthRegisterType) => apiRequest({
+    url: QUERY_URLS.register,
+    method: 'POST',
+    body: newUser,
+}, responseRegisterSchema)
 
 export const useLogin = () =>
     useMutation<responseLoginSchemaType, Error, { username: string, password: string }>
         ((credentials) => requestLogin(credentials.username, credentials.password))
 
-export const useLogout = () => {
-    const queryClient = useQueryClient()
-}
-
-export const useRegister = (newUser: UserType) => {
-    const queryClient = useQueryClient()
-}
+export const useRegister = () =>
+    useMutation<responseRegisterSchemaType, Error, AuthRegisterType>((newUser) => requestRegister(newUser))

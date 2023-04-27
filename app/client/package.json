@@ -26,9 +26,7 @@
     "react-icons": "^4.8.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.9.0",
-    "react-social-login-buttons": "^3.6.1",
     "react-use": "^17.4.0",
-    "reactjs-social-login": "^2.6.2",
     "sort-by": "^1.2.0",
     "uuid": "^9.0.0",
     "zod": "^3.21.4"

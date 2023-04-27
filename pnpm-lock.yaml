@@ -57,15 +57,9 @@ importers:
       react-router-dom:
         specifier: ^6.9.0
         version: 6.9.0(react-dom@18.2.0)(react@18.2.0)
-      react-social-login-buttons:
-        specifier: ^3.6.1
-        version: 3.6.1(react@18.2.0)
       react-use:
         specifier: ^17.4.0
         version: 17.4.0(react-dom@18.2.0)(react@18.2.0)
-      reactjs-social-login:
-        specifier: ^2.6.2
-        version: 2.6.2(react-dom@18.2.0)(react@18.2.0)
       sort-by:
         specifier: ^1.2.0
         version: 1.2.0
@@ -1954,14 +1948,6 @@ packages:
       react: 18.2.0
     dev: false
 
-  /react-social-login-buttons@3.6.1(react@18.2.0):
-    resolution: {integrity: sha512-DIz30W+C147s7wxwt8zgwjx5pE+gTJwtUzTNKpKZO3bEY06eLjcY1zvZ8h35hQd1Yjd7b4rLkeuZBwlLURYIfg==}
-    peerDependencies:
-      react: ^15.0.0 || ^16.0.0 || ^17.x || ^18.x
-    dependencies:
-      react: 18.2.0
-    dev: false
-
   /react-universal-interface@0.6.2(react@18.2.0)(tslib@2.5.0):
     resolution: {integrity: sha512-dg8yXdcQmvgR13RIlZbTRQOoUrDciFVoSBZILwjE2LFISxZZ8loVJKAkuzswl5js8BHda79bIb2b84ehU8IjXw==}
     peerDependencies:
@@ -2009,17 +1995,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
-    dev: false
-
-  /reactjs-social-login@2.6.2(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-7ngl3qMbnRkXJznsdd/fwCXLwE1wBpeLhaAZJlZF0Wki7tl9nwFL191t+uopZkSBnWuHRCBhmOGgT/y9KVSJAg==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: ^16 || ^17 || ^18
-      react-dom: ^16 || ^17 || ^18
-    dependencies:
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /read-cache@1.0.0:
