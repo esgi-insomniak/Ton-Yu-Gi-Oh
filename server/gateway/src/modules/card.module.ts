@@ -14,8 +14,14 @@ import {
   UserCardSetController,
   UserController,
 } from 'src/controllers/cards/user-card-set.controller';
-import { UserDeckController } from 'src/controllers/cards/user-deck.controller';
-import { UserSetController } from 'src/controllers/cards/user-set-controller';
+import {
+  UserDeckController,
+  UserDeckUserController,
+} from 'src/controllers/cards/user-deck.controller';
+import {
+  UserSetController,
+  UserSetUserController,
+} from 'src/controllers/cards/user-set-controller';
 import { CardController } from 'src/controllers/cards/card.controller';
 
 @Module({
@@ -35,7 +41,9 @@ import { CardController } from 'src/controllers/cards/card.controller';
     UserCardSetController,
     UserController,
     UserDeckController,
+    UserDeckUserController,
     UserSetController,
+    UserSetUserController,
   ],
 })
 export class CardModule {}

@@ -67,4 +67,12 @@ export class UserService {
     user.coins += coins;
     return this.userRepository.save(user);
   }
+
+  async removeCoinsUser(userId: string, coins: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    user.coins -= coins;
+    return this.userRepository.save(user);
+  }
 }

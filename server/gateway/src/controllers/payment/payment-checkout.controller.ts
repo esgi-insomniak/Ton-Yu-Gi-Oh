@@ -81,7 +81,6 @@ export class PaymentCheckoutController {
     }
 
     if (paymentResponse.item.paymentStatus === 'paid') {
-      console.log(paymentResponse.item.coins);
       await firstValueFrom(
         this.userServiceClient.send('add_coins_user', {
           userId: request.user.id,

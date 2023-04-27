@@ -108,4 +108,30 @@ export class UserController {
 
     return result;
   }
+
+  @MessagePattern('remove_coins_user')
+  public async removeCoinsUser(params: {
+    userId: string;
+    coins: number;
+  }): Promise<GetResponseOne<User>> {
+    let result: GetResponseOne<User> = {
+      status: HttpStatus.NOT_FOUND,
+      message: 'User not found',
+      item: null,
+    };
+
+    try {
+      const user = await this.userService.removeCoinsUser(
+        params.userId,
+        params.coins,
+      );
+
+      result = {
+        status: HttpStatus.OK,
+        item: user,
+      };
+    } catch (e) {}
+
+    return result;
+  }
 }

@@ -451,11 +451,6 @@ export class DBFeederService {
       (cardSets: CardSet[], card: any) => {
         if (card.card_sets && card.card_sets.length > 0) {
           card.card_sets.forEach((cardSet: any) => {
-            if (
-              rarities.find((r) => r.name === cardSet.set_rarity) === undefined
-            ) {
-              console.log(cardSet.set_rarity);
-            }
             cardSets.push(
               this.dataSource.getRepository(CardSet).create({
                 card: cards.find((c) => c.identifiant === card.id).id,
