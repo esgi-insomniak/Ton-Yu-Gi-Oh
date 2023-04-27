@@ -13,19 +13,6 @@ import { UserSetService } from 'src/services/user-set.service';
 export class UserSetController {
   constructor(private readonly userSetService: UserSetService) {}
 
-  @MessagePattern('get_usersets')
-  public async getUserSets(
-    query: QueryGetItems,
-  ): Promise<GetResponseArray<UserSet>> {
-    const userSets = await this.userSetService.getUserSets(query);
-    const result: GetResponseArray<UserSet> = {
-      status: HttpStatus.OK,
-      items: userSets,
-    };
-
-    return result;
-  }
-
   @MessagePattern('get_userset_by_id')
   public async getUserSetById(
     params: ParamGetItemById,
@@ -36,6 +23,48 @@ export class UserSetController {
       message: userSet ? null : 'UserSet not found',
       item: userSet,
     };
+
+    return result;
+  }
+
+  @MessagePattern('get_usersets_by_user_id')
+  public async getUserSetsByUserId(request: {
+    params: ParamGetItemById;
+    query: QueryGetItems;
+  }): Promise<GetResponseArray<UserSet>> {
+    const userSets = await this.userSetService.getUserSetsByUserId(
+      request.params.id,
+      request.query,
+    );
+    const result: GetResponseArray<UserSet> = {
+      status: HttpStatus.OK,
+      message: null,
+      items: userSets,
+    };
+
+    return result;
+  }
+
+  @MessagePattern('create_usersets')
+  public async createUserSets(params: {
+    userId: string;
+    setId: string;
+    amount: number;
+  }): Promise<GetResponseArray<UserSet>> {
+    let result: GetResponseArray<UserSet> = {
+      status: HttpStatus.BAD_REQUEST,
+      message: 'Invalid params provided',
+      items: [],
+    };
+
+    try {
+      const userSets = await this.userSetService.createUserSets(params);
+      result = {
+        status: HttpStatus.CREATED,
+        message: null,
+        items: userSets,
+      };
+    } catch (error) {}
 
     return result;
   }

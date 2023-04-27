@@ -61,7 +61,6 @@ export class CardController {
   public async getCardById(
     @Param() params: GetItemByIdDto,
   ): Promise<GetCardByIdResponseDto> {
-    console.log(params);
     const cardResponse: GetResponseOne<ICard> = await firstValueFrom(
       this.cardServiceClient.send('get_card_by_id', {
         id: params.id,

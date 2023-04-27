@@ -43,6 +43,20 @@ export class UserCardSetController {
     return result;
   }
 
+  @MessagePattern('get_usercardsets_by_ids')
+  public async getSetsByIds(params: {
+    ids: string[];
+  }): Promise<GetResponseArray<UserCardSet>> {
+    const sets = await this.userCardSetService.getUserCardSetsByIds(params.ids);
+    const result: GetResponseArray<UserCardSet> = {
+      status: sets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: sets ? null : 'CardSets not found',
+      items: sets,
+    };
+
+    return result;
+  }
+
   @MessagePattern('get_usercardsets_by_user_id')
   public async getUserCardSetsByUserId(request: {
     params: ParamGetItemById;

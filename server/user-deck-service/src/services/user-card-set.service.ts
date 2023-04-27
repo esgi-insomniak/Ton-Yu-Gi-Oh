@@ -36,6 +36,21 @@ export class UserCardSetService {
     return userCardSets;
   }
 
+  async getUserCardSetsByIds(ids: string[]): Promise<UserCardSet[]> {
+    const usercardSets: UserCardSet[] = [];
+    for (const id of ids) {
+      const userCardSet = await this.dataSource
+        .getRepository(UserCardSet)
+        .findOne({
+          where: { id },
+        });
+      if (userCardSet) {
+        usercardSets.push(userCardSet);
+      }
+    }
+    return usercardSets;
+  }
+
   async createUserCardSet(query: {
     userId: string;
     cardSetId: string;

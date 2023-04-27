@@ -37,4 +37,18 @@ export class SetController {
 
     return result;
   }
+
+  @MessagePattern('get_sets_by_ids')
+  public async getSetsByIds(params: {
+    ids: string[];
+  }): Promise<GetResponseArray<Set>> {
+    const sets = await this.setService.getSetsByIds(params.ids);
+    const result: GetResponseArray<Set> = {
+      status: sets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: sets ? null : 'Sets not found',
+      items: sets,
+    };
+
+    return result;
+  }
 }

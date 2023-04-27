@@ -13,23 +13,10 @@ import { UserDeck } from 'src/entities/user-deck.entity';
 export class UserDeckController {
   constructor(private readonly userDeckService: UserDeckService) {}
 
-  @MessagePattern('get_userdecks')
-  public async getUserDecks(
-    query: QueryGetItems,
-  ): Promise<GetResponseArray<UserDeck>> {
-    const userDecks = await this.userDeckService.getUserDecks(query);
-    const result: GetResponseArray<UserDeck> = {
-      status: HttpStatus.OK,
-      items: userDecks,
-    };
-
-    return result;
-  }
-
   @MessagePattern('post_userdeck')
   public async postUserDeck(query: {
     userId: string;
-    cardSetIds: string[];
+    userCardSetsIds: string[];
   }): Promise<GetResponseOne<UserDeck>> {
     const userDeck = await this.userDeckService.createUserDeck(query);
     const result: GetResponseOne<UserDeck> = {
@@ -41,11 +28,16 @@ export class UserDeckController {
     return result;
   }
 
+  @MessagePattern('delete_userdeck_by_id')
+  public async deleteUserDeck(params: ParamGetItemById): Promise<boolean> {
+    return await this.userDeckService.deleteUserDeckById(params.id);
+  }
+
   @MessagePattern('add_cardset_to_userdeck')
   public async addCardSetToUserDeck(query: {
     userId: string;
     deckId: string;
-    cardSetIds: string[];
+    userCardSetsIds: string[];
   }): Promise<GetResponseOne<UserDeck>> {
     const userDeck = await this.userDeckService.addCardSetsToDeck(query);
     const result: GetResponseOne<UserDeck> = {
@@ -66,6 +58,24 @@ export class UserDeckController {
       status: userDeck ? HttpStatus.OK : HttpStatus.NOT_FOUND,
       message: userDeck ? null : 'UserDeck not found',
       item: userDeck,
+    };
+
+    return result;
+  }
+
+  @MessagePattern('get_userdecks_by_user_id')
+  public async getUserDecksByUserId(request: {
+    params: ParamGetItemById;
+    query: QueryGetItems;
+  }): Promise<GetResponseArray<UserDeck>> {
+    const userDecks = await this.userDeckService.getUserDecksByUserId(
+      request.params.id,
+      request.query,
+    );
+    const result: GetResponseArray<UserDeck> = {
+      status: HttpStatus.OK,
+      message: null,
+      items: userDecks,
     };
 
     return result;

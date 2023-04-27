@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -10,25 +11,31 @@ import {
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetItemsPaginationDto } from '../../interfaces/common/common.query.dto';
 import {
   GetResponseArray,
   GetResponseOne,
 } from '../../interfaces/common/common.response';
 import { GetItemByIdDto } from '../../interfaces/common/common.params.dto';
-import { IUserCardSet } from '../../interfaces/user-deck-service/userCardSet/user-card-set.interface';
-import { GetUserCardSetByIdResponseDto } from '../../interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
+import {
+  IUserCardSet,
+  IUserCardSetPartial,
+} from '../../interfaces/user-deck-service/userCardSet/user-card-set.interface';
+import {
+  GetUserCardSetByIdResponseDto,
+  GetUserCardSetsResponseDto,
+} from '../../interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { Permission } from 'src/decorators/permission.decorator';
-import { ICardSet } from 'src/interfaces/card-service/set/set.interface';
-import { GetCardSetsResponseDto } from '../../interfaces/card-service/set/set.response.dto';
+import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
 
 @Controller('user_card_sets')
 @ApiTags('UserCardSet')
 export class UserCardSetController {
   constructor(
+    @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
     @Inject('USER_DECK_SERVICE')
     private readonly userDeckServiceClient: ClientProxy,
   ) {}
@@ -42,7 +49,8 @@ export class UserCardSetController {
   public async getUserCardSetById(
     @Param() params: GetItemByIdDto,
   ): Promise<GetUserCardSetByIdResponseDto> {
-    const userCardSetResponse: GetResponseOne<IUserCardSet> =
+    // get userCardSet by id
+    const userCardSetResponse: GetResponseOne<IUserCardSetPartial> =
       await firstValueFrom(
         this.userDeckServiceClient.send('get_usercardset_by_id', {
           id: params.id,
@@ -56,8 +64,24 @@ export class UserCardSetController {
       );
     }
 
+    // get cardSet by id
+    const cardSetResponse: GetResponseOne<ICardCardSet> = await firstValueFrom(
+      this.cardServiceClient.send('get_cardset_by_id', {
+        id: userCardSetResponse.item.cardSetId,
+      }),
+    );
+
+    if (cardSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(cardSetResponse.message, cardSetResponse.status);
+    }
+
+    // create response with combined data of cardSet and userCardSet
     const result: GetUserCardSetByIdResponseDto = {
-      data: userCardSetResponse.item,
+      data: {
+        id: userCardSetResponse.item.id,
+        userId: userCardSetResponse.item.userId,
+        cardSet: cardSetResponse.item,
+      },
     };
 
     if (userCardSetResponse.status !== HttpStatus.OK) {
@@ -65,6 +89,20 @@ export class UserCardSetController {
     }
 
     return result;
+  }
+
+  // TODO: Add type of response
+  @Delete(':id/scrap')
+  @Authorization(true)
+  @ApiOkResponse()
+  @ApiOperation({
+    summary: 'NOT IMPLEMENTED YET',
+  })
+  public async scrapCardSetById(
+    @Param() params: GetItemByIdDto,
+    @Request() request: IAuthorizedRequest,
+  ): Promise<any> {
+    return;
   }
 }
 
@@ -76,22 +114,30 @@ export class UserController {
     private readonly userDeckServiceClient: ClientProxy,
     @Inject('CARD_SERVICE')
     private readonly cardServiceClient: ClientProxy,
+    @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
   ) {}
 
   @Get(':id/user_card_sets')
   @Authorization(true)
   @ApiOkResponse({
-    type: GetCardSetsResponseDto,
+    type: GetUserCardSetsResponseDto,
   })
   public async getUserCardSetsByUserId(
     @Param() params: GetItemByIdDto,
     @Query() query: GetItemsPaginationDto,
-    @Request() request: IAuthorizedRequest,
-  ): Promise<GetCardSetsResponseDto> {
-    if (params.id !== request.user.id && !request.user.roles.includes('admin'))
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  ): Promise<GetUserCardSetsResponseDto> {
+    const userResponse = await firstValueFrom(
+      this.userServiceClient.send('get_user_by_id', {
+        id: params.id,
+      }),
+    );
 
-    const userCardSetResponse: GetResponseArray<IUserCardSet> =
+    if (userResponse.status !== HttpStatus.OK) {
+      throw new HttpException(userResponse.message, userResponse.status);
+    }
+
+    // get userCardSets
+    const userCardSetResponse: GetResponseArray<IUserCardSetPartial> =
       await firstValueFrom(
         this.userDeckServiceClient.send('get_usercardsets_by_user_id', {
           params: {
@@ -111,14 +157,33 @@ export class UserController {
       );
     }
 
-    const cardSetsResponse: GetResponseArray<ICardSet> = await firstValueFrom(
-      this.cardServiceClient.send('get_cardsets_by_ids', {
-        ids: userCardSetResponse.items.map((item) => item.cardSetId),
-      }),
-    );
+    // get cardSets
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: userCardSetResponse.items.map((item) => item.cardSetId),
+        }),
+      );
 
-    const result: GetCardSetsResponseDto = {
-      data: cardSetsResponse.items,
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    // create response with combined data of cardSets and userCardSets
+    const result: GetUserCardSetsResponseDto = {
+      data: userCardSetResponse.items.map((partialUserCardSet) => {
+        const cardSet: IUserCardSet = {
+          id: partialUserCardSet.id,
+          userId: partialUserCardSet.userId,
+          cardSet: cardSetsResponse.items.find(
+            (item) => item.id === partialUserCardSet.cardSetId,
+          ),
+        };
+        return cardSet;
+      }),
     };
 
     return result;

@@ -23,9 +23,10 @@ export class CreateUserBodyDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   @IsNotEmpty()
   @IsMobilePhone()
+  @IsOptional()
   phone: string;
 
   @ApiProperty({ required: true })

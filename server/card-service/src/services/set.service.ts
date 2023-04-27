@@ -23,4 +23,16 @@ export class SetService {
     });
     return set;
   }
+
+  async getSetsByIds(ids: string[]): Promise<Set[]> {
+    const sets: Set[] = [];
+    for (const id of ids) {
+      const set = await this.dataSource.getRepository(Set).findOne({
+        where: { id },
+        relations: ['cardSets'],
+      });
+      sets.push(set);
+    }
+    return sets;
+  }
 }

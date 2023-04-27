@@ -12,6 +12,20 @@ export class UserDeckService {
     const userDecks = await this.dataSource.getRepository(UserDeck).find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
+      relations: ['cardSets'],
+    });
+    return userDecks;
+  }
+
+  async getUserDecksByUserId(
+    userId: string,
+    query: QueryGetItems,
+  ): Promise<UserDeck[]> {
+    const userDecks = await this.dataSource.getRepository(UserDeck).find({
+      where: { userId },
+      take: query.limit || 10,
+      skip: query.offset * query.limit || 0,
+      relations: ['cardSets'],
     });
     return userDecks;
   }
@@ -19,6 +33,7 @@ export class UserDeckService {
   async getUserDeckById(id: string): Promise<UserDeck> {
     const userDeck = await this.dataSource.getRepository(UserDeck).findOne({
       where: { id },
+      relations: ['cardSets'],
     });
     return userDeck;
   }
@@ -26,13 +41,13 @@ export class UserDeckService {
   async addCardSetsToDeck(query: {
     userId: string;
     deckId: string;
-    cardSetIds: string[];
+    userCardSetsIds: string[];
   }): Promise<UserDeck> {
     const userDeck = await this.dataSource.getRepository(UserDeck).findOne({
       where: { id: query.deckId, userId: query.userId },
     });
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
-      where: { id: In(query.cardSetIds), userId: query.userId },
+      where: { id: In(query.userCardSetsIds), userId: query.userId },
     });
 
     // add cardSets not already in deck
@@ -50,13 +65,13 @@ export class UserDeckService {
   async removeCardSetsFromDeck(query: {
     userId: string;
     deckId: string;
-    cardSetIds: string[];
+    userCardSetsIds: string[];
   }): Promise<UserDeck> {
     const userDeck = await this.dataSource.getRepository(UserDeck).findOne({
       where: { id: query.deckId, userId: query.userId },
     });
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
-      where: { id: In(query.cardSetIds), userId: query.userId },
+      where: { id: In(query.userCardSetsIds), userId: query.userId },
     });
 
     // remove cardSets in deck
@@ -70,10 +85,10 @@ export class UserDeckService {
 
   async createUserDeck(query: {
     userId: string;
-    cardSetIds: string[];
+    userCardSetsIds: string[];
   }): Promise<UserDeck> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
-      where: { id: In(query.cardSetIds), userId: query.userId },
+      where: { id: In(query.userCardSetsIds), userId: query.userId },
     });
     const userDeck = this.dataSource.getRepository(UserDeck).create({
       userId: query.userId,

@@ -36,7 +36,6 @@ export class CardSetController {
   public async getCardCardSets(
     @Query() query: GetItemsPaginationDto,
   ): Promise<GetCardCardSetsResponseDto> {
-    console.log(query);
     const cardCardSetResponse: GetResponseArray<ICardCardSet> =
       await firstValueFrom(
         this.cardServiceClient.send('get_cardsets', {

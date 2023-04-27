@@ -44,7 +44,6 @@ export class CardSetController {
   public async getCardSetsByIds(params: {
     ids: string[];
   }): Promise<GetResponseArray<CardSet>> {
-    console.log(params.ids);
     const cardSets = await this.cardSetService.getCardSetsByIds(params.ids);
     const result: GetResponseArray<CardSet> = {
       status: cardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
