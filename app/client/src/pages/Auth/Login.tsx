@@ -6,9 +6,9 @@ import { useAuth } from "@/helpers/api/hooks";
 import { useLogin } from "@/helpers/api/hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { MdAlternateEmail, MdPassword } from "react-icons/md";
-import { VscEyeClosed, VscEye } from "react-icons/vsc";
 import { BiLockOpenAlt } from "react-icons/bi";
 import OurLogoWithoutRect from "@/assets/insomniak2";
+import { Input } from "@/components/Input";
 
 const Login = () => {
     const { login } = useAuth();
@@ -16,7 +16,7 @@ const Login = () => {
     const router = useNavigate()
 
     const [error, setError] = React.useState<string>("");
-    const [showPassword, setShowPassword] = React.useState<boolean>(false);
+
 
     const { register, handleSubmit, formState: {
         errors, isSubmitting
@@ -45,29 +45,24 @@ const Login = () => {
                     </h1>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-5">
-                    <label htmlFor="username" className="">Pseudo</label>
-                    <div className="rounded-md pr-5 pl-3 py-3 bg-transparent border-gray-400 border flex items-center group space-x-2">
-                        <MdAlternateEmail className="group-focus:text-red-500" />
-                        <input
-                            className="bg-transparent outline-none w-full group-focus:text-red-500"
-                            type="text"
-                            placeholder="Insomniak"
-                            {...register("username")}
-                        />
-                    </div>
-                    <label htmlFor="username" className="">Mot de passe</label>
-                    <div className="rounded-md pr-5 pl-3 py-3 bg-transparent border-gray-400 border flex items-center group space-x-2">
-                        <MdPassword className="group-focus:text-red-500" />
-                        <input
-                            className="bg-transparent outline-none w-full group-focus:text-red-500"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Changez moi"
-                            {...register("password")}
-                        />
-                        {
-                            showPassword ? <VscEye className="mr-5 cursor-pointer" onClick={() => setShowPassword(!showPassword)} /> : <VscEyeClosed className="mr-5 cursor-pointer" onClick={() => setShowPassword(!showPassword)} />
-                        }
-                    </div>
+                    <Input
+                        label="Nom d'utilisateur"
+                        placeholder="Insomniak"
+                        name="username"
+                        register={register}
+                        error={errors.username?.message}
+                        icons={<MdAlternateEmail />}
+                    />
+                    <Input
+                        label="Mot de passe"
+                        placeholder="Changez moi !"
+                        name="password"
+                        register={register}
+                        error={errors.password?.message}
+                        type={"password"}
+                        icons={<MdPassword />}
+                        passwordIcon
+                    />
                     <div className="flex w-full justify-end">
                         <span className="cursor-pointer hover:underline hover:text-blue-600 tracking-tight">Mot de passe oublié</span>
                     </div>
