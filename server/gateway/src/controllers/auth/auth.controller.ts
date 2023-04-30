@@ -14,6 +14,7 @@ import {
 } from 'src/interfaces/common/common.response';
 import { IUser } from 'src/interfaces/user-service/user/user.interface';
 import { IToken } from 'src/interfaces/auth-service/token/token.interface';
+import { IBasicAuth } from 'src/interfaces/auth-service/auth/basic-auth.interface';
 
 @Controller()
 @ApiTags('Auth')
@@ -30,6 +31,7 @@ export class AuthController {
   public async loginUser(
     @Body() body: LoginUserBodyDto,
   ): Promise<LoginUserResponseDto> {
+    // get user by credentials
     const userResponse: GetResponseOne<IUser> = await firstValueFrom(
       this.userServiceClient.send('get_user_by_credentials', {
         email: body.email,
@@ -42,6 +44,7 @@ export class AuthController {
       throw new HttpException(userResponse.message, userResponse.status);
     }
 
+    // check if password is correct
     const tokenResponse: GetResponseOne<IToken> = await firstValueFrom(
       this.authServiceClient.send('compare_user_password', {
         userId: userResponse.item.id,
@@ -54,6 +57,29 @@ export class AuthController {
 
     if (tokenResponse.status !== HttpStatus.CREATED) {
       throw new HttpException(tokenResponse.message, tokenResponse.status);
+    }
+
+    // check if user account is confirmed
+    const getBasicAuthTokensResponse: GetResponseOne<
+      Pick<IBasicAuth, 'confirmationToken'>
+    > = await firstValueFrom(
+      this.authServiceClient.send('get_basic_auth_confirmation_token', {
+        userId: userResponse.item.id,
+      }),
+    );
+
+    if (getBasicAuthTokensResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        getBasicAuthTokensResponse.message,
+        getBasicAuthTokensResponse.status,
+      );
+    }
+
+    if (getBasicAuthTokensResponse.item.confirmationToken !== null) {
+      throw new HttpException(
+        'Confirm your account first',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const result: LoginUserResponseDto = {

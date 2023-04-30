@@ -57,6 +57,14 @@ import { AuthModule } from './auth.module';
       inject: [ConfigService],
     },
     {
+      provide: 'MAILER_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const mailerServiceOptions = configService.get('mailerService');
+        return ClientProxyFactory.create(mailerServiceOptions);
+      },
+      inject: [ConfigService],
+    },
+    {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
@@ -71,6 +79,7 @@ import { AuthModule } from './auth.module';
     'PAYMENT_SERVICE',
     'AUTH_SERVICE',
     'USER_DECK_SERVICE',
+    'MAILER_SERVICE',
   ],
 })
 export class AppModule {}

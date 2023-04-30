@@ -186,6 +186,25 @@ services:
         - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
       volumes:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
+    mailer-service-node:
+      build:
+        context: ./server/mailer-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: mailer-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - mailcatcher
+      volumes:
+        - ./server/mailer-service:/usr/src/app
+      links:
+        - mailcatcher
     adminer:
       image: adminer:4.8.1
       hostname: adminer
@@ -193,6 +212,11 @@ services:
         - backend-dev
       ports:
         - 9000:8080
+    mailcatcher:
+      image: jderusse/mailcatcher:latest
+      hostname: mailcatcher
+      ports:
+        - 9025:80
 networks:
   backend-dev:
     driver: bridge
