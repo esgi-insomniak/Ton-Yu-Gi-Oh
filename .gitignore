@@ -83,3 +83,5 @@ fabric.properties
 node_modules
 yarn.lock
 pnpm-lock.yaml
+
+.secrets/age-key.txt
