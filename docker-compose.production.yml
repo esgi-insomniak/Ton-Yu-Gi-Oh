@@ -179,6 +179,20 @@ services:
         - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
       volumes:
         - user-deck-service-postgres-prod:/var/lib/postgresql/data
+    mailer-service-node:
+      build:
+        context: ./server/mailer-service
+        dockerfile: Dockerfile
+        target: prod
+      hostname: mailer-service-node
+      command: >
+        sh -c "node dist/main.js"
+      networks:
+        - backend-dev
+      env_file:
+        - .env
+      volumes:
+        - ./server/mailer-service:/usr/src/app
 networks:
   backend-prod:
     driver: bridge

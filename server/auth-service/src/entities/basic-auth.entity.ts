@@ -23,10 +23,9 @@ export class BasicAuth {
   renewToken: string;
 
   @BeforeInsert()
-  @BeforeUpdate()
-  hashPassword() {
+  async hashPassword() {
     if (this.password) {
-      this.password = bcrypt.hashSync(this.password, 10);
+      this.password = await bcrypt.hash(this.password, 10);
     }
   }
 
@@ -35,5 +34,13 @@ export class BasicAuth {
     if (!this.confirmationToken) {
       this.confirmationToken = randomBytes(48).toString('hex');
     }
+  }
+
+  generateRenewToken() {
+    this.renewToken = randomBytes(48).toString('hex');
+  }
+
+  changePassword(password: string) {
+    this.password = bcrypt.hashSync(password, 10);
   }
 }

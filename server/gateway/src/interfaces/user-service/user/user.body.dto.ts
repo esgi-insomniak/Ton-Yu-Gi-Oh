@@ -65,3 +65,30 @@ export class LoginUserBodyDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class ConfirmAccountBodyDto {
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  confirmationToken: string;
+}
+
+export class ResetPasswordBodyDto {
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  })
+  @MinLength(8)
+  @MaxLength(20)
+  password: string;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  renewToken: string;
+}

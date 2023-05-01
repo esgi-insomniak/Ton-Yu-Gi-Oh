@@ -186,6 +186,25 @@ services:
         - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
       volumes:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
+    mailer-service-node:
+      build:
+        context: ./server/mailer-service
+        dockerfile: Dockerfile
+        target: dev
+      hostname: mailer-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - mailcatcher
+      volumes:
+        - mailer-service-node-dev:/usr/src/app
+      links:
+        - mailcatcher
     adminer:
       image: adminer:4.8.1
       hostname: adminer
@@ -193,6 +212,13 @@ services:
         - backend-dev
       ports:
         - 9000:8080
+    mailcatcher:
+      image: jderusse/mailcatcher:latest
+      hostname: mailcatcher
+      networks:
+        - backend-dev
+      ports:
+        - 9025:80
 
 networks:
   backend-dev:
@@ -213,6 +239,7 @@ volumes:
     payment-service-node-dev:
     auth-service-node-dev:
     user-deck-service-node-dev:
+    mailer-service-node-dev:
 
 x-mutagen:
   sync:
@@ -320,6 +347,23 @@ x-mutagen:
     user-deck-service-replica:
       alpha: volume://user-deck-service-node-dev
       beta: ./server/user-deck-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+    mailer-service:
+      alpha: ./server/mailer-service
+      beta: volume://mailer-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    mailer-service-replica:
+      alpha: volume://mailer-service-node-dev
+      beta: ./server/mailer-service
       mode: one-way-replica
       ignore:
         paths:
