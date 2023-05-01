@@ -6,7 +6,7 @@ interface InputProps<T extends FieldValues> {
     label?: string;
     placeholder?: string;
     name: Path<T>;
-    register: UseFormRegister<T>;
+    register?: UseFormRegister<T>;
     error?: string;
     type?: "text" | "password" | "email";
     icons?: React.ReactNode;
@@ -35,7 +35,7 @@ export const Input = <T extends FieldValues>({
                     className="bg-transparent outline-none w-full text-gray-600"
                     type={showPassword ? "text" : type}
                     placeholder={placeholder}
-                    {...register(name)}
+                    {...register && register(name)}
                 />
                 {passwordIcon && (
                     <div

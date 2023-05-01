@@ -21,6 +21,6 @@ export type DecodedTokenType = Omit<UserContextType, 'id'> & {
     exp: number
 }
 
-export type AuthRegisterType = Omit<UserType, 'id' | 'createdAt' | 'updatedAt' | 'roles'> & {
+export type AuthRegisterType = Omit<UserContextType, 'id' | 'roles'> & {
     password: string
 }

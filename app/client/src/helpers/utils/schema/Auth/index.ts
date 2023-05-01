@@ -9,8 +9,6 @@ export const registerSchema = zod.object({
     username: zod.string().min(3).max(20),
     password: zod.string().min(3).max(20),
     email: zod.string().email(),
-    firstName: zod.string().min(3).max(20),
-    lastName: zod.string().min(3).max(20),
 });
 
 export const responseLoginSchema = zod.object({
