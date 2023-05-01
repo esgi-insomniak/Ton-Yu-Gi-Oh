@@ -1,6 +1,8 @@
 import React from "react";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
-
+import Login from "../Pages/Login";
+import Register from "../Pages/Register";
+import MainGrid from "../Pages/Dashboard/main";
 interface ProtectedRouteProps {
     redirect: string;
     condition: boolean;
@@ -33,7 +35,9 @@ const Router: React.FC = () => {
                     <Route path="/" element={<div>Dashboard</div>} />
                 </Route>
                 <Route path="/error" element={<div>Error Page</div>} />
-                <Route path="/login" element={<div>Login</div>} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<MainGrid />} />
                 <Route path="/logout" element={<div>Logout</div>} />
             </Routes>
         </React.Suspense>
