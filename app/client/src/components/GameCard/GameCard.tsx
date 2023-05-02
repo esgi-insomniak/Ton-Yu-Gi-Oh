@@ -1,12 +1,12 @@
 
 import React from 'react'
 import { animated, useSpring, to } from '@react-spring/web'
-import { round, clamp, adjust } from '../../helpers/utils/AdvancedMath';
+import { round, clamp, adjust } from '@/helpers/utils/AdvancedMath';
 import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, CardStaticStyles } from '.';
-import GameCardContext from '../../helpers/context/cards/GameCardContext';
+import GameCardContext from '@/helpers/context/cards/GameCardContext';
 
-import '../../assets/css/cards/loader.css'
-import { GameCardType } from '../../helpers/types/cards';
+import '@/assets/css/cards/loader.css'
+import { GameCardType } from '@/helpers/types/cards';
 
 const GameCard = (props: GameCardType) => {
     // CONTEXTE POUR showcase

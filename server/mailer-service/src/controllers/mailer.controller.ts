@@ -10,7 +10,7 @@ export class MailerController {
   constructor(
     private readonly configService: ConfigService,
     private readonly mailerService: MailerService,
-  ) {}
+  ) { }
 
   @MessagePattern('send_confirmation_email')
   public async sendConfirmationEmail(params: {
@@ -26,13 +26,12 @@ export class MailerController {
     const message: MailerMessage = {
       to: params.email,
       subject: '[TonYuGiOh] Thank you for registering!',
-      htmlBody: `<p>Thank you ${
-        params.username
-      } for registering with TonYuGiOh!</p>
+      htmlBody: `<p>Thank you ${params.username
+        } for registering with TonYuGiOh!</p>
       <p>Please click the link below to confirm your email address.</p>
       <p><a href="${this.configService.get(
-        'websiteUrl',
-      )}/account-confirmation?token=${params.token}">Confirm Email</a></p>`,
+          'websiteUrl',
+        )}/account-confirmation/${params.token}">Confirm Email</a></p>`,
     };
 
     const sent = await this.mailerService.sendEmail(message);
@@ -61,12 +60,11 @@ export class MailerController {
     const message: MailerMessage = {
       to: params.email,
       subject: '[TonYuGiOh] Password Reset',
-      htmlBody: `<p>Hi ${
-        params.username
-      },</p><p>Please click the link below to reset your password.</p>
+      htmlBody: `<p>Hi ${params.username
+        },</p><p>Please click the link below to reset your password.</p>
       <p><a href="${this.configService.get(
-        'websiteUrl',
-      )}/password-reset?token=${params.token}">Reset Password</a></p>`,
+          'websiteUrl',
+        )}/password-reset/${params.token}">Reset Password</a></p>`,
     };
 
     const sent = await this.mailerService.sendEmail(message);

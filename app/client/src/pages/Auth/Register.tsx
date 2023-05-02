@@ -1,5 +1,4 @@
 import { AuthRegisterType } from "@/helpers/types/users"
-import React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { registerSchema } from "@/helpers/utils/schema/Auth"
@@ -8,23 +7,25 @@ import OurLogoWithoutRect from "@/assets/insomniak2"
 import { Input } from "@/components/Input"
 import { BiLockOpenAlt } from "react-icons/bi"
 import { useNavigate } from "react-router-dom"
+import { useAlert } from "@/helpers/providers/alerts/AlertProvider"
 
 const Register = () => {
 
     const registerQuery = useRegister();
     const router = useNavigate();
+    const alert = useAlert()
 
     const { register, handleSubmit, formState: { errors } } = useForm<AuthRegisterType>({
         resolver: zodResolver<typeof registerSchema>(registerSchema)
     });
 
     const onSubmit = (data: AuthRegisterType) => {
-        console.log(data)
         registerQuery.mutate({ ...data }, {
-            onSuccess: (data) => {
-                console.log(data)
+            onSuccess: (res) => {
+                alert?.success(`Vous êtes bien inscrit ${res.data.username} !`)
+                router('/login')
             },
-            onError: (error) => console.log(error)
+            onError: (error) => alert?.error('Une erreur est survenue')
         })
     }
 
@@ -48,7 +49,7 @@ const Register = () => {
                     <Input label="Email" placeholder="Ex: challenge@reussite.com" name="email" register={register} error={errors.email?.message} />
                     <Input
                         label="Mot de passe"
-                        placeholder="Ex: Changez moi !"
+                        placeholder="Ex: Validez moi !"
                         name="password"
                         register={register}
                         error={errors.password?.message}

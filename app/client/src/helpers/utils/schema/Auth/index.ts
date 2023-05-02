@@ -16,13 +16,18 @@ export const responseLoginSchema = zod.object({
 });
 
 export const responseRegisterSchema = zod.object({
-    id: zod.string(),
-    username: zod.string(),
-    email: zod.string(),
-    phone: zod.string(),
-    coins: zod.number(),
-    roles: zod.array(zod.string()),
+    data: zod.object({
+        id: zod.string(),
+        username: zod.string(),
+        email: zod.string(),
+        phone: zod.string().nullable(),
+        coins: zod.number(),
+        roles: zod.array(zod.string()),
+    }),
 });
+
+export const responseConfirmAccountSchema = zod.string();
 
 export type responseLoginSchemaType = zod.infer<typeof responseLoginSchema>;
 export type responseRegisterSchemaType = zod.infer<typeof responseRegisterSchema>;
+export type responseConfirmAccountSchemaType = zod.infer<typeof responseConfirmAccountSchema>;
