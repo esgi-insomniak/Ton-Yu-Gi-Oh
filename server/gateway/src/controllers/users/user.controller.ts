@@ -19,15 +19,10 @@ import {
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
-import {
-  ConfirmAccountBodyDto,
-  CreateUserBodyDto,
-  ResetPasswordBodyDto,
-} from 'src/interfaces/user-service/user/user.body.dto';
+import { CreateUserBodyDto } from 'src/interfaces/user-service/user/user.body.dto';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
-  DefaultResponse,
   GetResponseArray,
   GetResponseOne,
 } from 'src/interfaces/common/common.response';
@@ -250,72 +245,5 @@ export class UserController {
         token: basicAuthRenewTokenResponse.item.renewToken,
       }),
     );
-  }
-
-  @Post(':id/confirm_account')
-  @ApiCreatedResponse({
-    status: HttpStatus.NO_CONTENT,
-  })
-  public async confirmAccount(
-    @Param() params: GetItemByIdDto,
-    @Body() body: ConfirmAccountBodyDto,
-  ): Promise<void> {
-    const userResponse: GetResponseOne<IUser> = await firstValueFrom(
-      this.userServiceClient.send('get_user_by_id', {
-        id: params.id,
-      }),
-    );
-
-    if (userResponse.status !== HttpStatus.OK) {
-      throw new HttpException(userResponse.message, userResponse.status);
-    }
-
-    const basicAuthResponse: DefaultResponse = await firstValueFrom(
-      this.authServiceClient.send('confirm_basic_auth_account', {
-        userId: userResponse.item.id,
-        confirmationToken: body.confirmationToken,
-      }),
-    );
-
-    if (basicAuthResponse.status !== HttpStatus.NO_CONTENT) {
-      throw new HttpException(
-        basicAuthResponse.message,
-        basicAuthResponse.status,
-      );
-    }
-  }
-
-  @Post(':id/reset_password')
-  @ApiCreatedResponse({
-    status: HttpStatus.NO_CONTENT,
-  })
-  public async resetPassword(
-    @Param() params: GetItemByIdDto,
-    @Body() body: ResetPasswordBodyDto,
-  ): Promise<void> {
-    const userResponse: GetResponseOne<IUser> = await firstValueFrom(
-      this.userServiceClient.send('get_user_by_id', {
-        id: params.id,
-      }),
-    );
-
-    if (userResponse.status !== HttpStatus.OK) {
-      throw new HttpException(userResponse.message, userResponse.status);
-    }
-
-    const basicAuthResponse: DefaultResponse = await firstValueFrom(
-      this.authServiceClient.send('reset_basic_auth_password', {
-        userId: userResponse.item.id,
-        renewToken: body.renewToken,
-        password: body.password,
-      }),
-    );
-
-    if (basicAuthResponse.status !== HttpStatus.NO_CONTENT) {
-      throw new HttpException(
-        basicAuthResponse.message,
-        basicAuthResponse.status,
-      );
-    }
   }
 }

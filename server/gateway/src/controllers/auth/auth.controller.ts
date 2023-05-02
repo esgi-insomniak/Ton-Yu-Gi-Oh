@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Body, Req } from '@nestjs/common';
+import { Controller, Post, Inject, Body, Req, Param } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
@@ -6,7 +6,11 @@ import { LoginUserResponseDto } from '../../interfaces/user-service/user/user.re
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
-import { LoginUserBodyDto } from 'src/interfaces/user-service/user/user.body.dto';
+import {
+  ConfirmAccountBodyDto,
+  LoginUserBodyDto,
+  ResetPasswordBodyDto,
+} from 'src/interfaces/user-service/user/user.body.dto';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import {
   DefaultResponse,
@@ -111,5 +115,48 @@ export class AuthController {
     }
 
     return;
+  }
+
+  @Post('confirm_account')
+  @ApiCreatedResponse({
+    status: HttpStatus.NO_CONTENT,
+  })
+  public async confirmAccount(
+    @Body() body: ConfirmAccountBodyDto,
+  ): Promise<void> {
+    const basicAuthResponse: DefaultResponse = await firstValueFrom(
+      this.authServiceClient.send('confirm_basic_auth_account', {
+        confirmationToken: body.confirmationToken,
+      }),
+    );
+
+    if (basicAuthResponse.status !== HttpStatus.NO_CONTENT) {
+      throw new HttpException(
+        basicAuthResponse.message,
+        basicAuthResponse.status,
+      );
+    }
+  }
+
+  @Post('reset_password')
+  @ApiCreatedResponse({
+    status: HttpStatus.NO_CONTENT,
+  })
+  public async resetPassword(
+    @Body() body: ResetPasswordBodyDto,
+  ): Promise<void> {
+    const basicAuthResponse: DefaultResponse = await firstValueFrom(
+      this.authServiceClient.send('reset_basic_auth_password', {
+        renewToken: body.renewToken,
+        password: body.password,
+      }),
+    );
+
+    if (basicAuthResponse.status !== HttpStatus.NO_CONTENT) {
+      throw new HttpException(
+        basicAuthResponse.message,
+        basicAuthResponse.status,
+      );
+    }
   }
 }
