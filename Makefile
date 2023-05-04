@@ -1,6 +1,10 @@
 copy-env:
 	cp -f .env.example .env && cp .env.dev.example .env.dev
 
+build-and-publish:
+	docker build --no-cache -f deploy/docker/Dockerfile -t maeljamin/ton-yugi-$(service) server/$(service) --target prod
+	docker push maeljamin/ton-yugi-$(service)
+
 start:
 	cd client && make up
 	docker compose -f ./docker-compose.yml up -d

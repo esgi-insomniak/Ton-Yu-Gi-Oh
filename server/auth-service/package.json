@@ -32,6 +32,7 @@
     "@nestjs/microservices": "^9.3.11",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "@nestjs/cli": "^9.0.0",
     "bcrypt": "^5.1.0",
     "pg": "^8.10.0",
     "reflect-metadata": "^0.1.13",
@@ -39,7 +40,6 @@
     "typeorm": "^0.3.12"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
     "@types/bcrypt": "^5.0.0",

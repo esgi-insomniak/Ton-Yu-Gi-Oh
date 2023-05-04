@@ -26,6 +26,7 @@
     "typeorm:revert": "yarn typeorm migration:revert -d src/config/database.ts"
   },
   "dependencies": {
+    "@nestjs/cli": "^9.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/microservices": "^9.3.11",
@@ -37,7 +38,6 @@
     "typeorm": "^0.3.12"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
     "@types/express": "^4.17.13",
