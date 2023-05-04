@@ -1,5 +1,8 @@
 version: "3.4"
 services:
+
+
+    ### FRONTEND GATEWAY ###
     gateway:
       build:
         context: ./server/gateway
@@ -21,6 +24,9 @@ services:
       networks:
         - backend-dev
         - frontend-dev
+
+
+    ### CARD SERVICE ###
     card-service-node:
       build:
         context: ./server/card-service
@@ -54,6 +60,9 @@ services:
         - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
       volumes:
         - card-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### USER SERVICE ###
     user-service-node:
       build:
         context: ./server/user-service
@@ -87,6 +96,9 @@ services:
         - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
       volumes:
         - user-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### PAYMENT SERVICE ###
     payment-service-node:
       build:
         context: ./server/payment-service
@@ -120,6 +132,9 @@ services:
         - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
       volumes:
         - payment-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### AUTH SERVICE ###
     auth-service-node:
       build:
         context: ./server/auth-service
@@ -153,6 +168,8 @@ services:
         - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
       volumes:
         - auth-service-postgres-dev:/var/lib/postgresql/data
+
+
     user-deck-service-node:
       build:
         context: ./server/user-deck-service
@@ -186,6 +203,8 @@ services:
         - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
       volumes:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
+
+    ## MAILER
     mailer-service-node:
       build:
         context: ./server/mailer-service
@@ -205,24 +224,32 @@ services:
         - ./server/mailer-service:/usr/src/app
       links:
         - mailcatcher
+
+    ## MAILCATCHER
+    mailcatcher:
+      image: jderusse/mailcatcher:latest
+      hostname: mailcatcher
+      ports:
+        - "9025:80"
+
+
+
+    ### ADMINER ###
     adminer:
       image: adminer:4.8.1
       hostname: adminer
       networks:
         - backend-dev
       ports:
-        - 9000:8080
-    mailcatcher:
-      image: jderusse/mailcatcher:latest
-      hostname: mailcatcher
-      ports:
-        - 9025:80
+        - "9000:8080"
+
+
 networks:
   backend-dev:
     driver: bridge
   frontend-dev:
-    external:
-      name: infrastructure
+    external: true
+
 volumes:
     card-service-postgres-dev:
     user-service-postgres-dev:
