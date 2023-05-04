@@ -6,8 +6,10 @@ services:
     gateway:
       build:
         context: ./server/gateway
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=gateway
       hostname: gateway
       command: >
         sh -c "yarn install &&
@@ -30,8 +32,10 @@ services:
     card-service-node:
       build:
         context: ./server/card-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=card-service
       hostname: card-service-node
       command: >
         sh -c "yarn install &&
@@ -66,8 +70,10 @@ services:
     user-service-node:
       build:
         context: ./server/user-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=user-service
       hostname: user-service-node
       command: >
         sh -c "yarn install &&
@@ -102,8 +108,10 @@ services:
     payment-service-node:
       build:
         context: ./server/payment-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=payment-service
       hostname: payment-service-node
       command: >
         sh -c "yarn install &&
@@ -138,8 +146,10 @@ services:
     auth-service-node:
       build:
         context: ./server/auth-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=auth-service
       hostname: auth-service-node
       command: >
         sh -c "yarn install &&
@@ -173,8 +183,10 @@ services:
     user-deck-service-node:
       build:
         context: ./server/user-deck-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=user-deck-service
       hostname: user-deck-service-node
       command: >
         sh -c "yarn install &&
@@ -205,25 +217,25 @@ services:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
 
     ## MAILER
-    mailer-service-node:
-      build:
-        context: ./server/mailer-service
-        dockerfile: Dockerfile
-        target: dev
-      hostname: mailer-service-node
-      command: >
-        sh -c "yarn install &&
-        yarn start:dev"
-      networks:
-        - backend-dev
-      env_file:
-        - .env.dev
-      depends_on:
-        - mailcatcher
-      volumes:
-        - ./server/mailer-service:/usr/src/app
-      links:
-        - mailcatcher
+    #mailer-service-node:
+    #  build:
+    #    context: ./server/mailer-service
+    #    dockerfile: ../../deploy/docker/Dockerfile
+    #    target: dev
+    #  hostname: mailer-service-node
+    #  command: >
+    #    sh -c "yarn install &&
+    #    yarn start:dev"
+    #  networks:
+    #    - backend-dev
+    #  env_file:
+    #    - .env.dev
+    #  depends_on:
+    #    - mailcatcher
+    #  volumes:
+    #    - ./server/mailer-service:/usr/src/app
+    #  links:
+    #    - mailcatcher
 
     ## MAILCATCHER
     mailcatcher:
