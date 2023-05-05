@@ -1,19 +1,20 @@
 import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
+import { ROLES } from "@/helpers/utils/enum/roles";
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-    const { user, isLoggedIn } = useAuth()
+    const { user } = useAuth()
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/bg-nav-items.png", title: "Mes decks" },
-        { animatedBackground: "/opening.mp4", path: "/collection", poster: "/bg-nav-items.png", title: "Collection" },
-        { animatedBackground: "/opening.mp4", path: "/duel", poster: "/bg-nav-items.png", title: "Duel" },
-        { animatedBackground: "/opening.mp4", path: "/opening", poster: "/bg-nav-items.png", title: "Booster" },
-        { animatedBackground: "/opening.mp4", path: "/shop", poster: "/bg-nav-items.png", title: "Boutique" },
-        { animatedBackground: "/opening.mp4", path: "/settings", poster: "/bg-nav-items.png", title: "Paramètres" },
-    ], [])
+        { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/bg-nav-items.png", title: "Mes decks", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/collection", poster: "/bg-nav-items.png", title: "Collection", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/duel", poster: "/bg-nav-items.png", title: "Duel", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/opening", poster: "/bg-nav-items.png", title: "Booster", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/shop", poster: "/bg-nav-items.png", title: "Boutique", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/admin", poster: "/bg-nav-items.png", title: "Admin", condition: user.roles.includes(ROLES.ADMIN) },
+    ], [user.roles])
 
     return (
         <div className="hero items-center min-h-screen text-gray-300">
@@ -28,7 +29,7 @@ const Home = () => {
                     </h1>
                 </div>
                 <div className="grid grid-cols-3 grid-flow-dense gap-8">
-                    {navs.map((nav, index) => (
+                    {navs.filter(auth => auth.condition === true).map((nav, index) => (
                         <NavItem
                             key={index}
                             title={nav.title}
