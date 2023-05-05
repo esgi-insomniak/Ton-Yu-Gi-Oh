@@ -1,30 +1,58 @@
-import { INavItemProps } from "@/helpers/types/common"
-import React from "react"
-import { useNavigate } from "react-router-dom"
+import React from "react";
+import { Link } from "react-router-dom";
+import { NavItemProps } from "@/helpers/types/common";
 
-export const NavItem = ({ animatedBackground, path, poster }: INavItemProps) => {
-    const router = useNavigate()
+export const NavItem: React.FC<NavItemProps> = ({
+    title,
+    imageUrl,
+    videoUrl,
+    linkUrl,
+}) => {
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const videoRef = React.useRef<HTMLVideoElement>(null);
+
+    const handleMouseOver = () => {
+        if (videoRef.current) {
+            setIsPlaying(true);
+            videoRef.current.play();
+        }
+    };
+
+    const handleMouseOut = () => {
+        if (videoRef.current) {
+            setIsPlaying(false);
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+        }
+    };
+
     return (
-        <React.Fragment>
-            <div className="t-nav-items flex items-center justify-center relative backdrop-opacity-10" onClick={() => router(path)}>
-                <video
-                    autoPlay={false}
-                    muted
-                    loop
-                    onMouseOver={(e) => e.currentTarget.play()}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.pause()
-                        // set poster image
-                        e.currentTarget.currentTime = 0
-                        e.currentTarget.load()
-                    }}
-                    id="myVideo"
-                    className="object-cover w-full h-full rounded-md"
-                    poster={poster}
-                >
-                    <source src={animatedBackground} type="video/mp4" />
-                </video>
-            </div>
-        </React.Fragment>
-    )
-}
+        <div
+            className="relative rounded-lg overflow-hidden w-96 h-64 cursor-pointer hover:scale-110 transition-all duration-300 drop-shadow-2xl shadow-2xl"
+            onMouseOver={handleMouseOver}
+            onMouseOut={handleMouseOut}
+        >
+            <Link to={linkUrl}>
+                <div className="relative z-10 flex justify-center items-center h-full">
+                    <h2 className="text-4xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
+                </div>
+                <div className="absolute inset-0 z-0">
+                    <video
+                        ref={videoRef}
+                        muted
+                        loop
+                        playsInline
+                        className={`object-cover w-full h-full ${isPlaying ? 'block' : 'hidden'}`}
+                    >
+                        <source src={videoUrl} type="video/mp4" />
+                    </video>
+                    <img
+                        src={imageUrl}
+                        alt={title}
+                        className={`object-cover w-full h-full ${isPlaying ? 'hidden' : 'block'}`}
+                    />
+                </div>
+            </Link>
+        </div>
+    );
+};

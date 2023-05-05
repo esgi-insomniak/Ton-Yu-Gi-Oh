@@ -7,11 +7,12 @@ const Home = () => {
     const { user, isLoggedIn } = useAuth()
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
-        { animatedBackground: "/opening.mp4", path: "/duel", poster: "/duel.png" },
-        { animatedBackground: "/opening.mp4", path: "/opening", poster: "/booster.png" },
-        { animatedBackground: "/opening.mp4", path: "/shop", poster: "/shop.png" },
-        { animatedBackground: "/opening.mp4", path: "/settings", poster: "/settings.png" },
+        { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/bg-nav-items.png", title: "Mes decks" },
+        { animatedBackground: "/opening.mp4", path: "/collection", poster: "/bg-nav-items.png", title: "Collection" },
+        { animatedBackground: "/opening.mp4", path: "/duel", poster: "/bg-nav-items.png", title: "Duel" },
+        { animatedBackground: "/opening.mp4", path: "/opening", poster: "/bg-nav-items.png", title: "Booster" },
+        { animatedBackground: "/opening.mp4", path: "/shop", poster: "/bg-nav-items.png", title: "Boutique" },
+        { animatedBackground: "/opening.mp4", path: "/settings", poster: "/bg-nav-items.png", title: "Paramètres" },
     ], [])
 
     return (
@@ -28,7 +29,13 @@ const Home = () => {
                 </div>
                 <div className="grid grid-cols-3 grid-flow-dense gap-8">
                     {navs.map((nav, index) => (
-                        <NavItem key={index} animatedBackground={nav.animatedBackground} path={nav.path} poster={nav.poster} />
+                        <NavItem
+                            key={index}
+                            title={nav.title}
+                            imageUrl={nav.poster}
+                            videoUrl={nav.animatedBackground}
+                            linkUrl={nav.path}
+                        />
                     ))}
                 </div>
             </div>
