@@ -61,13 +61,11 @@ export class AuthService {
   }
 
   public async confirmBasicAuthAccount(
-    userId: string,
     confirmationToken: string,
   ): Promise<boolean> {
     const basicAuthRepository = this.dataSource.getRepository(BasicAuth);
 
     const basicAuth = await basicAuthRepository.findOneBy({
-      userId,
       confirmationToken,
     });
 
@@ -82,14 +80,12 @@ export class AuthService {
   }
 
   public async changeBasicAuthPassword(
-    userId: string,
     renewToken: string,
     password: string,
   ): Promise<boolean> {
     const basicAuthRepository = this.dataSource.getRepository(BasicAuth);
 
     const basicAuth = await basicAuthRepository.findOneBy({
-      userId,
       renewToken,
     });
 

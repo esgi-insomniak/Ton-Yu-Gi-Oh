@@ -126,7 +126,6 @@ export class AuthController {
 
   @MessagePattern('reset_basic_auth_password')
   public async resetBasicAuthPassword(data: {
-    userId: string;
     renewToken: string;
     password: string;
   }): Promise<DefaultResponse> {
@@ -137,7 +136,6 @@ export class AuthController {
 
     try {
       const passwordChanged = await this.authService.changeBasicAuthPassword(
-        data.userId,
         data.renewToken,
         data.password,
       );
@@ -156,7 +154,6 @@ export class AuthController {
 
   @MessagePattern('confirm_basic_auth_account')
   public async confirmBasicAuthAccount(data: {
-    userId: string;
     confirmationToken: string;
   }): Promise<DefaultResponse> {
     let result: DefaultResponse = {
@@ -166,7 +163,6 @@ export class AuthController {
 
     try {
       const accountConfirmed = await this.authService.confirmBasicAuthAccount(
-        data.userId,
         data.confirmationToken,
       );
 

@@ -2,7 +2,7 @@ import { BASE_URL } from "@/helpers/utils/constants"
 import { ZodSchema } from "zod"
 import { ApiRequestOptions } from "@/helpers/types/api"
 
-export const apiRequest = async <Body extends object, Schema extends ZodSchema>(apiRequestOptions: ApiRequestOptions<Body>, schema: Schema) => {
+export const apiRequest = async <Body extends object, Schema extends ZodSchema>(apiRequestOptions: ApiRequestOptions<Body>, schema?: Schema) => {
     const { url, body, token, ...apiRequestRemainingOptions } = apiRequestOptions
 
     const fetchOptions = {
@@ -15,7 +15,15 @@ export const apiRequest = async <Body extends object, Schema extends ZodSchema>(
     }
 
     const response = await fetch(`${BASE_URL}${url}`, fetchOptions)
-    const json = await response.json()
 
-    return schema.parse(json)
+    let json = null
+
+    try {
+        json = await response.json()
+    } catch { }
+
+    if (!response.ok && json !== null) throw new Error(JSON.stringify(json))
+    if (!response.ok && json === null) throw new Error()
+
+    return schema ? schema.parse(json) : json
 }

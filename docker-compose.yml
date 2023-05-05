@@ -215,6 +215,8 @@ services:
     mailcatcher:
       image: jderusse/mailcatcher:latest
       hostname: mailcatcher
+      networks:
+        - backend-dev
       ports:
         - 9025:80
 networks:
