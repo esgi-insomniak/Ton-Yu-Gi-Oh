@@ -28,6 +28,15 @@ export const responseRegisterSchema = zod.object({
 
 export const responseConfirmAccountSchema = zod.string();
 
+export const resetPasswordMailSchema = zod.object({
+    email: zod.string().email(),
+});
+
+export const resetPasswordSchema = zod.object({
+    password: zod.string().min(3).max(20),
+    confirmPassword: zod.string().min(3).max(20),
+});
+
 export type responseLoginSchemaType = zod.infer<typeof responseLoginSchema>;
 export type responseRegisterSchemaType = zod.infer<typeof responseRegisterSchema>;
 export type responseConfirmAccountSchemaType = zod.infer<typeof responseConfirmAccountSchema>;

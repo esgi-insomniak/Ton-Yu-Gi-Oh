@@ -8,11 +8,8 @@ const QUERY_URLS = {
     login: '/login',
     register: '/users',
     confirmAccount: '/confirm_account',
-} as const
-
-const authKeys = {
-    all: ['auth'],
-    register: () => [...authKeys.all, 'register'],
+    requestResetPasswordMail: '/send_reset_password_email',
+    requestResetPassword: '/reset_password',
 } as const
 
 const requestLogin = (username: string, password: string) => apiRequest({
@@ -33,6 +30,18 @@ const confimAccount = (confirmationToken: string) => apiRequest({
     body: { confirmationToken },
 })
 
+const requestResetPasswordMail = (email: string) => apiRequest({
+    url: QUERY_URLS.requestResetPasswordMail,
+    method: 'POST',
+    body: { email },
+})
+
+const requestResetPassword = (password: string, renewToken: string) => apiRequest({
+    url: QUERY_URLS.requestResetPassword,
+    method: 'POST',
+    body: { password, renewToken },
+})
+
 export const useLogin = () =>
     useMutation<responseLoginSchemaType, Error, { username: string, password: string }>
         ((credentials) => requestLogin(credentials.username, credentials.password))
@@ -43,3 +52,8 @@ export const useRegister = () =>
 export const useConfirmAccount = () =>
     useMutation<responseConfirmAccountSchemaType, Error, string>((confirmationToken) => confimAccount(confirmationToken))
 
+export const useRequestResetPasswordMail = () =>
+    useMutation<void, Error, string>((email) => requestResetPasswordMail(email))
+
+export const useRequestResetPassword = () =>
+    useMutation<void, Error, { password: string, token: string }>((credentials) => requestResetPassword(credentials.password, credentials.token))

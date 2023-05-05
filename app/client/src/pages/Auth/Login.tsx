@@ -64,7 +64,12 @@ const Login = () => {
                         passwordIcon
                     />
                     <div className="flex w-full justify-end">
-                        <span className="cursor-pointer hover:underline hover:text-blue-600 tracking-tight">Mot de passe oublié</span>
+                        <span
+                            className="cursor-pointer hover:underline hover:text-blue-600 tracking-tight"
+                            onClick={() => router('/password-reset')}
+                        >
+                            Mot de passe oublié
+                        </span>
                     </div>
                     <button type="submit" className="t-btn">
                         <p>Se connecter</p>
