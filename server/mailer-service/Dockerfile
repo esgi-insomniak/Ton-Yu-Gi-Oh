@@ -6,7 +6,6 @@ RUN apk add yarn
 ENV NODE_ENV=development
 
 CMD yarn install && \
-    yarn typeorm:migrate && \
     yarn start:dev
 
 FROM node:19.0.0-alpine as prod
@@ -24,5 +23,4 @@ RUN yarn cache clean
 
 ENV NODE_ENV=production
 
-CMD yarn typeorm:migrate && \
-    node dist/main.js
+CMD ["node", "dist/main.js"]
