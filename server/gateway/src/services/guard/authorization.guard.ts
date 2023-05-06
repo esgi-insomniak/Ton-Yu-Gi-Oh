@@ -26,14 +26,6 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const secured = this.reflector.get<string[]>(
-      'secured',
-      context.getHandler(),
-    );
-
-    if (!secured) {
-      return true;
-    }
     if (context.getType() === 'http') {
       return await this.canActivateHttp(context);
     } else if (context.getType() === 'ws') {
@@ -44,6 +36,15 @@ export class AuthGuard implements CanActivate {
   }
 
   private async canActivateHttp(context: ExecutionContext): Promise<boolean> {
+    const secured = this.reflector.get<string[]>(
+      'secured',
+      context.getHandler(),
+    );
+
+    if (!secured) {
+      return true;
+    }
+
     const request: IAuthorizedRequest = context.switchToHttp().getRequest();
 
     const userTokenInfo: GetResponseOne<{ userId: string }> =
@@ -84,6 +85,15 @@ export class AuthGuard implements CanActivate {
   }
 
   private async canActivateWs(context: ExecutionContext): Promise<boolean> {
+    const secured = this.reflector.get<string[]>(
+      'secured',
+      context.getHandler(),
+    );
+
+    if (!secured) {
+      return true;
+    }
+
     const socket: IAuthorizedSocket = context.switchToWs().getClient();
 
     const token =

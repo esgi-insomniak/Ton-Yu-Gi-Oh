@@ -19,6 +19,7 @@ import { Namespace } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { AuthGuard } from './services/guard/authorization.guard';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
+import { PermissionGuard } from './services/guard/permission.guard';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway()
@@ -48,7 +49,8 @@ export class WebsocketGateway
   }
 
   @SetMetadata('secured', true)
-  @UseGuards(AuthGuard)
+  @SetMetadata('permission', { roles: ['admin'], areAuthorized: true })
+  @UseGuards(AuthGuard, PermissionGuard)
   @SubscribeMessage('ping')
   async test(@ConnectedSocket() client: IAuthorizedSocket) {
     client.send({
