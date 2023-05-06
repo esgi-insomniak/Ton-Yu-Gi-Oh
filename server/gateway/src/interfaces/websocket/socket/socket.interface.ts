@@ -1,12 +1,6 @@
 import { Socket } from 'socket.io';
+import { IUser } from 'src/interfaces/user-service/user/user.interface';
 
-// guard types
-export type AuthPayload = {
-  userId: string;
-  socketId: string;
-  name: string;
-};
-
-export type RequestWithAuth = Request & AuthPayload;
-
-export type SocketWithAuth = Socket & AuthPayload;
+export interface IAuthorizedSocket extends Socket {
+  user?: IUser;
+}
