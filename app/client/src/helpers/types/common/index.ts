@@ -1,5 +1,5 @@
-export interface INavItemProps {
-    path: string;
-    animatedBackground: string;
-    poster: string;
+export interface NavItemProps {
+    title: string;
+    videoUrl: string;
+    linkUrl: string;
 }

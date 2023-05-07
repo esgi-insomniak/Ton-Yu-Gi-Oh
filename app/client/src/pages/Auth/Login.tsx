@@ -9,12 +9,13 @@ import { MdAlternateEmail, MdPassword } from "react-icons/md";
 import { BiLockOpenAlt } from "react-icons/bi";
 import OurLogoWithoutRect from "@/assets/insomniak2";
 import { Input } from "@/components/Input";
+import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 
 const Login = () => {
     const { login } = useAuth();
     const loginQuery = useLogin();
     const router = useNavigate()
-
+    const alert = useAlert()
     const [error, setError] = React.useState<string>("");
 
 
@@ -30,8 +31,12 @@ const Login = () => {
             onSuccess: (data) => {
                 login(data.token);
                 router('/');
+                alert?.success(`Bienvenue !`)
             },
-            onError: (error) => setError(error.message)
+            onError: (error) => {
+                setError(error.message)
+                alert?.error('Une erreur est survenue')
+            }
         });
     }
 

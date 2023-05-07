@@ -1,13 +1,14 @@
+import { ROLES } from "@/helpers/utils/enum/roles";
+
 export interface UserManagementContextProps {
     children: React.ReactNode;
 }
-
 export interface UserType {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
-    roles: string[];
+    roles: ROLES[];
     createdAt: string;
     updatedAt: string;
     username: string;

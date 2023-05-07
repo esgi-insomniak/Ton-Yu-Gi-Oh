@@ -35,7 +35,7 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
 
     const logout = React.useCallback(() => {
         removeToken();
-        setUser({ id: "", email: "", roles: [ROLES.USER], username: "" })
+        setUser({ id: "", email: "", roles: [ROLES['USER']], username: "" })
         localStorage.clear();
     }, [setUser])
 

@@ -1,4 +1,5 @@
 // create a context for user management
+import { ROLES } from '@/helpers/utils/enum/roles';
 import React from 'react';
 
 export const initialUserContext = {
@@ -9,7 +10,7 @@ export const initialUserContext = {
     user: {
         id: "",
         email: "",
-        roles: [""],
+        roles: [ROLES.USER],
         username: "",
     }
 }
