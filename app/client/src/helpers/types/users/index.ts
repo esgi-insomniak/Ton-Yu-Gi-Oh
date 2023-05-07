@@ -8,7 +8,7 @@ export interface UserType {
     firstName: string;
     lastName: string;
     email: string;
-    roles: keyof typeof ROLES[];
+    roles: ROLES[];
     createdAt: string;
     updatedAt: string;
     username: string;

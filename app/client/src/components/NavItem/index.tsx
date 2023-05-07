@@ -4,7 +4,6 @@ import { NavItemProps } from "@/helpers/types/common";
 
 export const NavItem: React.FC<NavItemProps> = ({
     title,
-    imageUrl,
     videoUrl,
     linkUrl,
 }) => {
@@ -28,7 +27,7 @@ export const NavItem: React.FC<NavItemProps> = ({
 
     return (
         <div
-            className="relative rounded-lg overflow-hidden w-96 h-64 cursor-pointer hover:scale-110 transition-all duration-300 drop-shadow-2xl shadow-2xl"
+            className="relative rounded-lg overflow-hidden w-96 h-64 cursor-pointer hover:scale-105 transition-all duration-300 drop-shadow-2xl shadow-2xl bg-slate-50/20 backdrop:opacity-70 hover:border-4 hover:border-white"
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
         >
@@ -46,11 +45,6 @@ export const NavItem: React.FC<NavItemProps> = ({
                     >
                         <source src={videoUrl} type="video/mp4" />
                     </video>
-                    <img
-                        src={imageUrl}
-                        alt={title}
-                        className={`object-cover w-full h-full ${isPlaying ? 'hidden' : 'block'}`}
-                    />
                 </div>
             </Link>
         </div>
