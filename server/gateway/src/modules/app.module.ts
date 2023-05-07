@@ -10,9 +10,18 @@ import { CardModule } from './card.module';
 import { PaymentModule } from './payment.module';
 import { UserModule } from './user.module';
 import { AuthModule } from './auth.module';
+import { MailerModule } from './mailer.module';
+import { WebsocketModule } from './websoket.module';
 
 @Module({
-  imports: [CardModule, PaymentModule, UserModule, AuthModule],
+  imports: [
+    CardModule,
+    PaymentModule,
+    UserModule,
+    AuthModule,
+    MailerModule,
+    WebsocketModule,
+  ],
   providers: [
     ConfigService,
     LogService,
