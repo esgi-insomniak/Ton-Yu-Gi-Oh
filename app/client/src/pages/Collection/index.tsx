@@ -1,5 +1,6 @@
 import Checkbox from "@/components/Checkbox";
 import GameCard from "@/components/GameCard/GameCard";
+import { SkeletonCards } from "@/components/Skeleton";
 import { useGetAllCards } from "@/helpers/api/hooks/cards";
 import React from "react";
 
@@ -14,15 +15,20 @@ const Collection = () => {
                 <Checkbox title="Afficher les cartes en double" checked={false} handleChange={() => { }} />
                 <Checkbox title="Afficher les cartes en triple" checked={false} handleChange={() => { }} />
             </div>
-            <div className="h-full grid grid-flow-row-dense grid-cols-6 p-3 w-full gap-3">
-                {isFetching ? (
-                    <p>Chargement...</p>
-                ) : (
-                    allCards?.data.map((card, index) => (
-                        <div></div>
-                    ))
-                )}
-            </div>
+            {isFetching ? (
+                <div className="grid grid-flow-row-dense grid-cols-6 gap-3">
+                    {Array.from(Array(18).keys()).map((_, index) => (
+                        <SkeletonCards key={index} />
+                    ))}
+                </div>
+            ) : (
+                <div className="h-full grid grid-flow-row-dense grid-cols-6 p-3 w-full gap-3">
+                    {allCards?.data.map((card) => (
+                        //<GameCard key={card.id} {...card} />
+                        <div>cards</div>
+                    ))}
+                </div>
+            )}
         </div>
     )
 }
