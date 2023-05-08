@@ -2,7 +2,6 @@ import Checkbox from "@/components/Checkbox";
 import GameCard from "@/components/GameCard/GameCard";
 import { SkeletonCards } from "@/components/Skeleton";
 import { useGetAllCards } from "@/helpers/api/hooks/cards";
-import { ApiResponseCardSet, CardIdentifier, CardSetType } from "@/helpers/types/cards";
 import React from "react";
 
 const Collection = () => {
@@ -19,7 +18,7 @@ const Collection = () => {
     })
 
     return (
-        <div className="flex gap-5 w-full h-screen overflow-scroll p-5">
+        <div className="flex gap-5 w-full overflow-scroll p-5">
             <div className="h-full flex flex-col p-3 w-3/12 bg-white/20 rounded-md drop-shadow-md overflow-scroll">
                 <div className="divider">Rechercher</div>
                 <input
@@ -36,7 +35,7 @@ const Collection = () => {
                     collapsed.rarity && (
                         <React.Fragment>
                             <Checkbox title="Commune" checked={false} />
-                            <Checkbox title="Rare" checked={false} />
+                            <Checkbox title="Rare" checked={false} hc={setSearchValue} />
                             <Checkbox title="Super Rare" checked={false} />
                             <Checkbox title="Ultra Rare" checked={false} />
 
@@ -91,6 +90,28 @@ const Collection = () => {
                         </React.Fragment>
                     )
                 }
+                <div className="divider">Pages</div>
+                <div className="flex gap-2">
+                    <div className="btn-group mx-auto">
+                        <button
+                            className="btn bg-white/20 text-white hover:bg-gray-700"
+                            onClick={() => setPage(page - 1)}
+                            disabled={page === 1}
+                        >
+                            «
+                        </button>
+                        <button className="btn bg-white/20 text-white hover:bg-gray-700">{page}</button>
+                        <button
+                            className="btn bg-white/20 text-white hover:bg-gray-700"
+                            onClick={() => setPage(page + 1)}
+                        // get max page from api
+                        >
+                            »
+                        </button>
+                    </div>
+                    <button className="t-btn bg-white/20 hover:bg-gray-700">Filtrer</button>
+                </div>
+
             </div>
             {isFetching ? (
                 <div className="grid grid-flow-row-dense grid-cols-6 gap-3 w-full h-full">
@@ -99,11 +120,11 @@ const Collection = () => {
                     ))}
                 </div>
             ) : (
-                <div className="h-full grid grid-flow-row-dense grid-cols-6 px-3 w-full gap-3">
+                <div className="grid grid-cols-6 px-3 w-full gap-5">
                     {allCards?.data
-                        ?.filter((item) => searchRegex.test(item.card.name))
-                        .map((c) => (
-                            <div className="relative hover:scale-105 rounded-sm cursor-pointer duration-150">
+                        ?.filter((item) => searchRegex.test(item.card.name) || searchRegex.test(item.rarity.name))
+                        .map((c, i) => (
+                            <div className="relative hover:scale-105 rounded-sm cursor-pointer duration-150" key={i}>
                                 <img src={c.card.imageUrl} alt="" />
                             </div>
                         ))}
