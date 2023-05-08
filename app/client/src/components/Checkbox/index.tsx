@@ -3,15 +3,13 @@ import React from 'react';
 interface CheckboxProps {
     title: string;
     checked: boolean;
-    handleChange: (checked: boolean) => void;
 }
 
-const Checkbox = ({ title, checked, handleChange }: CheckboxProps) => {
+const Checkbox = ({ title, checked }: CheckboxProps) => {
     const [isChecked, setIsChecked] = React.useState(checked);
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
-        handleChange(event.target.checked);
     };
 
     return (

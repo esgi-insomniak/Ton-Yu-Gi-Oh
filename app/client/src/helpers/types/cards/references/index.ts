@@ -1,30 +1,12 @@
-type ApiCardAttType = {
+interface SetCardSet {
     id: string;
     name: string;
+    code: string;
+    image: string;
 }
 
-type ApiCardFrameType = {
+interface RarityCardSet {
     id: string;
     name: string;
+    code: string;
 }
-
-type ApiCardRace = {
-    id: string;
-    name: string;
-}
-
-type ApiCardAchetype = {
-    id: string;
-    name: string;
-}
-
-type ApiCardPrice = {
-    id: string;
-    cardMarketPrice: number;
-    tcgPlayerPrice: number;
-    ebayPrice: number;
-    amazonPrice: number;
-    coolStuffIncPrice: number;
-}
-
-export type { ApiCardAttType, ApiCardFrameType, ApiCardRace, ApiCardAchetype, ApiCardPrice }

@@ -1,11 +1,11 @@
 import { useQuery } from 'react-query'
 import { apiRequest } from '@/helpers/api'
 import { responseCardsSchema } from '@/helpers/utils/schema/cards'
-import { ApiResponse } from '@/helpers/types/cards'
 import React from 'react'
+import { ApiResponseCardSet } from '@/helpers/types/cards'
 
 const QUERY_URLS = {
-    cards: (pageNumber: number, itemPerPage: number) => `/cards?limit=${pageNumber}&offset=${itemPerPage}`,
+    cards: (pageNumber: number, itemPerPage: number) => `/card_sets?limit=${itemPerPage}&offset=${pageNumber}`,
 } as const
 
 const cardsKeys = {
@@ -19,7 +19,7 @@ const requestCards = (pageNumber: number, itemPerPage: number) => apiRequest({
 }, responseCardsSchema)
 
 export const useGetAllCards = (pageNumber: number, itemPerPage: number) => {
-    const arrayOfCards = useQuery<ApiResponse>(cardsKeys.cards(pageNumber, itemPerPage), () => requestCards(pageNumber, itemPerPage))
+    const arrayOfCards = useQuery<ApiResponseCardSet>(cardsKeys.cards(pageNumber, itemPerPage), () => requestCards(pageNumber, itemPerPage))
 
     return React.useMemo(() => arrayOfCards, [arrayOfCards])
 }

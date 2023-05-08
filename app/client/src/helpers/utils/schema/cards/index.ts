@@ -15,32 +15,34 @@ export const priceSchema = zod.object({
 });
 
 export const responseCardsSchema = zod.object({
-    data: zod.object({
+    data: zod.array(zod.object({
         id: zod.string(),
-        identifiant: zod.number(),
-        name: zod.string(),
-        enName: zod.string(),
-        description: zod.string(),
-        atk: zod.number(),
-        def: zod.number(),
-        level: zod.number(),
-        scale: zod.number(),
-        linkVal: zod.number(),
-        imageUrl: zod.string(),
-        imageUrlSmall: zod.string(),
-        type: commonSchema,
-        frameType: commonSchema,
-        race: commonSchema,
-        archetype: commonSchema,
-        attribute: zod.string().nullable(),
-        price: priceSchema,
-        cardSets: zod.array(zod.object({
+        card: zod.object({
             id: zod.string(),
-            price: zod.number(),
-        })),
-        linkMarkers: zod.array(zod.object({
+            identifiant: zod.number(),
+            name: zod.string(),
+            enName: zod.string(),
+            description: zod.string(),
+            atk: zod.number().nullable(),
+            def: zod.number().nullable(),
+            level: zod.number().nullable(),
+            scale: zod.null().nullable(),
+            linkVal: zod.null().nullable(),
+            imageUrl: zod.string(),
+            imageUrlSmall: zod.string(),
+        }),
+        set: zod.object({
             id: zod.string(),
             name: zod.string(),
-        })),
+            code: zod.string(),
+            image: zod.string(),
+        }),
+        price: zod.number(),
+        rarity: zod.object({
+            id: zod.string(),
+            name: zod.string(),
+            code: zod.string(),
+        }),
     }),
+    ),
 });
