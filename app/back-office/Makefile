@@ -10,6 +10,7 @@ up: ## Start the project
 	cp -n .env.example .env.local
 	docker compose up -d
 	$(info ************** Serveur VITE démarré sur le port $(port) **************)
+	cd ../analytics-kpi/api && yarn install && yarn start
 
 stop: ## Stop the project
 	docker compose stop

@@ -1,33 +1,22 @@
 import React from 'react';
-import { loginSchema } from '@/helpers/utils/schema/Auth';
-//import { zodResolver } from "@hookform/resolvers/zod"
-import { useAuth } from '@/helpers/api/hooks';
-import { useLogin } from '@/helpers/api/hooks/auth';
-
-import { useNavigate } from 'react-router-dom';
+import OurLogoWithoutRect from "@/assets/logo"
+import axios from 'axios';
 
 const Login = () => {
-  // const { login } = useAuth();
-  // const loginQuery = useLogin();
-  // const router = useNavigate()
 
-  // const [error, setError] = React.useState<string>("");
-  // const { register, handleSubmit, formState: {
-  //     errors, isSubmitting
-  // } } = useForm<{ username: string, password: string }>({
-  //     resolver: zodResolver<typeof loginSchema>(loginSchema)
-  // });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const body = {
+      email: e.currentTarget.email.value,
+      password: e.currentTarget.password.value,
+    }
 
-  // const onSubmit = (data: { username: string, password: string }) => {
-  //     const { username, password } = data;
-  //     loginQuery.mutate({ username, password }, {
-  //         onSuccess: (data) => {
-  //             login(data.token);
-  //             router('/');
-  //         },
-  //         onError: (error) => setError(error.message)
-  //     });
-  // }
+    axios.post('http://localhost:3000/login', body).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
 
   return (
     <React.Fragment>
@@ -37,11 +26,7 @@ const Login = () => {
             href="#"
             className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
           >
-            <img
-              className="w-8 h-8 mr-2"
-              src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-              alt="logo"
-            />
+            <OurLogoWithoutRect width="80" height="80" />
             Insomniak
           </a>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -49,7 +34,7 @@ const Login = () => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Connexion à votre compte
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="email"
