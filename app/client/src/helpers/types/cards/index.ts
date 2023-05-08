@@ -1,5 +1,6 @@
 import { DraggableProvided, DropResult } from "react-beautiful-dnd";
-import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "../../utils/enum/card";
+import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "@/helpers/utils/enum/card";
+import { ApiCardAchetype, ApiCardAttType, ApiCardFrameType, ApiCardPrice, ApiCardRace } from "@/helpers/types/cards/references";
 
 export type CardAttributeType = keyof typeof CardAttribute
 export type CardTypes = keyof typeof CardType
@@ -47,4 +48,34 @@ export interface GameCardContextProps {
     setIsLoaded: (card: GameCardType, isLoaded: boolean) => void;
     sortCards: (result: DropResult) => void;
     deactivateAllCards: () => void;
+}
+
+export interface CardData {
+    id: string;
+    identifiant: number;
+    name: string;
+    enName: string;
+    description: string;
+    atk: null;
+    def: null;
+    level: null;
+    scale: null;
+    linkVal: null;
+    imageUrl: string;
+    imageUrlSmall: string;
+    type: ApiCardAttType
+    frameType: ApiCardFrameType
+    race: ApiCardRace
+    archetype: ApiCardAchetype
+    attribute: null;
+    price: ApiCardPrice;
+    cardSets: {
+        id: string;
+        price: number;
+    }[];
+    linkMarkers: never[];
+}
+
+export interface ApiResponse {
+    data: CardData[];
 }
