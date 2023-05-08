@@ -48,4 +48,18 @@ const appIdSchema = new mongoose.Schema({
 
 const AppId = mongoose.model('AppId', appIdSchema);
 
-module.exports = { Tunnel, Tag, Stat, AppId };
+const userSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+});
+
+const User = mongoose.model('User', userSchema);
+    
+
+module.exports = { Tunnel, Tag, Stat, AppId, User };
