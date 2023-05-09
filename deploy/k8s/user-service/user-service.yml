@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: maeljamin/ton-yugi-user-service:82746b01
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3003
+          env:
+            - name: USER_SERVICE_POSTGRES_HOST
+              value: "user-service-db"
+            - name: USER_SERVICE_POSTGRES_PORT
+              value: "5432"
+            - name: USER_SERVICE_POSTGRES_USER
+              value: "postgres"
+            - name: USER_SERVICE_POSTGRES_PASSWORD
+              value: "postgres"
+            - name: USER_SERVICE_POSTGRES_DB
+              value: "user_service"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service # which pods will receive the traffic
+  ports:
+    - name: http
+      port: 3002
+  type: ClusterIP # Can be accessed from other pods in the cluster
