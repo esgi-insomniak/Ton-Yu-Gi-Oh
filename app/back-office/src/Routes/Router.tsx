@@ -18,6 +18,7 @@ const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
 const LogoutPage = React.lazy(() => import('@/pages/Auth/Logout'));
 const Register = React.lazy(() => import('@/pages/Auth/Register'));
 const Dashboard = React.lazy(() => import('@/pages/Dashboard/Dashboard'));
+const Heatmap = React.lazy(() => import('@/pages/Dashboard/Heatmap'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -55,6 +56,7 @@ const Router: React.FC = () => {
                     <Route path="/login" element={<LoginPage />} />
                 </Route>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/heatmap/:id" element={<Heatmap />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/logout" element={<LogoutPage />} />
                 <Route path="/error" element={<ErrorPage />} />

@@ -1,9 +1,10 @@
 import React from 'react';
 import OurLogoWithoutRect from "@/assets/logo"
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
-
+  const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const body = {
@@ -15,6 +16,7 @@ const Register = () => {
 
     axios.post('http://localhost:3000/register', body).then((res) => {
       console.log(res);
+      navigate('/login');
     }).catch((err) => {
       console.log(err);
     });

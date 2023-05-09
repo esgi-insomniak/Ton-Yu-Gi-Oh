@@ -3,7 +3,7 @@ import OurLogoWithoutRect from '@/assets/logo';
 import Charts from '@/components/Charts';
 
 const Dashboard = () => {
-  const optionsLine = {
+  const [optionsGraph, setOptionsGraph] = React.useState<any>({
     xAxis: {
       type: 'category',
       data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -18,42 +18,27 @@ const Dashboard = () => {
         smooth: true,
       },
     ],
-  };
+  });
 
-  const optionsPie = {
-    title: {
-      text: 'Referer of a Website',
-      subtext: 'Fake Data',
-      left: 'center',
-    },
-    tooltip: {
-      trigger: 'item',
-    },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-    },
-    series: [
-      {
-        name: 'Access From',
-        type: 'pie',
-        radius: '50%',
-        data: [
-          { value: 1048, name: 'Search Engine' },
-          { value: 735, name: 'Direct' },
-          { value: 580, name: 'Email' },
-          { value: 484, name: 'Union Ads' },
-          { value: 300, name: 'Video Ads' },
-        ],
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)',
-          },
-        },
+  const handleClick = (dataName: string) => {
+    console.log(dataName);
+
+    setOptionsGraph({
+      xAxis: {
+        type: 'category',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       },
-    ],
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          data: [820, 932, 901, 934, 1290, 1330, 1320],
+          type: 'line',
+          smooth: true,
+        },
+      ],
+    });
   };
 
   return (
@@ -61,61 +46,17 @@ const Dashboard = () => {
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
         <header className="z-40 py-4  bg-gray-800 flex justify-between items-center">
           <div className="flex justify-center">
-            <div className="mx-auto">
+            <div className="flex items-center mx-5">
               <OurLogoWithoutRect width="80" height="80" />
-              <div className="flex items-center">
+              <div className="flex items-center mx-5">
                 <p className="text-2xl text-green-500 font-semibold">WEB</p>
-                <p className="ml-2 font-semibold italic">ANALYTICS</p>
+                <p className="ml-2 font-semibold italic text-white">
+                  ANALYTICS
+                </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between h-8 px-6 mx-auto">
-            <button
-              className="p-1 mr-5 -ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-purple"
-              aria-label="Menu"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h7"
-                />
-              </svg>
-            </button>
-
-            <div className="flex justify-center  mt-2 mr-4">
-              <div className="relative flex w-full flex-wrap items-stretch mb-3">
-                <input
-                  type="search"
-                  placeholder="Search"
-                  className="form-input px-3 py-2 placeholder-gray-400 text-gray-700 relative bg-white rounded-lg text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full pr-10"
-                />
-                <span className="z-10 h-full leading-snug font-normal  text-center text-gray-400 absolute bg-transparent rounded text-base items-center justify-center w-8 right-0 pr-3 py-3">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 -mt-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-
+          <div className="flex items-center justify-between h-8 px-6">
             <ul className="flex items-center flex-shrink-0 space-x-6">
               <li className="relative">
                 <button
@@ -246,7 +187,7 @@ const Dashboard = () => {
           </div>
         </header>
         <main className="">
-          <div className="grid mb-4 pb-10 px-8 mx-4 rounded-3xl bg-gray-100 border-4 border-green-400">
+          <div className="grid mb-4 pb-10 px-8 rounded-3xl bg-gray-100">
             <div className="grid grid-cols-12 gap-6">
               <div className="grid grid-cols-12 col-span-12 gap-6 xxl:col-span-9">
                 <div className="col-span-12 mt-8">
@@ -257,8 +198,8 @@ const Dashboard = () => {
                   </div>
                   <div className="grid grid-cols-12 gap-6 mt-5">
                     <a
-                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
-                      href="#"
+                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
+                      onClick={() => handleClick('users')}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -287,15 +228,15 @@ const Dashboard = () => {
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
-                              Item Sales
+                              Utilisateurs
                             </div>
                           </div>
                         </div>
                       </div>
                     </a>
                     <a
-                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
-                      href="#"
+                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
+                      onClick={() => handleClick('session')}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -324,15 +265,15 @@ const Dashboard = () => {
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
-                              Item Sales
+                              Sessions
                             </div>
                           </div>
                         </div>
                       </div>
                     </a>
                     <a
-                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
-                      href="#"
+                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
+                      onClick={() => handleClick('rebond')}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -367,15 +308,15 @@ const Dashboard = () => {
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
-                              Item Sales
+                              Taux de rebond
                             </div>
                           </div>
                         </div>
                       </div>
                     </a>
                     <a
-                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
-                      href="#"
+                      className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
+                      onClick={() => handleClick('time')}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -404,7 +345,7 @@ const Dashboard = () => {
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
-                              Item Sales
+                              Durée de la session
                             </div>
                           </div>
                         </div>
@@ -413,19 +354,18 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="col-span-12 mt-5">
-                  <div className="grid gap-2 grid-cols-1 lg:grid-cols-2">
+                  <div className="grid gap-2 grid-cols-1 lg:grid-cols-1">
                     <div className="bg-white shadow-lg p-4">
-                      <Charts options={optionsLine} />
-                    </div>
-                    <div className="bg-white shadow-lg">
-                      <Charts options={optionsPie} />
+                      <Charts options={optionsGraph} />
                     </div>
                   </div>
                 </div>
                 <div className="col-span-12 mt-5">
                   <div className="grid gap-2 grid-cols-1 lg:grid-cols-1">
                     <div className="bg-white p-4 shadow-lg rounded-lg">
-                      <h1 className="font-bold text-base">Table</h1>
+                      <h1 className="font-bold text-base">
+                        Pages les plus vues
+                      </h1>
                       <div className="mt-4">
                         <div className="flex flex-col">
                           <div className="-my-2 overflow-x-auto">
@@ -437,23 +377,34 @@ const Dashboard = () => {
                                       <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                         <div className="flex cursor-pointer">
                                           <span className="mr-2">
-                                            PRODUCT NAME
+                                            Nom de la page
                                           </span>
                                         </div>
                                       </th>
                                       <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                         <div className="flex cursor-pointer">
-                                          <span className="mr-2">Stock</span>
+                                          <span className="mr-2">
+                                            Nombre de visiteurs
+                                          </span>
                                         </div>
                                       </th>
                                       <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                         <div className="flex cursor-pointer">
-                                          <span className="mr-2">STATUS</span>
+                                          <span className="mr-2">
+                                            Nombres de clique
+                                          </span>
                                         </div>
                                       </th>
                                       <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                         <div className="flex cursor-pointer">
-                                          <span className="mr-2">ACTION</span>
+                                          <span className="mr-2">
+                                            Temps passé sur la page
+                                          </span>
+                                        </div>
+                                      </th>
+                                      <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                        <div className="flex cursor-pointer">
+                                          <span className="mr-2">Heatmap</span>
                                         </div>
                                       </th>
                                     </tr>
@@ -461,76 +412,21 @@ const Dashboard = () => {
                                   <tbody className="bg-white divide-y divide-gray-200">
                                     <tr>
                                       <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <p>Apple MacBook Pro 13</p>
-                                        <p className="text-xs text-gray-400">
-                                          PC & Laptop
-                                        </p>
+                                        <p>tonyugigi.fr</p>
                                       </td>
                                       <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <p>77</p>
+                                        <p>9999999</p>
                                       </td>
                                       <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <div className="flex text-green-500">
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="w-5 h-5 mr-1"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            />
-                                          </svg>
-                                          <p>Active</p>
-                                        </div>
+                                        <p>9999999</p>
                                       </td>
                                       <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <div className="flex space-x-4">
-                                          <a
-                                            href="#"
-                                            className="text-blue-500 hover:text-blue-600"
-                                          >
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              className="w-5 h-5 mr-1"
-                                              fill="none"
-                                              viewBox="0 0 24 24"
-                                              stroke="currentColor"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                              />
-                                            </svg>
-                                            <p>Edit</p>
-                                          </a>
-                                          <a
-                                            href="#"
-                                            className="text-red-500 hover:text-red-600"
-                                          >
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              className="w-5 h-5 mr-1 ml-3"
-                                              fill="none"
-                                              viewBox="0 0 24 24"
-                                              stroke="currentColor"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                              />
-                                            </svg>
-                                            <p>Delete</p>
-                                          </a>
-                                        </div>
+                                        <p>15min52</p>
+                                      </td>
+                                      <td>
+                                        <a href="/heatmap/{pageId}" className="text-blue-500">
+                                          Heatmap de la page
+                                        </a>
                                       </td>
                                     </tr>
                                   </tbody>

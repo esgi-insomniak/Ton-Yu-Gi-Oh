@@ -28,15 +28,12 @@ const { Tunnel, Tag, Stat, User } = require('./models');
 
 // Routes
 app.post('/register', (req, res) => {
-    // TODO: Implement register logic
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
     const terms = req.body.terms;
     if(terms === "on"){
-        //crypt password
         if(password === confirmPassword){
-            //save user
             bcrypt.hash(password, 10, function(err, hash) {
                 const user = new User({
                     email: email,
@@ -55,7 +52,6 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-    // TODO: Implement login logic
     const email = req.body.email;
     const password = req.body.password;
 
