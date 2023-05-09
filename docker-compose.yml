@@ -15,9 +15,6 @@ services:
         sh -c "yarn install && yarn start:dev"
       env_file:
         - .env.dev
-      depends_on:
-        - card-service-node
-        - user-service-node
       volumes:
         - ./server/gateway:/usr/src/gateway
       ports:
@@ -178,7 +175,7 @@ services:
       volumes:
         - auth-service-postgres-dev:/var/lib/postgresql/data
 
-
+    ### USER DECK SERVICE ###
     user-deck-service-node:
       build:
         context: ./server/user-deck-service
@@ -214,6 +211,9 @@ services:
         - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
       volumes:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### MAILER SERVICE ###
     mailer-service-node:
       build:
         context: ./server/mailer-service
@@ -233,6 +233,8 @@ services:
         - ./server/mailer-service:/usr/src/app
       links:
         - mailcatcher
+
+    ### ADMINER ###
     adminer:
       image: adminer:4.8.1
       hostname: adminer
@@ -240,6 +242,9 @@ services:
         - backend-dev
       ports:
         - "9000:8080"
+
+
+    ### MAILCATCHER ###
     mailcatcher:
       image: jderusse/mailcatcher:latest
       hostname: mailcatcher
