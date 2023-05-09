@@ -92,3 +92,10 @@ export class ResetPasswordBodyDto {
   @IsString()
   renewToken: string;
 }
+
+export class SendEmailBodyDto {
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}

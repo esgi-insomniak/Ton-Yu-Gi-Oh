@@ -1,18 +1,20 @@
 import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
+import { ROLES } from "@/helpers/utils/enum/roles";
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-    const { user, isLoggedIn } = useAuth()
+    const { user } = useAuth()
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/display-cards", poster: "/my_decks.png" },
-        { animatedBackground: "/opening.mp4", path: "/duel", poster: "/duel.png" },
-        { animatedBackground: "/opening.mp4", path: "/opening", poster: "/booster.png" },
-        { animatedBackground: "/opening.mp4", path: "/shop", poster: "/shop.png" },
-        { animatedBackground: "/opening.mp4", path: "/settings", poster: "/settings.png" },
-    ], [])
+        { animatedBackground: "/opening.mp4", path: "/display-cards", title: "Mes decks", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: user.roles.includes(ROLES.ADMIN) },
+    ], [user.roles])
 
     return (
         <div className="hero items-center min-h-screen text-gray-300">
@@ -27,8 +29,13 @@ const Home = () => {
                     </h1>
                 </div>
                 <div className="grid grid-cols-3 grid-flow-dense gap-8">
-                    {navs.map((nav, index) => (
-                        <NavItem key={index} animatedBackground={nav.animatedBackground} path={nav.path} poster={nav.poster} />
+                    {navs.filter(auth => auth.condition === true).map((nav, index) => (
+                        <NavItem
+                            key={index}
+                            title={nav.title}
+                            videoUrl={nav.animatedBackground}
+                            linkUrl={nav.path}
+                        />
                     ))}
                 </div>
             </div>
