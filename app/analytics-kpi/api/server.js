@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const swagger = require('./swagger');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -23,15 +24,46 @@ mongoose
 swagger(app);
 
 // Models
-const { Tunnel, Tag, Stat } = require('./models');
+const { Tunnel, Tag, Stat, User } = require('./models');
 
 // Routes
 app.post('/register', (req, res) => {
-    // TODO: Implement register logic
+    const email = req.body.email;
+    const password = req.body.password;
+    const confirmPassword = req.body.confirmPassword;
+    const terms = req.body.terms;
+    if(terms === "on"){
+        if(password === confirmPassword){
+            bcrypt.hash(password, 10, function(err, hash) {
+                const user = new User({
+                    email: email,
+                    password: hash
+                });
+                user.save().then((user) => {
+                    res.json(user);
+                });
+            });
+        }else{
+            res.json({message: "Passwords do not match"});
+        }
+    }else{
+        res.json({message: "You must accept the terms and conditions"});
+    }
 });
 
 app.post('/login', (req, res) => {
-    // TODO: Implement login logic
+    const email = req.body.email;
+    const password = req.body.password;
+
+    const user = User.findOne({email: email}).then((user) => {
+        bcrypt.compare(password, user.password, function(err, result) {
+            if(result){
+                res.json({message: "Login successful", user: user});
+            }else{
+                res.json({message: "Login failed"});
+            }
+        });
+    });
 });
 
 app.get('/tunnels', async (req, res) => {
