@@ -19,7 +19,9 @@ const requestCards = (pageNumber: number, itemPerPage: number) => apiRequest({
 }, responseCardsSchema)
 
 export const useGetAllCards = (pageNumber: number, itemPerPage: number) => {
-    const arrayOfCards = useQuery<ApiResponseCardSet>(cardsKeys.cards(pageNumber, itemPerPage), () => requestCards(pageNumber, itemPerPage))
+    const arrayOfCards = useQuery<ApiResponseCardSet>(cardsKeys.cards(pageNumber, itemPerPage), () => requestCards(pageNumber, itemPerPage), {
+        refetchOnWindowFocus: false,
+    })
 
     return React.useMemo(() => arrayOfCards, [arrayOfCards])
 }

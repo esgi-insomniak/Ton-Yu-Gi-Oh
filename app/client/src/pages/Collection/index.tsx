@@ -7,7 +7,6 @@ import React from "react";
 const Collection = () => {
     const [page, setPage] = React.useState<number>(1)
     const [searchValue, setSearchValue] = React.useState<string>("")
-    const searchRegex = new RegExp(searchValue, 'i');
     const { data: allCards, isFetching } = useGetAllCards(page, 18)
 
     const [collapsed, setCollapsed] = React.useState({
@@ -17,9 +16,57 @@ const Collection = () => {
         archetype: false
     })
 
+    const filters = React.useMemo(() => {
+        return {
+            rarity: [
+                { name: "Commune", checked: false },
+                { name: "Rare", checked: false },
+                { name: "Super Rare", checked: false },
+                { name: "Ultra Rare", checked: false },
+            ],
+            type: [
+                { name: "Monstre", checked: false },
+                { name: "Magie", checked: false },
+                { name: "Piège", checked: false },
+            ],
+            attribute: [
+                { name: "Lumière", checked: false },
+                { name: "Ténèbres", checked: false },
+                { name: "Eau", checked: false },
+                { name: "Feu", checked: false },
+                { name: "Vent", checked: false },
+            ],
+            archetype: [
+                { name: "Dragon", checked: false },
+                { name: "Magicien", checked: false },
+                { name: "Guerrier", checked: false },
+                { name: "Bête", checked: false },
+                { name: "Bête-Guerrier", checked: false },
+                { name: "Bête Ailée", checked: false },
+                { name: "Démon", checked: false },
+            ]
+        }
+    }, [])
+
+    const handleCheckboxChange = React.useCallback((tabName: keyof typeof filters, name: string, checked: boolean) => {
+        filters[tabName].map((item: { name: string; checked: boolean; }) => {
+            if (item.name === name) {
+                item.checked = !checked
+            }
+        })
+    }, [filters])
+
+    const handleUpdateFilters = React.useCallback(() => {
+        const checkedFilters = Object.keys(filters).map((key) => {
+            return filters[key as keyof typeof filters].filter((item) => item.checked).map((item) => item.name)
+        })
+
+        console.log(checkedFilters)
+    }, [filters])
+
     return (
         <div className="flex gap-5 w-full overflow-scroll p-5">
-            <div className="h-full flex flex-col p-3 w-3/12 bg-white/20 rounded-md drop-shadow-md overflow-scroll">
+            <div className="h-full flex flex-col p-3 w-3/12 bg-white/20 rounded-md drop-shadow-md overflow-scroll scrollbar-none">
                 <div className="divider">Rechercher</div>
                 <input
                     type="text"
@@ -34,11 +81,9 @@ const Collection = () => {
                 {
                     collapsed.rarity && (
                         <React.Fragment>
-                            <Checkbox title="Commune" checked={false} />
-                            <Checkbox title="Rare" checked={false} hc={setSearchValue} />
-                            <Checkbox title="Super Rare" checked={false} />
-                            <Checkbox title="Ultra Rare" checked={false} />
-
+                            {filters.rarity.map((r, i) => (
+                                <Checkbox key={i} title={r.name} checked={r.checked} hc={() => handleCheckboxChange('rarity', r.name, r.checked)} />
+                            ))}
                         </React.Fragment>
                     )
                 }
@@ -49,9 +94,9 @@ const Collection = () => {
                 {
                     collapsed.type && (
                         <React.Fragment>
-                            <Checkbox title="Monstre" checked={false} />
-                            <Checkbox title="Magie" checked={false} />
-                            <Checkbox title="Piège" checked={false} />
+                            {filters.type.map((type_, i) => (
+                                <Checkbox key={i} title={type_.name} checked={type_.checked} hc={() => handleCheckboxChange('type', type_.name, type_.checked)} />
+                            ))}
                         </React.Fragment>
                     )
                 }
@@ -62,13 +107,9 @@ const Collection = () => {
                 {
                     collapsed.attribute && (
                         <React.Fragment>
-                            <Checkbox title="Lumière" checked={false} />
-                            <Checkbox title="Ténèbres" checked={false} />
-                            <Checkbox title="Eau" checked={false} />
-                            <Checkbox title="Feu" checked={false} />
-                            <Checkbox title="Vent" checked={false} />
-                            <Checkbox title="Terre" checked={false} />
-                            <Checkbox title="Divin" checked={false} />
+                            {filters.attribute.map((attr, i) => (
+                                <Checkbox key={i} title={attr.name} checked={attr.checked} hc={() => handleCheckboxChange('attribute', attr.name, attr.checked)} />
+                            ))}
                         </React.Fragment>
                     )
                 }
@@ -79,14 +120,9 @@ const Collection = () => {
                 {
                     collapsed.archetype && (
                         <React.Fragment>
-                            <Checkbox title="Dragon" checked={false} />
-                            <Checkbox title="Magicien" checked={false} />
-                            <Checkbox title="Guerrier" checked={false} />
-                            <Checkbox title="Bête" checked={false} />
-                            <Checkbox title="Bête-Guerrier" checked={false} />
-                            <Checkbox title="Bête Ailée" checked={false} />
-                            <Checkbox title="Démon" checked={false} />
-                            <Checkbox title="Machine" checked={false} />
+                            {filters.archetype.map((arch, i) => (
+                                <Checkbox key={i} title={arch.name} checked={arch.checked} hc={() => handleCheckboxChange('archetype', arch.name, arch.checked)} />
+                            ))}
                         </React.Fragment>
                     )
                 }
@@ -109,7 +145,12 @@ const Collection = () => {
                             »
                         </button>
                     </div>
-                    <button className="t-btn bg-white/20 hover:bg-gray-700">Filtrer</button>
+                    <button
+                        className="t-btn bg-white/20 hover:bg-gray-700"
+                        onClick={handleUpdateFilters}
+                    >
+                        Filtrer
+                    </button>
                 </div>
 
             </div>
@@ -120,9 +161,8 @@ const Collection = () => {
                     ))}
                 </div>
             ) : (
-                <div className="grid grid-cols-6 px-3 w-full gap-5">
+                <div className="grid grid-cols-6 px-3 w-full gap-5 scrollbar-none">
                     {allCards?.data
-                        ?.filter((item) => searchRegex.test(item.card.name) || searchRegex.test(item.rarity.name))
                         .map((c, i) => (
                             <div className="relative hover:scale-105 rounded-sm cursor-pointer duration-150" key={i}>
                                 <img src={c.card.imageUrl} alt="" />
