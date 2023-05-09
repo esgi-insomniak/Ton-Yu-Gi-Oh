@@ -1,5 +1,11 @@
+VERSION := $(shell git rev-parse --short HEAD)
+
 copy-env:
 	cp -f .env.example .env && cp .env.dev.example .env.dev
+
+build-and-publish:
+	docker build --no-cache -f deploy/docker/Dockerfile -t maeljamin/ton-yugi-$(service):$(VERSION) server/$(service) --target prod --build-arg SERVICE_NAME=$(service)
+	docker push maeljamin/ton-yugi-$(service):$(VERSION)
 
 start:
 	cd client && make up

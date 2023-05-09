@@ -1,31 +1,40 @@
 version: "3.4"
 services:
+
+
+    ### FRONTEND GATEWAY ###
     gateway:
       build:
         context: ./server/gateway
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=gateway
       hostname: gateway
       command: >
-        sh -c "yarn install &&
-        yarn start:dev"
+        sh -c "yarn install && yarn start:dev"
       env_file:
         - .env.dev
       depends_on:
         - card-service-node
         - user-service-node
       volumes:
-        - ./server/gateway:/usr/src/app
+        - ./server/gateway:/usr/src/gateway
       ports:
         - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
       networks:
         - backend-dev
         - frontend-dev
+
+
+    ### CARD SERVICE ###
     card-service-node:
       build:
         context: ./server/card-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=card-service
       hostname: card-service-node
       command: >
         sh -c "yarn install &&
@@ -38,7 +47,7 @@ services:
       depends_on:
         - card-service-postgres
       volumes:
-        - ./server/card-service:/usr/src/app
+        - ./server/card-service:/usr/src/card-service
       links:
         - card-service-postgres
     card-service-postgres:
@@ -54,11 +63,16 @@ services:
         - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
       volumes:
         - card-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### USER SERVICE ###
     user-service-node:
       build:
         context: ./server/user-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=user-service
       hostname: user-service-node
       command: >
         sh -c "yarn install &&
@@ -71,7 +85,7 @@ services:
       depends_on:
         - user-service-postgres
       volumes:
-        - ./server/user-service:/usr/src/app
+        - ./server/user-service:/usr/src/user-service
       links:
         - user-service-postgres
     user-service-postgres:
@@ -87,11 +101,16 @@ services:
         - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
       volumes:
         - user-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### PAYMENT SERVICE ###
     payment-service-node:
       build:
         context: ./server/payment-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=payment-service
       hostname: payment-service-node
       command: >
         sh -c "yarn install &&
@@ -104,7 +123,7 @@ services:
       depends_on:
         - payment-service-postgres
       volumes:
-        - ./server/payment-service:/usr/src/app
+        - ./server/payment-service:/usr/src/payment-service
       links:
         - payment-service-postgres
     payment-service-postgres:
@@ -120,11 +139,16 @@ services:
         - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
       volumes:
         - payment-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### AUTH SERVICE ###
     auth-service-node:
       build:
         context: ./server/auth-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=auth-service
       hostname: auth-service-node
       command: >
         sh -c "yarn install &&
@@ -137,7 +161,7 @@ services:
       depends_on:
         - auth-service-postgres
       volumes:
-        - ./server/auth-service:/usr/src/app
+        - ./server/auth-service:/usr/src/auth-service
       links:
         - auth-service-postgres
     auth-service-postgres:
@@ -153,11 +177,15 @@ services:
         - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
       volumes:
         - auth-service-postgres-dev:/var/lib/postgresql/data
+
+
     user-deck-service-node:
       build:
         context: ./server/user-deck-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=user-deck-service
       hostname: user-deck-service-node
       command: >
         sh -c "yarn install &&
@@ -170,7 +198,7 @@ services:
       depends_on:
         - user-deck-service-postgres
       volumes:
-        - ./server/user-deck-service:/usr/src/app
+        - ./server/user-deck-service:/usr/src/user-deck-service
       links:
         - user-deck-service-postgres
     user-deck-service-postgres:
@@ -189,7 +217,7 @@ services:
     mailer-service-node:
       build:
         context: ./server/mailer-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
       hostname: mailer-service-node
       command: >
@@ -211,20 +239,23 @@ services:
       networks:
         - backend-dev
       ports:
-        - 9000:8080
+        - "9000:8080"
     mailcatcher:
       image: jderusse/mailcatcher:latest
       hostname: mailcatcher
       networks:
         - backend-dev
       ports:
-        - 9025:80
+        - "9025:80"
+
+
+
 networks:
   backend-dev:
     driver: bridge
   frontend-dev:
-    external:
-      name: infrastructure
+    external: true
+
 volumes:
     card-service-postgres-dev:
     user-service-postgres-dev:
