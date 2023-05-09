@@ -12,15 +12,14 @@ services:
           - SERVICE_NAME=gateway
       hostname: gateway
       command: >
-        sh -c "yarn install &&
-        yarn start:dev"
+        sh -c "yarn install && yarn start:dev"
       env_file:
         - .env.dev
       depends_on:
         - card-service-node
         - user-service-node
       volumes:
-        - ./server/gateway:/usr/src/app
+        - ./server/gateway:/usr/src/gateway
       ports:
         - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
       networks:
@@ -48,7 +47,7 @@ services:
       depends_on:
         - card-service-postgres
       volumes:
-        - ./server/card-service:/usr/src/app
+        - ./server/card-service:/usr/src/card-service
       links:
         - card-service-postgres
     card-service-postgres:
@@ -86,7 +85,7 @@ services:
       depends_on:
         - user-service-postgres
       volumes:
-        - ./server/user-service:/usr/src/app
+        - ./server/user-service:/usr/src/user-service
       links:
         - user-service-postgres
     user-service-postgres:
@@ -124,7 +123,7 @@ services:
       depends_on:
         - payment-service-postgres
       volumes:
-        - ./server/payment-service:/usr/src/app
+        - ./server/payment-service:/usr/src/payment-service
       links:
         - payment-service-postgres
     payment-service-postgres:
@@ -162,7 +161,7 @@ services:
       depends_on:
         - auth-service-postgres
       volumes:
-        - ./server/auth-service:/usr/src/app
+        - ./server/auth-service:/usr/src/auth-service
       links:
         - auth-service-postgres
     auth-service-postgres:
@@ -199,7 +198,7 @@ services:
       depends_on:
         - user-deck-service-postgres
       volumes:
-        - ./server/user-deck-service:/usr/src/app
+        - ./server/user-deck-service:/usr/src/user-deck-service
       links:
         - user-deck-service-postgres
     user-deck-service-postgres:

@@ -1,34 +1,28 @@
 FROM node:19.0.0-alpine as dev
 ARG SERVICE_NAME
 
-WORKDIR /usr/src/${SERVICE_NAME}
+ENV NODE_ENV=development
 
-RUN apk add yarn
+WORKDIR /usr/src/${SERVICE_NAME}
 
 COPY package*.json yarn*.lock tsconfig*.json ./
 
-ENV NODE_ENV=development
-
 CMD yarn install && \
-    yarn typeorm:migrate && \
     yarn start:dev
 
 FROM node:19.0.0-alpine as prod
+ARG SERVICE_NAME
 
 ENV NODE_ENV=production
 
-WORKDIR /usr/src/app
-
-RUN apk add yarn
+WORKDIR /usr/src/${SERVICE_NAME}
 
 COPY package*.json yarn*.lock tsconfig*.json ./
 
 RUN yarn install --production
-
-COPY . .
-
 RUN yarn build
 RUN yarn cache clean
 
-CMD yarn typeorm:migrate && \
-    node dist/main.js
+COPY ./dist ./dist
+
+CMD yarn start:prod
