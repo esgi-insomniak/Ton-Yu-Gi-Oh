@@ -19,7 +19,7 @@ env:
 
 jobs:
   build-publish-deploy:
-    name: Build, Publish, and Deploy
+    name: Build, Publish, Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment: production
