@@ -46,9 +46,22 @@ jobs:
         #
       - id: auth
         name: Authenticate
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+
+
+
+
+
+
 
         #
         # Sets up kubectl and gcloud
@@ -57,14 +70,6 @@ jobs:
         #  run: |
         #    gcloud config set compute/zone $GKE_ZONE
         #    gcloud container clusters get-credentials $GKE_CLUSTER
-        
-
-        # Get the GKE credentials so we can deploy to the cluster
-      - name: Set up GKE credentials
-        uses: google-github-actions/get-gke-credentials@v0
-        with:
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_ZONE }}
 
 
 
