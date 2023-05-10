@@ -4,11 +4,15 @@ import { useAuth } from "@/helpers/api/hooks"
 import { useMe } from "@/helpers/api/hooks/users"
 import { useModal } from "@/helpers/providers/modal"
 import React from "react"
+import { getScreenSize } from "insomniak-sdk-analytics"
+import { useNavigate } from "react-router-dom"
 
 const Shop = () => {
     const { user } = useAuth()
     const { data: me } = useMe(user.id)
     const { openModal } = useModal()
+
+    const router = useNavigate()
 
     const Coins = React.useMemo(() => {
         return [
@@ -22,9 +26,9 @@ const Shop = () => {
 
     const handleBuyCoinsModal = () => {
         openModal(
-            <div className="flex justify-around space-x-5">
+            <div className="flex space-x-2 justify-center items-center w-full h-full">
                 {Coins.map((coin, i) => (
-                    <CardCoins price={coin.price} amount={coin.name} />
+                    <CardCoins price={coin.price} amount={coin.name} key={i} />
                 ))}
             </div>,
             "Acheter des coins",
@@ -32,13 +36,16 @@ const Shop = () => {
             {
                 yes: { action: () => { }, title: "" }, no: { action: () => { }, title: "" }
             },
-            "xl"
+            getScreenSize(window)
         )
     }
+
     return (
         <div>
             <div className="h-20 w-full flex bg-white/10 items-center justify-between px-10">
-                <OurLogoWithoutRect width="50" height="50" />
+                <div onClick={() => router('/')}>
+                    <OurLogoWithoutRect width="50" height="50" />
+                </div>
                 <div className="flex items-center space-x-2 bg-black/20 rounded-full pr-4">
                     <div className="space-x-2 rounded-full drop-shadow-2xl bg-orange-50 p-2 flex items-center">
                         <img src="/InsomniakCoins.png" alt="" className="h-7 w-7" />

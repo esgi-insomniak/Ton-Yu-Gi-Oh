@@ -36,7 +36,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, title, yesNoAction, yesNo, conte
             case "lg":
                 return "max-w-4xl min-h-[30rem]";
             case "xl":
-                return "max-w-7xl min-h-[35rem]";
+                return "max-w-7xl min-h-[45rem]";
             default:
                 return "max-w-lg";
         }
@@ -44,16 +44,16 @@ const Modal: React.FC<ModalProps> = ({ onClose, title, yesNoAction, yesNo, conte
 
     return isOpen
         ? ReactDOM.createPortal(
-            <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="fixed z-10 inset-0 overflow-y-auto text-white">
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="fixed inset-0 transition-opacity">
                         <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={onClose}></div>
                     </div>
-                    <div className={`bg-white rounded-lg overflow-hidden shadow-xl transform transition-all w-full h-full ${getSizeClassName(size)}`}>
+                    <div className={`bg-black/50 rounded-lg overflow-hidden shadow-xl transform transition-all w-full h-full ${getSizeClassName(size)} flex justify-between flex-col`}>
                         {title && (
                             <div className=" py-4 px-6 text-lg font-semibold">{title}</div>
                         )}
-                        <div className="px-6 py-4 bg-red-200">{content}</div>
+                        <div className={`px-6 py-4 ${size === 'xl' ? 'max-h-max' : ''}`}>{content}</div>
                         {yesNo && (
                             <div className="px-6 py-4 flex justify-end">
                                 <button

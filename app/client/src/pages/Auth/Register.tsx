@@ -56,13 +56,13 @@ const Register = () => {
                         type={"password"}
                         passwordIcon
                     />
-                    <button type="submit" className="t-btn col-span-2">
+                    <button type="submit" className="t-btn bg-blue-500 text-white hover:bg-blue-300 col-span-2">
                         <p>S'incrire</p>
                         <BiLockOpenAlt className="font-bold scale-105" />
                     </button>
                 </form>
                 <div className="divider text-black">ou</div>
-                <div className="t-btn bg-slate-400 hover:bg-slate-500" onClick={() => router('/login')}>
+                <div className="t-btn bg-slate-400 hover:bg-slate-500 text-white hover:text-white" onClick={() => router('/login')}>
                     <p>Se connecter</p>
                     <BiLockOpenAlt className="font-bold scale-105" />
                 </div>
