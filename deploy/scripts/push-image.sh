@@ -29,7 +29,7 @@ set -u # or set -o nounset
 : "$REGISTRY_PW"
 
 export DIR=$1
-echo $REGISTRY_PW | docker login $CONTAINER_REGISTRY --username $REGISTRY_UN --password-stdin
+echo $REGISTRY_PW | docker login --username $REGISTRY_UN --password-stdin
 docker push $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION
 docker tag $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION $CONTAINER_REGISTRY/ton-yugi-$DIR:latest
 docker push $CONTAINER_REGISTRY/ton-yugi-$DIR:latest
