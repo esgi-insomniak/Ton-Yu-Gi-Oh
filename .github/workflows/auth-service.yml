@@ -53,11 +53,24 @@ jobs:
         #
         # Sets up kubectl and gcloud
         #
-      - name: Set up kubectl
-        run: |
-          gcloud config set compute/zone $GKE_ZONE
-          gcloud container clusters get-credentials $GKE_CLUSTER
+        # - name: Set up kubectl
+        #  run: |
+        #    gcloud config set compute/zone $GKE_ZONE
+        #    gcloud container clusters get-credentials $GKE_CLUSTER
         
+
+        # Get the GKE credentials so we can deploy to the cluster
+      - name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v0
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+
+
+
+
+
 
         #
         # Applies the Kubernetes files.
