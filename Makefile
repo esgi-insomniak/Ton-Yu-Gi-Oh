@@ -4,8 +4,10 @@ copy-env:
 	cp -f .env.example .env && cp .env.dev.example .env.dev
 
 build-and-publish:
-	docker build --no-cache -f deploy/docker/Dockerfile -t maeljamin/ton-yugi-$(service):$(VERSION) server/$(service) --target prod --build-arg SERVICE_NAME=$(service)
-	docker push maeljamin/ton-yugi-$(service):$(VERSION)
+	# docker build --no-cache -f deploy/docker/Dockerfile -t maeljamin/ton-yugi-$(service):$(VERSION) server/$(service) --target prod --build-arg SERVICE_NAME=$(service)
+	# docker push maeljamin/ton-yugi-$(service):$(VERSION)
+	deploy/scripts/build-image.sh $(service)
+	deploy/scripts/push-image.sh $(service)
 
 start:
 	cd client && make up

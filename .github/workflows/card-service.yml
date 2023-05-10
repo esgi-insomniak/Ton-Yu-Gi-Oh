@@ -1,0 +1,63 @@
+name: Deploy "card-service"
+
+on:
+  push:
+    paths:
+      - "server/card-service/**"
+      - ".github/workflows/card-service.yml"
+
+env:
+  CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+  REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
+  REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
+  VERSION: ${{ github.sha }}
+
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+
+        #
+        # Builds the Docker image.
+        #
+      - name: Build
+        run: .deploy/scripts/build-image.sh card-service
+
+        #
+        # Publishes the Docker image to the container registry.
+        #
+      - name: Publish
+        run: .deploy/scripts/push-image.sh card-service
+
+        #
+        # Authenticates with the Google Cloud Platform.
+        #
+      - id: auth
+        name: Authenticate
+        uses: google-github-actions/auth@v0
+        with:
+          # Set the JSON key using the stringified JSON env variable
+          # from the `Configure GCP Service Account` step.
+          credentials: ${{ secrets.GCP_SA_KEY }}
+          # Set the project ID
+          project_id: ${{ secrets.PROJECT_ID }}
+
+
+        #
+        # Deploys the Docker image to the Kubernetes cluster.
+        #
+      - name: Deploy
+        run: .deploy/scripts/deploy-image.sh card-service
+
