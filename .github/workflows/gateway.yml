@@ -50,6 +50,22 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+        #
+        # Sets up kubectl and gcloud
+        #
+      - name: Set up kubectl
+        run: |
+            gcloud config set project $PROJECT_ID
+            gcloud config set compute/zone $GKE_ZONE
+            gcloud container clusters get-credentials $GKE_CLUSTER
+        
+
+        #
+        # Applies the Kubernetes files.
+        #
+      - name: Apply Kubernetes files
+        run: |
+            kubectl apply -f deploy/k8s/gateway/gateway.yml                        
 
         #
         # Deploys the Docker image to the Kubernetes cluster.
