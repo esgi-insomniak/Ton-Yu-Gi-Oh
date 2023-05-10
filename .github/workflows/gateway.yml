@@ -51,10 +51,6 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
 
-
-
-
-
         #
         # Deploys the Docker image to the Kubernetes cluster.
         #
