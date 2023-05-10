@@ -25,3 +25,7 @@ export type DecodedTokenType = Omit<UserContextType, 'id'> & {
 export type AuthRegisterType = Omit<UserContextType, 'id' | 'roles'> & {
     password: string
 }
+
+export type UserMe = Omit<UserType, 'createdAt' | 'updatedAt'> & {
+    coins: number
+}
