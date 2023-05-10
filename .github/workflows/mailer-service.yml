@@ -9,7 +9,8 @@ on:
 env:
   CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
   REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
-  REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+  #REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+  REGISTRY_PW: dckr_pat_kS188eCPzujTdkv-O0XP1U4yvtY
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
