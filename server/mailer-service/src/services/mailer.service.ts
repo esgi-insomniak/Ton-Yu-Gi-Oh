@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from './config/config.service';
 import * as Transport from 'nodemailer-sendinblue-transport';
-import { MailerMessage } from 'src/interfaces/mail/mailer.interface';
+import { MailerMessage } from '../interfaces/mail/mailer.interface';
 import { SentMessageInfo } from 'nodemailer/lib/smtp-connection';
 
 @Injectable()
