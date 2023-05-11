@@ -50,8 +50,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-
-
+        #
+        # Sets up the Google Cloud SDK (gcloud).
+        #
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
