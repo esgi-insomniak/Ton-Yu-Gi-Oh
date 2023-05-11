@@ -9,7 +9,7 @@ export interface IPaymentHistoryGetResponse {
 export interface ICheckoutCreateResponse {
   status: number;
   message?: string;
-  session: {
+  item: {
     sessionId: string;
     paymentStatus: string;
     url: string;
