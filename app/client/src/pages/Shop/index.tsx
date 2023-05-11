@@ -16,11 +16,11 @@ const Shop = () => {
 
     const Coins = React.useMemo(() => {
         return [
-            { id: 1, name: 1000, price: 10 },
-            { id: 2, name: 2000, price: 20 },
-            { id: 3, name: 3000, price: 30 },
-            { id: 4, name: 4000, price: 40 },
-            { id: 5, name: 5000, price: 50 },
+            { id: 'price_1McUUpLgiVx31CexG2tzOzeM', amount: 100, bonus: 0, price: 1 },
+            { id: 'price_1McUVKLgiVx31CexMLtVRzxT', amount: 500, bonus: 50, price: 5 },
+            { id: 'price_1McUVkLgiVx31CexeVvLIyow', amount: 1000, bonus: 250, price: 10 },
+            { id: 'price_1McUWiLgiVx31CexrZUIISVY', amount: 2000, bonus: 500, price: 20 },
+            { id: 'price_1McUX2LgiVx31CexqzAF7K2v', amount: 5000, bonus: 1500, price: 50 },
         ]
     }, [])
 
@@ -28,7 +28,7 @@ const Shop = () => {
         openModal(
             <div className="flex space-x-2 justify-center items-center w-full h-full">
                 {Coins.map((coin, i) => (
-                    <CardCoins price={coin.price} amount={coin.name} key={i} />
+                    <CardCoins {...coin} key={i} />
                 ))}
             </div>,
             "Acheter des coins",
@@ -49,14 +49,21 @@ const Shop = () => {
                 <div className="flex items-center space-x-2 bg-black/20 rounded-full pr-4">
                     <div className="space-x-2 rounded-full drop-shadow-2xl bg-orange-50 p-2 flex items-center">
                         <img src="/InsomniakCoins.png" alt="" className="h-7 w-7" />
-                        <span>Coins</span>
-                        <span>{me?.coins || 0}</span>
+                        <span>{me?.data.coins || 0}</span>
                     </div>
                     <span className="" onClick={handleBuyCoinsModal}>🛒</span>
                 </div>
             </div>
-            <div>
-                <div></div>
+            <div className="grid grid-cols-1 grid-flow-dense gap-5 p-10 text-black">
+                <div className="bg-white/30 flex p-2 rounded-md h-80 space-x-2">
+                    <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 flex items-center justify-center">
+                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvignette.wikia.nocookie.net%2Fyugioh%2Fimages%2Fd%2Fd0%2FDarkMagician-DG-EN-VG-NC.png%2Frevision%2Flatest%3Fcb%3D20150228230223&f=1&nofb=1&ipt=ea1743e962017ad09795818a2c6cf39cf52964ce2a25299732797daf05896118&ipo=images" alt="" className="h-64" />
+                    </div>
+                    <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 object-cover flex items-center justify-center">
+                        <img src="https://images.ygoprodeck.com/images/sets/HISU.jpg" alt="" className="h-64 drop-shadow-md shadow-xl" />
+                    </div>
+                    <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30">PREVISUALISATION</div>
+                </div>
             </div>
         </div>
     )

@@ -71,6 +71,7 @@ const Router: React.FC = () => {
                         </GameCardProvider>
                     } />
                     <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/shop:sessionId" element={<ShopPage />} />
                 </Route>
 
                 <Route

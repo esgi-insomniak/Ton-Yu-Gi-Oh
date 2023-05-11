@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="App">
       <QueryClientProvider client={queryClient}>
-        <TrackingProvider>
+        <TrackingProvider appId=''>
           <ModalProvider>
             <UserContextProvider>
               <BrowserRouter>

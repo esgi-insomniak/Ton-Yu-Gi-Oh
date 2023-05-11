@@ -1,12 +1,28 @@
+import { usePayment } from "@/helpers/api/hooks/shop";
+import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+
 type CardCoinsProps = {
     amount: number;
     price: number;
+    id: string
+    bonus: number;
 }
 
-const CardCoins = ({ amount, price }: CardCoinsProps) => {
+const CardCoins = ({ amount, price, id, bonus }: CardCoinsProps) => {
 
-    const handleStripe = async () => {
-        console.log("stripe")
+    const sendPayement = usePayment()
+    const alert = useAlert()
+
+    const handleStripe = () => {
+        sendPayement.mutate(id, {
+            onSuccess: (data) => {
+                console.log(data);
+                // window.location.href =
+            },
+            onError: (err) => {
+                alert?.error('Une erreur est survenu lors du paiement')
+            }
+        })
     }
 
     return (
@@ -20,7 +36,7 @@ const CardCoins = ({ amount, price }: CardCoinsProps) => {
                 <img className="relative w-40" src="/InsomniakCoins.png" alt="" />
             </div>
             <div className="relative text-white px-6 pb-6 mt-6">
-                {/* <span className="block opacity-75 -mb-1">Indoor</span> */}
+                <span className="block opacity-75 -mb-1">{bonus} IC bonus</span>
                 <div className="flex justify-between">
                     <span className="block font-semibold text-lg">{amount} pièces</span>
                     <button

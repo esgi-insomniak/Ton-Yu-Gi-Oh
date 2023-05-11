@@ -6,7 +6,7 @@ import jwt_decode from "jwt-decode"
 import { useLocalStorage } from "react-use";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
-    const [tokenLs, setToken, removeToken] = useLocalStorage("token", "");
+    const [tokenLs, setToken, removeToken] = useLocalStorage("token", "", { raw: true });
     const token = tokenLs || "";
     const defaultUser = React.useMemo(() => {
         if (tokenLs) {

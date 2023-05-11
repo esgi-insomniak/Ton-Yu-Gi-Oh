@@ -1,4 +1,6 @@
 import { ROLES } from "@/helpers/utils/enum/roles";
+import { ApiFormatResponse } from "../common";
+
 
 export interface UserManagementContextProps {
     children: React.ReactNode;
@@ -12,6 +14,7 @@ export interface UserType {
     createdAt: string;
     updatedAt: string;
     username: string;
+    coins?: number;
 }
 
 export type UserContextType = Omit<UserType, 'createdAt' | 'updatedAt' | 'firstName' | 'lastName'>
@@ -26,6 +29,4 @@ export type AuthRegisterType = Omit<UserContextType, 'id' | 'roles'> & {
     password: string
 }
 
-export type UserMe = Omit<UserType, 'createdAt' | 'updatedAt'> & {
-    coins: number
-}
+export type UserMe = ApiFormatResponse<Omit<UserType, 'createdAt' | 'updatedAt'>> 

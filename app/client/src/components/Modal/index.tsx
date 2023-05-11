@@ -49,7 +49,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, title, yesNoAction, yesNo, conte
                     <div className="fixed inset-0 transition-opacity">
                         <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={onClose}></div>
                     </div>
-                    <div className={`bg-black/50 rounded-lg overflow-hidden shadow-xl transform transition-all w-full h-full ${getSizeClassName(size)} flex justify-between flex-col`}>
+                    <div className={`bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all w-full h-full ${getSizeClassName(size)} flex justify-between flex-col`}>
                         {title && (
                             <div className=" py-4 px-6 text-lg font-semibold">{title}</div>
                         )}
