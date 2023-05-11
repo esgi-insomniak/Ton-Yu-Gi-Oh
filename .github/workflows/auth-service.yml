@@ -1,0 +1,84 @@
+name: Deploy "auth-service"
+
+on:
+  push:
+    branches:
+      - feature/ci-cd
+    paths:
+      - "server/auth-service/**"
+      - ".github/workflows/auth-service.yml"
+
+env:
+  CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+  REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
+  REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
+  VERSION: ${{ github.sha }}
+
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish, Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+
+        #
+        # Builds the Docker image.
+        #
+      - name: Build
+        run: deploy/scripts/build-image.sh auth-service
+
+        #
+        # Publishes the Docker image to the container registry.
+        #
+      - name: Publish
+        run: deploy/scripts/push-image.sh auth-service
+
+        #
+        # Authenticates with the Google Cloud Platform.
+        #
+      - id: auth
+        name: Authenticate
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          install_components: kubectl
+
+        #
+        # Configures the Kubernetes cluster.
+        #
+      - name: Configure Kubernetes cluster
+        run: |
+            gcloud config set project ${{ secrets.PROJECT_ID }}
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
+            kubectl config current-context
+
+        #
+        # Applies the Kubernetes files.
+        #
+      - name: Apply Kubernetes files
+        run: |
+            kubectl apply -f deploy/k8s/auth-service/auth-service.yml                        
+
+        #
+        # Deploys the Docker image to the Kubernetes cluster.
+        #
+      - name: Deploy
+        run: deploy/scripts/deploy-image.sh auth-service
+

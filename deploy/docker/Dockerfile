@@ -23,6 +23,4 @@ RUN yarn install --production
 RUN yarn build
 RUN yarn cache clean
 
-COPY ./dist ./dist
-
 CMD yarn start:prod
