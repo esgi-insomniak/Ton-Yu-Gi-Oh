@@ -63,7 +63,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud auth login
+            gcloud auth configure-docker
             gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
             kubectl config current-context
 
