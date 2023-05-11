@@ -4,12 +4,12 @@
 
 */
 
-.card[data-rarity="collector-s-rare"] .card__shine {
+.yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine {
   clip-path: var(--clip);
 }
 
-.card[data-rarity="collector-s-rare"] .card__shine,
-.card[data-rarity="collector-s-rare"] .card__shine:after {
+.yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine,
+.yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine:after {
 
   --space: 5%;
   --angle: 133deg;
@@ -45,7 +45,7 @@
 
 }
 
-.card[data-rarity="collector-s-rare"] .card__shine:after {
+.yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine:after {
 
   content: "";
 
@@ -62,7 +62,7 @@
 
 }
 
-.card[data-rarity="collector-s-rare"] .card__shine:before {
+.yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine:before {
 
   content: "";
   -webkit-mask-image: none;
@@ -95,7 +95,7 @@
 
 */
 
-.card[data-rarity="collector-s-rare"] .card__glare {
+.yugi-card[data-rarity="collector-s-rare"] .yugi-card__glare {
 
   background-image:
     radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
@@ -124,8 +124,8 @@
 
 */
 
-.card:not(.masked).card[data-rarity="collector-s-rare"] .card__shine,
-.card:not(.masked).card[data-rarity="collector-s-rare"] .card__shine:after {
+.yugi-card:not(.yugi-masked).yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine,
+.yugi-card:not(.yugi-masked).yugi-card[data-rarity="collector-s-rare"] .yugi-card__shine:after {
 
   --mask: none;
   --foil: url("/img/illusion.png");
@@ -141,7 +141,7 @@
 
 }
 
-.card:not(.masked).card[data-rarity*="collector-s-rare"] .card__shine:after {
+.yugi-card:not(.yugi-masked).yugi-card[data-rarity*="collector-s-rare"] .yugi-card__shine:after {
 
   filter: brightness(calc((var(--pointer-from-center)*.4) + .5)) contrast(1.4) saturate(1.2);
   mix-blend-mode: difference;

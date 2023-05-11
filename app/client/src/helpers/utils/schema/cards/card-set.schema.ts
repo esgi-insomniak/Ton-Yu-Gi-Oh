@@ -1,11 +1,11 @@
 import * as zod from "zod";
-import { cardPartialSchema } from "./card.schema";
+import { cardSchema } from "./card.schema";
 import { setPartialSchema } from "./set.schema";
 import { raritySchema } from "./rarity.schema";
 
 export const cardSetSchema = zod.object({
   id: zod.string(),
-  card: zod.lazy(() => cardPartialSchema),
+  card: zod.lazy(() => cardSchema.omit({ cardSets: true })),
   set: zod.lazy(() => setPartialSchema),
   rarity: zod.lazy(() => raritySchema),
   price: zod.number(),

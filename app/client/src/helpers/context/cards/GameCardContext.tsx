@@ -1,9 +1,9 @@
 import React from 'react';
-import { GameCardContextProps } from '../../types/cards';
+import { IGameCardContextProps } from '../../types/cards';
 
-const GameCardContext = React.createContext<GameCardContextProps>({
-    cards: [],
-    setCards: () => { },
+const GameCardContext = React.createContext<IGameCardContextProps>({
+    cardSets: [],
+    setCardSets: () => { },
     setIsDraggable: () => { },
     setIsActive: () => { },
     setIsHidden: () => { },
@@ -11,8 +11,8 @@ const GameCardContext = React.createContext<GameCardContextProps>({
     setCanPop: () => { },
     setCanFlip: () => { },
     setIsLoaded: () => { },
-    sortCards: () => { },
-    deactivateAllCards: () => { }
+    sortCardSets: () => { },
+    deactivateAllCardSets: () => { }
 });
 
 export default GameCardContext;

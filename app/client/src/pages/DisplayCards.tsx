@@ -5,13 +5,13 @@ import cardsJson from '@/assets/cards.json'
 import GameCardContext from "../helpers/context/cards/GameCardContext"
 import { v4 as uuidv4 } from "uuid"
 import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "@/helpers/utils/enum/card"
-import { GameCardType } from "@/helpers/types/cards"
+import { IGameCard } from "@/helpers/types/cards"
 
 const DisplayCards = () => {
-    const { cards, setCards, sortCards } = React.useContext(GameCardContext)
+    const { cardSets, setCardSets, sortCardSets } = React.useContext(GameCardContext)
 
     React.useEffect(() => {
-        if (cards.length !== 0) return;
+        if (cardSets.length !== 0) return;
 
         const filteredCards = Object.values(cardsJson).filter((card) => {
             if (card.card_sets !== undefined)
@@ -40,25 +40,25 @@ const DisplayCards = () => {
                 isFocused: false,
                 canPop: true,
                 canFlip: true
-            } as unknown as GameCardType
+            } as unknown as IGameCard
         })
 
-        setCards(filteredCards.slice(0, 10))
-    }, [cards.length])
+        setCardSets(filteredCards.slice(0, 10))
+    }, [cardSets.length])
 
     return (
         <div className="w-full flex justify-center items-center px-32">
-            <DragDropContext onDragEnd={sortCards}>
+            <DragDropContext onDragEnd={sortCardSets}>
                 <Droppable droppableId="drop_test">
                     {dropProvided => (
                         <div {...dropProvided.droppableProps} ref={dropProvided.innerRef} className="grid grid-cols-3 grid-flow-dense gap-5">
-                            {cards.map((card, index) => (
+                            {cardSets.map((cardSet, index) => (
                                 <div key={index}>
-                                    <h2>{card.rarity.replace(/\W/g, '-').toLowerCase()}</h2>
-                                    <Draggable key={card.id} draggableId={card.id.toString()} index={index} isDragDisabled={!card.isDraggable}>
+                                    <h2>{cardSet.rarity.name.replace(/\W/g, '-').toLowerCase()}</h2>
+                                    <Draggable key={cardSet.id} draggableId={cardSet.id.toString()} index={index} isDragDisabled={!cardSet.isDraggable}>
                                         {dragProvided => (
                                             <div ref={dragProvided.innerRef} {...dragProvided.draggableProps}>
-                                                <GameCard {...card} dragProvided={dragProvided} />
+                                                <GameCard {...cardSet} dragProvided={dragProvided} />
                                             </div>
                                         )}
                                     </Draggable>

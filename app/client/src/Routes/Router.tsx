@@ -64,7 +64,11 @@ const Router: React.FC = () => {
                     } />
                     <Route path="/" element={<HomePage />} />
                     <Route path="/opening" element={<BoosterPage />} />
-                    <Route path="/collection" element={<CollectionPage />} />
+                    <Route path="/collection" element={
+                        <GameCardProvider>
+                            <CollectionPage />
+                        </GameCardProvider>
+                    } />
                 </Route>
 
                 <Route

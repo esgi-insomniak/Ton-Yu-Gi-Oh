@@ -34,7 +34,6 @@ export class DBFeederService {
     - Sets: ${await this.feedSets({ rowData, chunk })}
     - LinkMarkers: ${await this.feedLinkMarkers({ rowData, chunk })}
     - Cards: ${await this.feedCards({ rowData, chunk })}
-    - Prices: ${await this.feedPrices({ rowData, chunk })}
     - CardSets: ${await this.feedCardSets({ rowData, chunk })}
     `;
   }
@@ -364,6 +363,14 @@ export class DBFeederService {
     const linkMarkers = await this.dataSource.getRepository(LinkMarker).find();
 
     const newCards: DeepPartial<Card>[] = await rowData.map((card: any) => {
+      const newPrice: DeepPartial<Price> = {
+        cardMarketPrice: card.card_prices[0].cardmarket_price,
+        tcgPlayerPrice: card.card_prices[0].tcgplayer_price,
+        ebayPrice: card.card_prices[0].ebay_price,
+        amazonPrice: card.card_prices[0].amazon_price,
+        coolStuffIncPrice: card.card_prices[0].coolstuffinc_price,
+      };
+
       return {
         identifiant: card.id,
         name: card.name,
@@ -392,6 +399,7 @@ export class DBFeederService {
               card.linkmarkers.includes(linkMarker.name),
             )
           : [],
+        price: newPrice,
       } as DeepPartial<Card>;
     });
     const currentCards = await this.dataSource.getRepository(Card).find({
@@ -405,36 +413,6 @@ export class DBFeederService {
           (card) =>
             !currentCards.find(
               (currentCard) => currentCard.identifiant === card.identifiant,
-            ),
-        ),
-        { chunk },
-      )
-    ).length;
-  }
-
-  async feedPrices({ rowData, chunk = 1000 }): Promise<number> {
-    const cards = await this.dataSource.getRepository(Card).find();
-    const newPrices: DeepPartial<Price>[] = await rowData.map((card: any) => {
-      return {
-        card: cards.find((c) => c.identifiant === card.id).id,
-        cardMarketPrice: card.card_prices[0].cardmarket_price,
-        tcgPlayerPrice: card.card_prices[0].tcgplayer_price,
-        ebayPrice: card.card_prices[0].ebay_price,
-        amazonPrice: card.card_prices[0].amazon_price,
-        coolStuffIncPrice: card.card_prices[0].coolstuffinc_price,
-      } as DeepPartial<Price>;
-    });
-    const currentPrices = await this.dataSource.getRepository(Price).find({
-      where: newPrices.map((price) => ({
-        card: price.card,
-      })),
-    });
-    return (
-      await this.dataSource.getRepository(Price).save(
-        newPrices.filter(
-          (price) =>
-            !currentPrices.find(
-              (currentPrice) => currentPrice.card === price.card,
             ),
         ),
         { chunk },

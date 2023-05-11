@@ -16,8 +16,8 @@
 
 */
 
-.card[data-rarity="10000-secret-rare"] .card__shine,
-.card[data-rarity="ghost-gold-rare"] .card__shine {
+.yugi-card[data-rarity="10000-secret-rare"] .yugi-card__shine,
+.yugi-card[data-rarity="ghost-gold-rare"] .yugi-card__shine {
 
   --space: 5%;
   --angle: -22deg;
@@ -43,7 +43,7 @@
 
 }
 
-.card[data-rarity="10000-secret-rare"] .card__shine {
+.yugi-card[data-rarity="10000-secret-rare"] .yugi-card__shine {
   background-image:
     repeating-linear-gradient(110deg,
       var(--violet), var(--blue), var(--green), var(--yellow), var(--red),
@@ -52,8 +52,8 @@
   filter: brightness(calc((var(--pointer-from-center)*0.1) + 0.5)) contrast(1.6) saturate(0.8);
 }
 
-.card[data-rarity="10000-secret-rare"] .card__shine:after,
-.card[data-rarity="ghost-gold-rare"] .card__shine:after {
+.yugi-card[data-rarity="10000-secret-rare"] .yugi-card__shine:after,
+.yugi-card[data-rarity="ghost-gold-rare"] .yugi-card__shine:after {
 
   content: "";
 
@@ -88,8 +88,8 @@
   
   */
 
-.card[data-rarity="10000-secret-rare"] .card__glare,
-.card[data-rarity="ghost-gold-rare"] .card__glare {
+.yugi-card[data-rarity="10000-secret-rare"] .yugi-card__glare,
+.yugi-card[data-rarity="ghost-gold-rare"] .yugi-card__glare {
 
   background-image:
     radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),

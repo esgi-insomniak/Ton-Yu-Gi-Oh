@@ -15,9 +15,9 @@
 
 */
 
-.card[data-rarity="super-short-print"] .card__shine,
-.card[data-rarity="duel-terminal-super-parallel-rare"] .card__shine,
-.card[data-rarity="super-rare"] .card__shine {
+.yugi-card[data-rarity="super-short-print"] .yugi-card__shine,
+.yugi-card[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__shine,
+.yugi-card[data-rarity="super-rare"] .yugi-card__shine {
 
   background-image:
     var(--glitter),
@@ -34,9 +34,9 @@
 
 }
 
-.card[data-rarity="super-short-print"] .card__shine:before,
-.card[data-rarity="duel-terminal-super-parallel-rare"] .card__shine:before,
-.card[data-rarity="super-rare"] .card__shine:before {
+.yugi-card[data-rarity="super-short-print"] .yugi-card__shine:before,
+.yugi-card[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__shine:before,
+.yugi-card[data-rarity="super-rare"] .yugi-card__shine:before {
 
   content: "";
   -webkit-mask-image: none !important;
@@ -59,9 +59,9 @@
 
 }
 
-.card[data-rarity="super-short-print"] .card__shine:after,
-.card[data-rarity="duel-terminal-super-parallel-rare"] .card__shine:after,
-.card[data-rarity="super-rare"] .card__shine:after {
+.yugi-card[data-rarity="super-short-print"] .yugi-card__shine:after,
+.yugi-card[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__shine:after,
+.yugi-card[data-rarity="super-rare"] .yugi-card__shine:after {
 
   content: "";
   -webkit-mask-image: none !important;
@@ -95,9 +95,9 @@
 
 */
 
-.card.masked[data-rarity="super-short-print"] .card__glare,
-.card.masked[data-rarity="duel-terminal-super-parallel-rare"] .card__glare,
-.card.masked[data-rarity="super-rare"] .card__glare {
+.yugi-card.yugi-masked[data-rarity="super-short-print"] .yugi-card__glare,
+.yugi-card.yugi-masked[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__glare,
+.yugi-card.yugi-masked[data-rarity="super-rare"] .yugi-card__glare {
 
   background-image:
     radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
@@ -109,9 +109,9 @@
 
 }
 
-.card.masked[data-rarity="super-short-print"] .card__glare:after,
-.card.masked[data-rarity="duel-terminal-super-parallel-rare"] .card__glare:after,
-.card.masked[data-rarity="super-rare"] .card__glare:after {
+.yugi-card.yugi-masked[data-rarity="super-short-print"] .yugi-card__glare:after,
+.yugi-card.yugi-masked[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__glare:after,
+.yugi-card.yugi-masked[data-rarity="super-rare"] .yugi-card__glare:after {
 
   content: "";
   -webkit-mask-image: var(--mask);
@@ -146,15 +146,15 @@
 
 */
 
-.card:not(.masked)[data-rarity="super-short-print"] .card__shine,
-.card:not(.masked)[data-rarity="duel-terminal-super-parallel-rare"] .card__shine,
-.card:not(.masked)[data-rarity="super-rare"] .card__shine {
+.yugi-card:not(.yugi-masked)[data-rarity="super-short-print"] .yugi-card__shine,
+.yugi-card:not(.yugi-masked)[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__shine,
+.yugi-card:not(.yugi-masked)[data-rarity="super-rare"] .yugi-card__shine {
   clip-path: var(--clip);
 }
 
-.card:not(.masked)[data-rarity="super-short-print"] .card__glare,
-.card:not(.masked)[data-rarity="duel-terminal-super-parallel-rare"] .card__glare,
-.card:not(.masked)[data-rarity="super-rare"] .card__glare {
+.yugi-card:not(.yugi-masked)[data-rarity="super-short-print"] .yugi-card__glare,
+.yugi-card:not(.yugi-masked)[data-rarity="duel-terminal-super-parallel-rare"] .yugi-card__glare,
+.yugi-card:not(.yugi-masked)[data-rarity="super-rare"] .yugi-card__glare {
   background-image:
     radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
       hsla(0, 0%, 100%, 1) 10%,
