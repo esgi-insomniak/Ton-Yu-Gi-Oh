@@ -1,5 +1,5 @@
 import React from 'react';
-import { IGameCardContextProps } from '../../types/cards';
+import { IGameCardContextProps } from '@/helpers/types/cards';
 
 const GameCardContext = React.createContext<IGameCardContextProps>({
     cardSets: [],
@@ -14,5 +14,7 @@ const GameCardContext = React.createContext<IGameCardContextProps>({
     sortCardSets: () => { },
     deactivateAllCardSets: () => { }
 });
+
+export const useGameCard = () => React.useContext(GameCardContext);
 
 export default GameCardContext;

@@ -27,7 +27,6 @@ be loaded when they are actually needed, instead of being loaded all at once whe
 starts. This can improve the performance of the application by reducing the initial load time. The
 `import()` function is used to dynamically import the components. */
 const HomePage = React.lazy(() => import('@/pages/Home'));
-const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
 const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
 const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
 const LogoutPage = React.lazy(() => import('@/pages/Auth/Logout'));
@@ -58,11 +57,6 @@ const Router: React.FC = () => {
                         </ProtectedRoute>
                     }
                 >
-                    <Route path="/display-cards" element={
-                        <GameCardProvider>
-                            <DisplayCards />
-                        </GameCardProvider>
-                    } />
                     <Route path="/" element={<HomePage />} />
                     <Route path="/opening" element={<BoosterPage />} />
                     <Route path="/collection" element={

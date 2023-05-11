@@ -1,11 +1,10 @@
 import Checkbox from "@/components/Checkbox";
 import GameCard from "@/components/GameCard/GameCard";
-import { SkeletonCards } from "@/components/Skeleton";
 import { useGetCardSets } from "@/helpers/api/hooks/cards/card-set.hook";
 import { useGetAllArchetypes } from "@/helpers/api/hooks/cards/archetype.hook";
 import React from "react";
 import { ICard, IGameCard } from "@/helpers/types/cards";
-import GameCardContext from "@/helpers/context/cards/GameCardContext";
+import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useGetAllAttributes } from "@/helpers/api/hooks/cards/attribute.hook";
 
 const Collection = () => {
@@ -13,7 +12,7 @@ const Collection = () => {
     const [searchValue, setSearchValue] = React.useState<string>("")
     const { data: cardSetsResponse } = useGetCardSets(page, 18)
     // const { data: attributesResponse } = useGetAllAttributes()
-    const { cardSets, setCardSets, sortCardSets } = React.useContext(GameCardContext)
+    const { cardSets, setCardSets, sortCardSets } = useGameCard()
 
     React.useEffect(() => {
         if (cardSetsResponse?.data === undefined || cardSetsResponse?.data.length === 0) return;
@@ -140,11 +139,11 @@ const Collection = () => {
                         <button
                             className="btn bg-white/20 text-white hover:bg-gray-700"
                             onClick={() => setPage(page - 1)}
-                            disabled={page === 1}
+                            disabled={page === 0}
                         >
                             «
                         </button>
-                        <button className="btn bg-white/20 text-white hover:bg-gray-700">{page}</button>
+                        <button className="btn bg-white/20 text-white hover:bg-gray-700">{page + 1}</button>
                         <button
                             className="btn bg-white/20 text-white hover:bg-gray-700"
                             onClick={() => setPage(page + 1)}
@@ -165,12 +164,7 @@ const Collection = () => {
             <div className="grid grid-cols-6 px-3 w-full gap-5 scrollbar-none">
                 {cardSets
                     .map((cardSet, i) => (
-                        // <div className="relative hover:scale-105 rounded-sm cursor-pointer duration-150" key={i}>
-                        //     <img src={cardSet.card.imageUrl} alt="" />
-                        // </div>
-                        <GameCard key={i} {
-                            ...cardSet
-                        } />
+                        <GameCard key={i} {...cardSet} />
                     ))}
             </div>
         </div>
