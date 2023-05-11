@@ -2,8 +2,6 @@ name: Deploy "mailer-service"
 
 on:
   push:
-    branches:
-      - feature/ci-cd
     paths:
       - "server/mailer-service/**"
       - ".github/workflows/mailer-service.yml"
@@ -65,7 +63,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud config set project ${{ secrets.PROJECT_ID }}
+            gcloud auth login
             gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
             kubectl config current-context
 

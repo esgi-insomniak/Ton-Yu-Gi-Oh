@@ -2,8 +2,6 @@ name: Deploy "user-service"
 
 on:
   push:
-    branches:
-      - feature/ci-cd
     paths:
       - "server/user-service/**"
       - ".github/workflows/user-service.yml"
@@ -65,7 +63,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud config set project ${{ secrets.PROJECT_ID }}
+            gcloud auth login
             gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
             kubectl config current-context
 
