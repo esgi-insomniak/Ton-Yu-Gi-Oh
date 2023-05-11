@@ -57,7 +57,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.PROJECT_ID }}
-          # install_components: kubectl
+          install_components: kubectl
 
         #
         # Configures the Kubernetes cluster.
