@@ -19,3 +19,20 @@
 html {
     font-family: "Circular Std Book", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
+
+.animate-neon:hover {
+    animation: neon 1s ease-in-out infinite alternate;
+  }
+  
+  @keyframes neon {
+    from {
+      opacity: 0;
+      box-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff, 0 0 8px #fff, 0 0 10px #fff, 0 0 12px #fff, 0 0 14px #fff;
+    }
+    to {
+      opacity: 1;
+      box-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 6px #fff, 0 0 8px #f40, 0 0 10px #f40, 0 0 12px #f40, 0 0 14px #f40;
+    }
+  }
+  
+  

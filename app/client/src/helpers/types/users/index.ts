@@ -1,5 +1,5 @@
 import { ROLES } from "@/helpers/utils/enum/roles";
-import { ApiFormatResponse } from "../common";
+import { ApiGetItemResponse } from "../common";
 
 
 export interface UserManagementContextProps {
@@ -29,4 +29,4 @@ export type AuthRegisterType = Omit<UserContextType, 'id' | 'roles'> & {
     password: string
 }
 
-export type UserMe = ApiFormatResponse<Omit<UserType, 'createdAt' | 'updatedAt'>> 
+export type UserMe = ApiGetItemResponse<Omit<UserType, 'createdAt' | 'updatedAt'>> 

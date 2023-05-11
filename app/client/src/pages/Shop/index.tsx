@@ -6,6 +6,7 @@ import { useModal } from "@/helpers/providers/modal"
 import React from "react"
 import { getScreenSize } from "insomniak-sdk-analytics"
 import { useNavigate } from "react-router-dom"
+import CustomBooster from "@/components/GameCard/custom-booster"
 
 const Shop = () => {
     const { user } = useAuth()
@@ -21,6 +22,13 @@ const Shop = () => {
             { id: 'price_1McUVkLgiVx31CexeVvLIyow', amount: 1000, bonus: 250, price: 10 },
             { id: 'price_1McUWiLgiVx31CexrZUIISVY', amount: 2000, bonus: 500, price: 20 },
             { id: 'price_1McUX2LgiVx31CexqzAF7K2v', amount: 5000, bonus: 1500, price: 50 },
+        ]
+    }, [])
+
+    const Booster = React.useMemo(() => {
+        return [
+            { id: '3452345235345', replaceImage: '/test.png', originUrl: 'https://images.ygoprodeck.com/images/sets/HISU.jpg' },
+            { id: '3452345235345', replaceImage: '/test-2.png', originUrl: 'https://images.ygoprodeck.com/images/sets/BLVO.jpg' },
         ]
     }, [])
 
@@ -40,6 +48,20 @@ const Shop = () => {
         )
     }
 
+    const handlePreviewBoosterModal = (booster: any) => {
+        openModal(
+            <div className="flex space-x-2 justify-center items-center w-full h-full">
+            </div>,
+            "Voir les cartes",
+            false,
+            {
+                yes: { action: () => { }, title: "" }, no: { action: () => { }, title: "" }
+            },
+            "xl"
+        )
+    }
+
+
     return (
         <div>
             <div className="h-20 w-full flex bg-white/10 items-center justify-between px-10">
@@ -51,19 +73,25 @@ const Shop = () => {
                         <img src="/InsomniakCoins.png" alt="" className="h-7 w-7" />
                         <span>{me?.data.coins || 0}</span>
                     </div>
-                    <span className="" onClick={handleBuyCoinsModal}>🛒</span>
+                    <span className="cursor-pointer text-2xl" onClick={handleBuyCoinsModal}>🏧</span>
                 </div>
             </div>
             <div className="grid grid-cols-1 grid-flow-dense gap-5 p-10 text-black">
-                <div className="bg-white/30 flex p-2 rounded-md h-80 space-x-2">
-                    <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 flex items-center justify-center">
-                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvignette.wikia.nocookie.net%2Fyugioh%2Fimages%2Fd%2Fd0%2FDarkMagician-DG-EN-VG-NC.png%2Frevision%2Flatest%3Fcb%3D20150228230223&f=1&nofb=1&ipt=ea1743e962017ad09795818a2c6cf39cf52964ce2a25299732797daf05896118&ipo=images" alt="" className="h-64" />
+                {Booster.map((booster, i) => (
+                    <div className="bg-white/30 flex p-2 rounded-md h-80 space-x-2" key={i}>
+                        <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 flex items-center justify-center">
+                            <img src={booster.replaceImage} alt="" className="h-64" />
+                        </div>
+                        <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 object-cover flex items-center justify-around">
+                            <img src={booster.originUrl} alt="" className="h-64 drop-shadow-md shadow-xl" />
+                            <CustomBooster idBooster="" replaceImage={booster.replaceImage} />
+                        </div>
+                        <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 flex flex-col space-y-2 justify-center">
+                            <button className="t-btn" onClick={handlePreviewBoosterModal}>Voir les cartes</button>
+                            <button className="t-btn">Acheter</button>
+                        </div>
                     </div>
-                    <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30 object-cover flex items-center justify-center">
-                        <img src="https://images.ygoprodeck.com/images/sets/HISU.jpg" alt="" className="h-64 drop-shadow-md shadow-xl" />
-                    </div>
-                    <div className="w-1/3 p-2 rounded-md border shadow-inner bg-black/30">PREVISUALISATION</div>
-                </div>
+                ))}
             </div>
         </div>
     )
