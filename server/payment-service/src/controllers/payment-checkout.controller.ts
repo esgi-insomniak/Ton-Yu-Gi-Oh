@@ -16,8 +16,8 @@ export class PaymentCheckoutController {
   }): Promise<ICheckoutCreateResponse> {
     let result: ICheckoutCreateResponse = {
       status: HttpStatus.NOT_FOUND,
-      message: 'Product not found',
-      session: null,
+      message: 'Product not found or stripe private key not add in .env',
+      item: null,
     };
 
     try {
@@ -29,7 +29,7 @@ export class PaymentCheckoutController {
       result = {
         status: HttpStatus.CREATED,
         message: null,
-        session: {
+        item: {
           sessionId: session.id,
           paymentStatus: session.paymentStatus,
           url: session.url,
@@ -48,7 +48,7 @@ export class PaymentCheckoutController {
     let result: ICheckoutCreateResponse = {
       status: HttpStatus.NOT_FOUND,
       message: 'Session or Id not found',
-      session: null,
+      item: null,
     };
 
     try {
@@ -60,7 +60,7 @@ export class PaymentCheckoutController {
       result = {
         status: HttpStatus.ACCEPTED,
         message: 'Session updated',
-        session: {
+        item: {
           sessionId: session.id,
           paymentStatus: session.paymentStatus,
           url: session.url,

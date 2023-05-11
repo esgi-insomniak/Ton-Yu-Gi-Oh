@@ -1,9 +1,9 @@
 import { Controller, HttpStatus } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { MailerService } from '../services/mailer.service';
-import { DefaultResponse } from 'src/interfaces/common/common.response.interface';
-import { MailerMessage } from 'src/interfaces/mail/mailer.interface';
-import { ConfigService } from 'src/services/config/config.service';
+import { DefaultResponse } from '../interfaces/common/common.response.interface';
+import { MailerMessage } from '../interfaces/mail/mailer.interface';
+import { ConfigService } from '../services/config/config.service';
 
 @Controller('mailer')
 export class MailerController {
