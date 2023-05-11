@@ -2,6 +2,8 @@ name: Deploy "mailer-service"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/mailer-service/**"
       - ".github/workflows/mailer-service.yml"

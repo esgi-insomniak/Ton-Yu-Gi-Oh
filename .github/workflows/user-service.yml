@@ -2,6 +2,8 @@ name: Deploy "user-service"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/user-service/**"
       - ".github/workflows/user-service.yml"

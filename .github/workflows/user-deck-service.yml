@@ -2,6 +2,8 @@ name: Deploy "user-deck-service"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/user-deck-service/**"
       - ".github/workflows/user-deck-service.yml"

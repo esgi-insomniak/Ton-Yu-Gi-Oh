@@ -2,6 +2,8 @@ name: Deploy "card-service"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/card-service/**"
       - ".github/workflows/card-service.yml"

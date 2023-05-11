@@ -2,6 +2,8 @@ name: Deploy "auth-service"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/auth-service/**"
       - ".github/workflows/auth-service.yml"

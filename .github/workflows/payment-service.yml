@@ -2,6 +2,8 @@ name: Deploy "payment-service"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/payment-service/**"
       - ".github/workflows/payment-service.yml"

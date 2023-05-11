@@ -2,6 +2,8 @@ name: Deploy "{{ROUTE}}"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/{{ROUTE}}/**"
       - ".github/workflows/{{ROUTE}}.yml"

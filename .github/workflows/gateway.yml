@@ -2,6 +2,8 @@ name: Deploy "gateway"
 
 on:
   push:
+    branches:
+      - feature/ci-cd
     paths:
       - "server/gateway/**"
       - ".github/workflows/gateway.yml"
