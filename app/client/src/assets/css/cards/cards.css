@@ -1,4 +1,4 @@
-.card {
+.yugi-card {
 
   --grain: url("/img/grain.webp");
   --glitter: url("/img/glitter.png");
@@ -25,8 +25,8 @@
 
 }
 
-.card__shine,
-.card__glare {
+.yugi-card__shine,
+.yugi-card__glare {
   
   will-change: transform, opacity, background-image, background-size,
     background-position, background-blend-mode, filter;

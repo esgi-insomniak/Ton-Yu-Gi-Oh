@@ -1,50 +1,107 @@
 import { DraggableProvided, DropResult } from "react-beautiful-dnd";
-import { CardAttribute, CardFrameType, CardRace, CardRarity, CardType } from "../../utils/enum/card";
+import {
+  CardAttribute,
+  CardFrameType,
+  CardRace,
+  CardRarity,
+  CardType,
+} from "@/helpers/utils/enum/card";
 
-export type CardAttributeType = keyof typeof CardAttribute
-export type CardTypes = keyof typeof CardType
-export type FrameType = keyof typeof CardFrameType
-export type CardRarityType = keyof typeof CardRarity
-export type CardRaceType = keyof typeof CardRace
-
-export interface GameCardType {
-    uniqueId: string;
-    id: number;
-    name: string;
-    name_en: string;
-    type: CardTypes;
-    frameType: FrameType;
-    archetype?: string;
-    rarity: CardRarityType;
-    setCode: string;
-    race: CardRaceType;
-    attribute?: CardAttributeType;
-    level?: number;
-    atk?: number;
-    def?: number;
-    image_large: string;
-    image_small: string;
-    dragProvided?: DraggableProvided;
-    isDraggable?: boolean;
-    isActive: boolean;
-    isHidden: boolean;
-    isFocused: boolean;
-    isLoaded: boolean;
-    canPop: boolean;
-    canFlip: boolean;
+interface ICommonNameId {
+  id: string;
+  name: string;
 }
 
+export interface CardIArchetype extends ICommonNameId {}
 
-export interface GameCardContextProps {
-    cards: GameCardType[];
-    setCards: React.Dispatch<React.SetStateAction<GameCardType[]>>;
-    setIsDraggable: (card: GameCardType, isDraggable: boolean) => void;
-    setIsActive: (card: GameCardType, isActive: boolean) => void;
-    setIsHidden: (card: GameCardType, isHidden: boolean) => void;
-    setIsFocused: (card: GameCardType, isFocused: boolean) => void;
-    setCanPop: (card: GameCardType, canPop: boolean) => void;
-    setCanFlip: (card: GameCardType, canFlip: boolean) => void;
-    setIsLoaded: (card: GameCardType, isLoaded: boolean) => void;
-    sortCards: (result: DropResult) => void;
-    deactivateAllCards: () => void;
+export interface CardIAttribute extends ICommonNameId {
+  name: keyof typeof CardAttribute;
+}
+
+export interface CardICardSet {
+  id: string;
+  card: ICard;
+  set: CardISet;
+  rarity: CardIRarity;
+  price: number;
+}
+
+export interface ICard {
+  identifiant: number;
+  enName: string;
+  description: string;
+  atk?: number;
+  def?: number;
+  level?: number;
+  scale?: number;
+  linkVal?: number;
+  imageUrl: string;
+  imageUrlSmall: string;
+  type: CardIType;
+  frameType: CardIFrameType;
+  race: CardIRace;
+  archetype?: CardIArchetype;
+  attribute?: CardIAttribute;
+  price: CardIPrice;
+  cardSets: CardICardSet[];
+  linkMarkers: CardILinkMarker[];
+}
+
+export interface CardIFrameType extends ICommonNameId {
+  name: keyof typeof CardFrameType;
+}
+
+export interface CardILinkMarker extends ICommonNameId {}
+
+export interface CardIPrice {
+  id: string;
+  card: ICard;
+  cardMarketPrice: number;
+  tcgPlayerPrice: number;
+  ebayPrice: number;
+  amazonPrice: number;
+  coolStuffIncPrice: number;
+}
+
+export interface CardIRace extends ICommonNameId {
+  name: keyof typeof CardRace;
+}
+
+export interface CardIRarity extends ICommonNameId {
+  name: keyof typeof CardRarity;
+}
+
+export interface CardISet extends ICommonNameId {
+  code: string;
+  image: string;
+  cardSets: CardICardSet[];
+}
+
+export interface CardIType extends ICommonNameId {
+  name: keyof typeof CardType;
+}
+
+export interface IGameCard extends CardICardSet {
+  dragProvided?: DraggableProvided;
+  isDraggable?: boolean;
+  isActive: boolean;
+  isHidden: boolean;
+  isFocused: boolean;
+  isLoaded: boolean;
+  canPop: boolean;
+  canFlip: boolean;
+}
+
+export interface IGameCardContextProps {
+  cardSets: IGameCard[];
+  setCardSets: React.Dispatch<React.SetStateAction<IGameCard[]>>;
+  setIsDraggable: (card: IGameCard, isDraggable: boolean) => void;
+  setIsActive: (card: IGameCard, isActive: boolean) => void;
+  setIsHidden: (card: IGameCard, isHidden: boolean) => void;
+  setIsFocused: (card: IGameCard, isFocused: boolean) => void;
+  setCanPop: (card: IGameCard, canPop: boolean) => void;
+  setCanFlip: (card: IGameCard, canFlip: boolean) => void;
+  setIsLoaded: (card: IGameCard, isLoaded: boolean) => void;
+  sortCardSets: (result: DropResult) => void;
+  deactivateAllCardSets: () => void;
 }

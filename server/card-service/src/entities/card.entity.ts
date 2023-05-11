@@ -41,7 +41,7 @@ export class Card {
   @ManyToOne(() => Attribute, { nullable: true })
   attribute: Attribute;
 
-  @OneToOne(() => Price)
+  @OneToOne(() => Price, (price) => price.card, { cascade: true })
   @JoinColumn()
   price: Price;
 

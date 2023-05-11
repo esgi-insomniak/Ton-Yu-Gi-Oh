@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  JoinColumn,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Card } from './card.entity';
 
 @Entity()
@@ -13,9 +6,7 @@ export class Price {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @PrimaryColumn('uuid')
-  @OneToOne(() => Card)
-  @JoinColumn()
+  @OneToOne(() => Card, (card) => card.price)
   card: Card;
 
   @Column('double precision')

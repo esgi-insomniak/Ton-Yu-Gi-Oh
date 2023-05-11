@@ -11,7 +11,6 @@ export class SetService {
     const sets = await this.dataSource.getRepository(Set).find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
-      relations: ['cardSets'],
     });
     return sets;
   }

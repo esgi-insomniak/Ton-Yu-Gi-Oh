@@ -1,134 +1,134 @@
 import React from "react";
 import { DropResult } from "react-beautiful-dnd";
 import GameCardContext from "../../context/cards/GameCardContext";
-import { GameCardType } from "../../types/cards";
+import { IGameCard } from "../../types/cards";
 
 export const GameCardProvider = ({ children }: { children: React.ReactNode }) => {
-    const [cards, setCards] = React.useState<GameCardType[]>([]);
+    const [cardSets, setCardSets] = React.useState<IGameCard[]>([]);
 
-    const setIsDraggable = (card: GameCardType, isDraggable: boolean) => {
-        setCards((prevState) => {
+    const setIsDraggable = (cardSet: IGameCard, isDraggable: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, isDraggable };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, isDraggable };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const setIsActive = (card: GameCardType, isActive: boolean) => {
-        setCards((prevState) => {
+    const setIsActive = (cardSet: IGameCard, isActive: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, isActive };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, isActive };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const setIsHidden = (card: GameCardType, isHidden: boolean) => {
-        setCards((prevState) => {
+    const setIsHidden = (cardSet: IGameCard, isHidden: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, isHidden };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, isHidden };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const setIsFocused = (card: GameCardType, isFocused: boolean) => {
-        setCards((prevState) => {
+    const setIsFocused = (cardSet: IGameCard, isFocused: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, isFocused };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, isFocused };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const setCanPop = (card: GameCardType, canPop: boolean) => {
-        setCards((prevState) => {
+    const setCanPop = (cardSet: IGameCard, canPop: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, canPop };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, canPop };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const setCanFlip = (card: GameCardType, canFlip: boolean) => {
-        setCards((prevState) => {
+    const setCanFlip = (cardSet: IGameCard, canFlip: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, canFlip };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, canFlip };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const setIsLoaded = (card: GameCardType, isLoaded: boolean) => {
-        setCards((prevState) => {
+    const setIsLoaded = (cardSet: IGameCard, isLoaded: boolean) => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                if (card.uniqueId === updatedCard.uniqueId) {
-                    return { ...updatedCard, isLoaded };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, isLoaded };
                 }
-                return updatedCard;
+                return updatedCardSet;
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const deactivateAllCards = () => {
-        setCards((prevState) => {
+    const deactivateAllCardSets = () => {
+        setCardSets((prevState) => {
             if (!prevState) return prevState;
 
-            const updatedCards = prevState.map((updatedCard) => {
-                return { ...updatedCard, isActive: false };
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                return { ...updatedCardSet, isActive: false };
             });
-            return updatedCards;
+            return updatedCardSets;
         });
     };
 
-    const sortCards = (result: DropResult) => {
+    const sortCardSets = (result: DropResult) => {
         if (!result.destination) return;
         if (result.destination.index === result.source.index) return;
 
-        const sortedCards = [...cards]
-        const [removed] = sortedCards.splice(result.source.index, 1);
-        sortedCards.splice(result.destination.index, 0, removed);
+        const sortedCardSets = [...cardSets]
+        const [removed] = sortedCardSets.splice(result.source.index, 1);
+        sortedCardSets.splice(result.destination.index, 0, removed);
 
-        setCards(sortedCards);
+        setCardSets(sortedCardSets);
     };
 
     const value = React.useMemo(() => ({
-        cards,
-        setCards,
+        cardSets,
+        setCardSets,
         setIsDraggable,
         setIsActive,
         setIsHidden,
@@ -136,10 +136,10 @@ export const GameCardProvider = ({ children }: { children: React.ReactNode }) =>
         setCanPop,
         setCanFlip,
         setIsLoaded,
-        deactivateAllCards,
-        sortCards
-    }), [cards,
-        setCards,
+        deactivateAllCardSets,
+        sortCardSets
+    }), [cardSets,
+        setCardSets,
         setIsDraggable,
         setIsActive,
         setIsHidden,
@@ -147,8 +147,8 @@ export const GameCardProvider = ({ children }: { children: React.ReactNode }) =>
         setCanPop,
         setCanFlip,
         setIsLoaded,
-        deactivateAllCards,
-        sortCards]);
+        deactivateAllCardSets,
+        sortCardSets]);
 
     return (
         <GameCardContext.Provider value={value}>

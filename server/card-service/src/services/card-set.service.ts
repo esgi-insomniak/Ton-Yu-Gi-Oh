@@ -11,7 +11,18 @@ export class CardSetService {
     const cardSets = await this.dataSource.getRepository(CardSet).find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
-      relations: ['card', 'set', 'rarity'],
+      relations: [
+        'card',
+        'set',
+        'rarity',
+        'card.type',
+        'card.frameType',
+        'card.race',
+        'card.archetype',
+        'card.attribute',
+        'card.price',
+        'card.linkMarkers',
+      ],
     });
     return cardSets;
   }
@@ -19,7 +30,18 @@ export class CardSetService {
   async getCardSetById(id: string): Promise<CardSet> {
     const cardSet = await this.dataSource.getRepository(CardSet).findOne({
       where: { id },
-      relations: ['card', 'set', 'rarity'],
+      relations: [
+        'card',
+        'set',
+        'rarity',
+        'card.type',
+        'card.frameType',
+        'card.race',
+        'card.archetype',
+        'card.attribute',
+        'card.price',
+        'card.linkMarkers',
+      ],
     });
     return cardSet;
   }

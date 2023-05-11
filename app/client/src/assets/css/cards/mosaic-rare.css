@@ -4,7 +4,7 @@
 
 */
 
-.card[data-rarity="mosaic-rare"] .card__shine {
+.yugi-card[data-rarity="mosaic-rare"] .yugi-card__shine {
 
     --space: 4%;
   
@@ -47,7 +47,7 @@
   }
   
   
-  .card[data-rarity="mosaic-rare"] .card__shine:before {
+  .yugi-card[data-rarity="mosaic-rare"] .yugi-card__shine:before {
   
     content: "";
     z-index: 2;
@@ -84,7 +84,7 @@
   
   }
   
-  .card[data-rarity="mosaic-rare"] .card__shine:after {
+  .yugi-card[data-rarity="mosaic-rare"] .yugi-card__shine:after {
   
     content: "";
     z-index: 3;
@@ -131,7 +131,7 @@
   
   */
   
-  .card[data-rarity="mosaic-rare"] .card__glare {
+  .yugi-card[data-rarity="mosaic-rare"] .yugi-card__glare {
   
     background-image:
       radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
@@ -143,7 +143,7 @@
   
   }
   
-  .card[data-rarity="mosaic-rare"] .card__glare:after {
+  .yugi-card[data-rarity="mosaic-rare"] .yugi-card__glare:after {
   
     content: "";
   

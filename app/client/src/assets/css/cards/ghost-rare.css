@@ -16,7 +16,7 @@
 
 */
 
-.card[data-rarity="ghost-rare"] .card__shine {
+.yugi-card[data-rarity="ghost-rare"] .yugi-card__shine {
 
   --space: 5%;
   --angle: -22deg;
@@ -43,7 +43,7 @@
 
 }
 
-.card[data-rarity="ghost-rare"] .card__shine:after {
+.yugi-card[data-rarity="ghost-rare"] .yugi-card__shine:after {
   
   content: "";
 
@@ -81,7 +81,7 @@
 
 */
 
-.card[data-rarity="ghost-rare"] .card__glare {
+.yugi-card[data-rarity="ghost-rare"] .yugi-card__glare {
 
   background-image: 
     radial-gradient( 

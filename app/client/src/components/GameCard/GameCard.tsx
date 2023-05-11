@@ -6,9 +6,9 @@ import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, Ca
 import GameCardContext from '@/helpers/context/cards/GameCardContext';
 
 import '@/assets/css/cards/loader.css'
-import { GameCardType } from '@/helpers/types/cards';
+import { IGameCard } from '@/helpers/types/cards';
 
-const GameCard = (props: GameCardType) => {
+const GameCard = (props: IGameCard) => {
     // CONTEXTE POUR showcase
     const showcase = false;
 
@@ -23,14 +23,14 @@ const GameCard = (props: GameCardType) => {
     };
 
     const backImg = "https://images.ygoprodeck.com/images/cards/back_high.jpg";
-    const frontImg = props.image_large;
+    const frontImg = props.card.imageUrl;
 
     const thisCardElement = React.useRef<HTMLDivElement>();
 
     // const [componentIsLoaded, setComponentIsLoaded] = React.useState(false);
 
-    const { cards, setIsDraggable, setIsActive, setIsHidden, setCanFlip, setIsLoaded, deactivateAllCards } = React.useContext(GameCardContext);
-    const currentCard = cards.find((card) => card.id === props.id) as GameCardType;
+    const { cardSets, setIsDraggable, setIsActive, setIsHidden, setCanFlip, setIsLoaded, deactivateAllCardSets } = React.useContext(GameCardContext);
+    const currentCardSet = cardSets.find((cardSet) => cardSet.id === props.id) as IGameCard;
 
     const [repositionTimer, setRepositionTimer] = React.useState<number>();
     const [interacting, setInteracting] = React.useState(false);
@@ -90,12 +90,12 @@ const GameCard = (props: GameCardType) => {
     const interact = (e: CardInteractPointerEvent<HTMLElement> | CardInteractTouchEvent<HTMLElement>) => {
         endShowcase();
 
-        if (!isVisible || currentCard.isHidden) {
+        if (!isVisible || currentCardSet.isHidden) {
             return setInteracting(false);
         }
 
         // prevent other background cards being interacted with
-        // if (!currentCard.isFocused) {
+        // if (!currentCardSet.isFocused) {
         //     return setInteracting(false);
         // }
 
@@ -147,23 +147,23 @@ const GameCard = (props: GameCardType) => {
     };
 
     const activate = (e: React.MouseEvent<HTMLElement>) => {
-        if (currentCard.isHidden && currentCard.canFlip) {
-            deactivateAllCards();
-            setIsHidden(currentCard, false);
-            setCanFlip(currentCard, false);
-        } else if (currentCard.isActive) {
-            setIsDraggable(currentCard, true);
-            setIsActive(currentCard, false);
+        if (currentCardSet.isHidden && currentCardSet.canFlip) {
+            deactivateAllCardSets();
+            setIsHidden(currentCardSet, false);
+            setCanFlip(currentCardSet, false);
+        } else if (currentCardSet.isActive) {
+            setIsDraggable(currentCardSet, true);
+            setIsActive(currentCardSet, false);
         } else {
-            setIsDraggable(currentCard, false);
-            deactivateAllCards();
-            setIsActive(currentCard, true);
+            setIsDraggable(currentCardSet, false);
+            deactivateAllCardSets();
+            setIsActive(currentCardSet, true);
         }
     }
 
     const deactivate = (e: React.FocusEvent<HTMLDivElement>) => {
-        setIsDraggable(currentCard, true);
-        setIsActive(currentCard, false);
+        setIsDraggable(currentCardSet, true);
+        setIsActive(currentCardSet, false);
         interactEnd();
     }
 
@@ -249,26 +249,26 @@ const GameCard = (props: GameCardType) => {
     });
 
     React.useEffect(() => {
-        if (currentCard.canPop && !currentCard.isHidden) {
-            if (currentCard.isActive) {
+        if (currentCardSet.canPop && !currentCardSet.isHidden) {
+            if (currentCardSet.isActive) {
                 popover();
-                // setIsActive(currentCard, true);
+                // setIsActive(currentCardSet, true);
             } else {
                 retreat();
-                // setIsActive(currentCard, false);
+                // setIsActive(currentCardSet, false);
             }
         }
-    }, [currentCard.canPop, currentCard.isActive, currentCard.isHidden]);
+    }, [currentCardSet.canPop, currentCardSet.isActive, currentCardSet.isHidden]);
 
     React.useEffect(() => {
-        if (currentCard.isHidden) {
-            setIsDraggable(currentCard, false);
+        if (currentCardSet.isHidden) {
+            setIsDraggable(currentCardSet, false);
             hide();
         } else {
-            setIsDraggable(currentCard, true);
+            setIsDraggable(currentCardSet, true);
             reset();
         }
-    }, [currentCard.isHidden]);
+    }, [currentCardSet.isHidden]);
 
     // React.useEffect(() => {
     //     if (componentIsLoaded) return;
@@ -323,23 +323,23 @@ const GameCard = (props: GameCardType) => {
 
     return (
         <animated.div
-            className={`card ${props.attribute ? props.attribute.replace(/\W/g, '-').toLowerCase() : ''} / interactive /${currentCard.isHidden ? ' hidden' : ''}${currentCard.isActive ? ' active' : ''}${interacting ? ' interacting' : ''}${!currentCard.isLoaded ? ' loading' : ''}`}
+            className={`yugi-card ${props.card.attribute ? props.card.attribute.name.replace(/\W/g, '-').toLowerCase() : ''} / yugi-interactive /${currentCardSet.isHidden ? ' yugi-hidden' : ''}${currentCardSet.isActive ? ' yugi-active' : ''}${interacting ? ' yugi-interacting' : ''}${!currentCardSet.isLoaded ? ' yugi-loading' : ''}`}
             data-number={props.id}
-            data-set={props.setCode}
-            data-type={props.type.replace(/\W/g, '-').toLowerCase()}
-            data-frametype={props.frameType.replace(/\W/g, '-').toLowerCase()}
-            data-archetype={props.archetype ? props.archetype.replace(/\W/g, '-').toLowerCase() : ''}
-            data-rarity={props.rarity.replace(/\W/g, '-').toLowerCase()}
+            data-set={props.set.code}
+            data-type={props.card.type.name.replace(/\W/g, '-').toLowerCase()}
+            data-frametype={props.card.frameType.name.replace(/\W/g, '-').toLowerCase()}
+            data-archetype={props.card.archetype ? props.card.archetype.name.replace(/\W/g, '-').toLowerCase() : ''}
+            data-rarity={props.rarity.name.replace(/\W/g, '-').toLowerCase()}
             style={dynamicStyles}
             ref={thisCardElement as React.RefObject<HTMLDivElement>}>
-            <div className="card__translater">
+            <div className="yugi-card__translater">
                 {/* onBlur={deactivate} */}
-                <div className="card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
-                    <img className="card__back" src={backImg} loading="lazy" width="660" height="921" />
-                    <div className="card__front" style={staticStyles}>
-                        <img src={frontImg} onLoad={() => setIsLoaded(currentCard, true)} loading="lazy" width="660" height="921" />
-                        <div className="card__shine"></div>
-                        <div className="card__glare"></div>
+                <div className="yugi-card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
+                    <img className="yugi-card__back" src={backImg} loading="lazy" width="660" height="921" />
+                    <div className="yugi-card__front" style={staticStyles}>
+                        <img src={frontImg} onLoad={() => setIsLoaded(currentCardSet, true)} loading="lazy" width="660" height="921" />
+                        <div className="yugi-card__shine"></div>
+                        <div className="yugi-card__glare"></div>
                     </div>
                 </div>
             </div>
