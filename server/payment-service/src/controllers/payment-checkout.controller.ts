@@ -40,6 +40,40 @@ export class PaymentCheckoutController {
     return result;
   }
 
+  @MessagePattern('get_checkout')
+  public async getCheckout(params: {
+    sessionId: string;
+    userId: string;
+  }): Promise<ICheckoutCreateResponse> {
+    let result: ICheckoutCreateResponse = {
+      status: HttpStatus.NOT_FOUND,
+      message: 'Checkout not found',
+      item: null,
+    };
+
+    try {
+      const session = await this.paymentCheckoutService.getCheckout(
+        params.sessionId,
+        params.userId,
+      );
+
+      if (!session) return result;
+
+      result = {
+        status: HttpStatus.OK,
+        message: null,
+        item: {
+          sessionId: session.id,
+          paymentStatus: session.paymentStatus,
+          url: session.url,
+          coins: session.coins,
+        },
+      };
+    } catch (e) {}
+
+    return result;
+  }
+
   @MessagePattern('update_checkout')
   public async updateCheckout(params: {
     sessionId: string;
