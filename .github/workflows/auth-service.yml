@@ -38,6 +38,14 @@ jobs:
       - name: Testing
         run: deploy/scripts/test-service.sh auth-service
 
+      - name: Wait for 15 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '15s'
+
+      - name: run tests
+        run: docker exec -it auth-service-node yarn test
+
         #
         # Builds the Docker image.
         #
