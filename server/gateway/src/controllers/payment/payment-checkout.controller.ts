@@ -69,6 +69,24 @@ export class PaymentCheckoutController {
     @Param() param: UpdatePaymentCheckoutBodyDto,
     @Req() request: IAuthorizedRequest,
   ): Promise<UpdateCheckoutResponseDto> {
+    const checkoutResponse: GetResponseOne<ICheckout> = await firstValueFrom(
+      this.paymentServiceClient.send('get_checkout', {
+        sessionId: param.sessionId,
+        userId: request.user.id,
+      }),
+    );
+
+    if (checkoutResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        checkoutResponse.message,
+        checkoutResponse.status,
+      );
+    }
+
+    if (checkoutResponse.item.paymentStatus === 'paid') {
+      throw new HttpException('Product already paid', HttpStatus.BAD_REQUEST);
+    }
+
     const paymentResponse: GetResponseOne<ICheckout> = await firstValueFrom(
       this.paymentServiceClient.send('update_checkout', {
         sessionId: param.sessionId,
@@ -87,6 +105,8 @@ export class PaymentCheckoutController {
           coins: paymentResponse.item.coins,
         }),
       );
+    } else {
+      throw new HttpException('Payment not completed', HttpStatus.BAD_REQUEST);
     }
 
     const result: UpdateCheckoutResponseDto = {

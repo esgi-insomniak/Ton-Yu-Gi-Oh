@@ -24,6 +24,7 @@ const Collection = () => {
                 isHidden: false,
                 isFocused: false,
                 isLoaded: false,
+                isDraggable: false,
                 canPop: true,
                 canFlip: false,
             } as IGameCard
