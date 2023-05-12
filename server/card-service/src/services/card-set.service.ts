@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CardSet } from 'src/entities/cardSet.entity';
 import { CardSetsQuery } from 'src/interfaces/common/common.query.interface';
-import { DataSource, In } from 'typeorm';
+import { DataSource, In, ILike } from 'typeorm';
 
 @Injectable()
 export class CardSetService {
@@ -11,20 +11,38 @@ export class CardSetService {
     const cardSets = await this.dataSource.getRepository(CardSet).find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
-      where: {
-        set: {
-          id: query.setId ? query.setId : null,
-          code: query.setCodes ? In(query.setCodes) : null,
+      where: [
+        {
+          set: {
+            id: query.setId ? query.setId : null,
+            code: query.setCodes ? In(query.setCodes) : null,
+          },
+          card: {
+            name: query.cardName ? ILike(`%${query.cardName}%`) : null,
+            archetype: { id: query.archetypeId ? query.archetypeId : null },
+            attribute: { id: query.attributeId ? query.attributeId : null },
+            frameType: { id: query.frameTypeId ? query.frameTypeId : null },
+            race: { id: query.raceId ? query.raceId : null },
+            type: { id: query.typeId ? query.typeId : null },
+          },
+          rarity: { id: query.rarityId ? query.rarityId : null },
         },
-        card: {
-          archetype: { id: query.archetypeId ? query.archetypeId : null },
-          attribute: { id: query.attributeId ? query.attributeId : null },
-          frameType: { id: query.frameTypeId ? query.frameTypeId : null },
-          race: { id: query.raceId ? query.raceId : null },
-          type: { id: query.typeId ? query.typeId : null },
+        {
+          set: {
+            id: query.setId ? query.setId : null,
+            code: query.setCodes ? In(query.setCodes) : null,
+          },
+          card: {
+            enName: query.cardName ? ILike(`%${query.cardName}%`) : null,
+            archetype: { id: query.archetypeId ? query.archetypeId : null },
+            attribute: { id: query.attributeId ? query.attributeId : null },
+            frameType: { id: query.frameTypeId ? query.frameTypeId : null },
+            race: { id: query.raceId ? query.raceId : null },
+            type: { id: query.typeId ? query.typeId : null },
+          },
+          rarity: { id: query.rarityId ? query.rarityId : null },
         },
-        rarity: { id: query.rarityId ? query.rarityId : null },
-      },
+      ],
       relations: [
         'card',
         'set',
@@ -67,21 +85,40 @@ export class CardSetService {
     const cardSets: CardSet[] = [];
     for (const id of ids) {
       const cardSet = await this.dataSource.getRepository(CardSet).findOne({
-        where: {
-          id,
-          set: {
-            id: query.setId ? query.setId : null,
-            code: query.setCodes ? In(query.setCodes) : null,
+        where: [
+          {
+            id,
+            set: {
+              id: query.setId ? query.setId : null,
+              code: query.setCodes ? In(query.setCodes) : null,
+            },
+            card: {
+              name: query.cardName ? ILike(`%${query.cardName}%`) : null,
+              archetype: { id: query.archetypeId ? query.archetypeId : null },
+              attribute: { id: query.attributeId ? query.attributeId : null },
+              frameType: { id: query.frameTypeId ? query.frameTypeId : null },
+              race: { id: query.raceId ? query.raceId : null },
+              type: { id: query.typeId ? query.typeId : null },
+            },
+            rarity: { id: query.rarityId ? query.rarityId : null },
           },
-          card: {
-            archetype: { id: query.archetypeId ? query.archetypeId : null },
-            attribute: { id: query.attributeId ? query.attributeId : null },
-            frameType: { id: query.frameTypeId ? query.frameTypeId : null },
-            race: { id: query.raceId ? query.raceId : null },
-            type: { id: query.typeId ? query.typeId : null },
+          {
+            id,
+            set: {
+              id: query.setId ? query.setId : null,
+              code: query.setCodes ? In(query.setCodes) : null,
+            },
+            card: {
+              enName: query.cardName ? ILike(`%${query.cardName}%`) : null,
+              archetype: { id: query.archetypeId ? query.archetypeId : null },
+              attribute: { id: query.attributeId ? query.attributeId : null },
+              frameType: { id: query.frameTypeId ? query.frameTypeId : null },
+              race: { id: query.raceId ? query.raceId : null },
+              type: { id: query.typeId ? query.typeId : null },
+            },
+            rarity: { id: query.rarityId ? query.rarityId : null },
           },
-          rarity: { id: query.rarityId ? query.rarityId : null },
-        },
+        ],
         relations: [
           'card',
           'set',
