@@ -85,6 +85,7 @@ export class UserDeckService {
 
   async createUserDeck(query: {
     userId: string;
+    name: string;
     userCardSetsIds: string[];
   }): Promise<UserDeck> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
@@ -92,6 +93,7 @@ export class UserDeckService {
     });
     const userDeck = this.dataSource.getRepository(UserDeck).create({
       userId: query.userId,
+      name: query.name,
       cardSets: userCardSets,
     });
     return this.dataSource.getRepository(UserDeck).save(userDeck);

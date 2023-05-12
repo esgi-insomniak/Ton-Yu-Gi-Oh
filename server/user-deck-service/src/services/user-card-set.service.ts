@@ -24,14 +24,9 @@ export class UserCardSetService {
     return userCardSet;
   }
 
-  async getUserCardSetsByUserId(
-    userId: string,
-    query: QueryGetItems,
-  ): Promise<UserCardSet[]> {
+  async getUserCardSetsByUserId(userId: string): Promise<UserCardSet[]> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
       where: { userId },
-      take: query.limit || 10,
-      skip: query.offset * query.limit || 0,
     });
     return userCardSets;
   }

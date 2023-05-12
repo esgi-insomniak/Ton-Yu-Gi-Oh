@@ -45,7 +45,6 @@ import {
   IUserCardSet,
   IUserCardSetPartial,
 } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
-import { IUserRoles } from 'src/interfaces/user-service/user/user.interface';
 
 @Controller('user_decks')
 @ApiTags('UserDeck')
@@ -100,6 +99,7 @@ export class UserDeckController {
       data: {
         id: userDeckResponse.item.id,
         userId: userDeckResponse.item.userId,
+        name: userDeckResponse.item.name,
         cardSets: userDeckResponse.item.cardSets.map((partialCardSet) => {
           const cardSet: IUserCardSet = {
             id: partialCardSet.id,
@@ -161,6 +161,7 @@ export class UserDeckController {
       await firstValueFrom(
         this.userDeckServiceClient.send('post_userdeck', {
           userId: request.user.id,
+          name: body.name,
           userCardSetsIds: body.userCardSetIds,
         }),
       );
@@ -192,6 +193,7 @@ export class UserDeckController {
       data: {
         id: userDeckResponse.item.id,
         userId: userDeckResponse.item.userId,
+        name: userDeckResponse.item.name,
         cardSets: userDeckResponse.item.cardSets.map((partialCardSet) => {
           const cardSet: IUserCardSet = {
             id: partialCardSet.id,
@@ -345,6 +347,7 @@ export class UserDeckUserController {
         const userDeck: IUserDeck = {
           id: partialUserDeck.id,
           userId: partialUserDeck.userId,
+          name: partialUserDeck.name,
           cardSets: partialUserDeck.cardSets.map((partialCardSet) => {
             const cardSet: IUserCardSet = {
               id: partialCardSet.id,

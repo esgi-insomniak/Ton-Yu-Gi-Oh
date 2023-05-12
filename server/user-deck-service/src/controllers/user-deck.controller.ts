@@ -16,6 +16,7 @@ export class UserDeckController {
   @MessagePattern('post_userdeck')
   public async postUserDeck(query: {
     userId: string;
+    name: string;
     userCardSetsIds: string[];
   }): Promise<GetResponseOne<UserDeck>> {
     const userDeck = await this.userDeckService.createUserDeck(query);

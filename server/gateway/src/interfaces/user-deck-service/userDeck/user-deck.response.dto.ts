@@ -7,6 +7,7 @@ export class GetUserDecksResponseDto {
       {
         id: 'e5b92849-9d34-4e25-815e-4dd6fd8729dd',
         userId: 'cfd4195c-362b-4b37-b25d-3a35ecb88368',
+        name: 'Deck 1',
         cardSets: [
           {
             id: '03a54917-a491-462c-b1b0-0730ddbad892',
@@ -56,6 +57,7 @@ export class GetUserDeckByIdResponseDto {
     example: {
       id: 'e5b92849-9d34-4e25-815e-4dd6fd8729dd',
       userId: 'cfd4195c-362b-4b37-b25d-3a35ecb88368',
+      name: 'Deck 1',
       cardSets: [
         {
           id: '03a54917-a491-462c-b1b0-0730ddbad892',

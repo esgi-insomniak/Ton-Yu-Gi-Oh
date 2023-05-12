@@ -13,7 +13,6 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
   GetResponseArray,
   GetResponseOne,
@@ -33,6 +32,7 @@ import {
   IUserSetPartial,
 } from 'src/interfaces/user-deck-service/userSet/user-set.interface';
 import { IUser } from 'src/interfaces/user-service/user/user.interface';
+import { GetSetsQueryDto } from 'src/interfaces/card-service/set/set.query.dto';
 
 @Controller('sets')
 @ApiTags('Set')
@@ -49,13 +49,10 @@ export class SetController {
     type: GetCardSetsResponseDto,
   })
   public async getCardSets(
-    @Query() query: GetItemsPaginationDto,
+    @Query() query: GetSetsQueryDto,
   ): Promise<GetCardSetsResponseDto> {
     const cardSetResponse: GetResponseArray<ICardSet> = await firstValueFrom(
-      this.cardServiceClient.send('get_sets', {
-        limit: query.limit,
-        offset: query.offset,
-      }),
+      this.cardServiceClient.send('get_sets', query),
     );
 
     if (cardSetResponse.status !== HttpStatus.OK) {
@@ -164,10 +161,18 @@ export class SetController {
     // create response with combined data of sets and userSets
     const result: GetUserSetsResponseDto = {
       data: userSetsResponse.items.map((partialUserSet) => {
+        const partialSet: ICardSet = {
+          id: cardSetResponse.item.id,
+          name: cardSetResponse.item.name,
+          code: cardSetResponse.item.code,
+          image: cardSetResponse.item.image,
+          cardSets: undefined,
+        };
+
         const set: IUserSet = {
           id: partialUserSet.id,
           userId: partialUserSet.userId,
-          set: cardSetResponse.item,
+          set: partialSet,
         };
         return set;
       }),
