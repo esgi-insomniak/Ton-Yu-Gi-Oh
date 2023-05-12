@@ -33,7 +33,7 @@ jobs:
         # Tests the Docker image.
         #
       - name: Testing
-        run: deploy/scripts/test.sh user-deck-service
+        run: deploy/scripts/test-service.sh user-deck-service
 
         #
         # Builds the Docker image.

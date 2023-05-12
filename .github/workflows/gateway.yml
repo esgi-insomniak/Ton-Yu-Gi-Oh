@@ -33,7 +33,7 @@ jobs:
         # Tests the Docker image.
         #
       - name: Testing
-        run: deploy/scripts/test.sh gateway
+        run: deploy/scripts/test-service.sh gateway
 
         #
         # Builds the Docker image.

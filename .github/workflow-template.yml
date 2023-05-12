@@ -33,7 +33,7 @@ jobs:
         # Tests the Docker image.
         #
       - name: Testing
-        run: deploy/scripts/test.sh {{ROUTE}}
+        run: deploy/scripts/test-service.sh {{ROUTE}}
 
         #
         # Builds the Docker image.
