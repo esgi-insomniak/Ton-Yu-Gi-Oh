@@ -38,6 +38,9 @@ jobs:
       - name: Testing
         run: deploy/scripts/test-service.sh user-deck-service
 
+        #
+        # Migrates the database.
+        #
       - name: Migrate DB
         run: docker exec -it user-deck-service-node yarn typeorm:migrate
 

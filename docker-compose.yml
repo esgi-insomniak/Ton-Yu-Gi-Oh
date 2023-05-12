@@ -66,6 +66,7 @@ services:
         args:
           - SERVICE_NAME=user-service
       hostname: user-service-node
+      container_name: user-service-node
       command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
@@ -80,6 +81,7 @@ services:
     user-service-postgres:
       image: postgres:13.2-alpine
       hostname: user-service-postgres
+      container_name: user-service-postgres
       networks:
         - backend-dev
       env_file:
