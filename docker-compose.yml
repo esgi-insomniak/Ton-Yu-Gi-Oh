@@ -242,7 +242,7 @@ networks:
   backend-dev:
     driver: bridge
   frontend-dev:
-    external: true
+    driver: bridge
 
 volumes:
     card-service-postgres-dev:

@@ -86,4 +86,3 @@ jobs:
         #
       - name: Deploy
         run: deploy/scripts/deploy-image.sh gateway
-
