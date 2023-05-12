@@ -84,5 +84,5 @@ jobs:
         #
         # Deploys the Docker image to the Kubernetes cluster.
         #
-      - name: Deploy
+      - name: Deploy Image
         run: deploy/scripts/deploy-image.sh gateway
