@@ -1,0 +1,254 @@
+version: "3.4"
+services:
+
+
+    ### FRONTEND GATEWAY ###
+    gateway:
+      build:
+        context: ./server/gateway
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=gateway
+      hostname: gateway
+      env_file:
+        - .env.dev
+      volumes:
+        - ./server/gateway:/usr/src/gateway
+      ports:
+        - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+      networks:
+        - backend-dev
+        - frontend-dev
+
+
+    ### CARD SERVICE ###
+    card-service-node:
+      build:
+        context: ./server/card-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=card-service
+      hostname: card-service-node
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - card-service-postgres
+      volumes:
+        - ./server/card-service:/usr/src/card-service
+      links:
+        - card-service-postgres
+    card-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: card-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${CARD_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${CARD_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
+      volumes:
+        - card-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### USER SERVICE ###
+    user-service-node:
+      build:
+        context: ./server/user-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: test
+        args:
+          - SERVICE_NAME=user-service
+      hostname: user-service-node
+      container_name: user-service-node
+      command: sh -c "yarn typeorm:migrate"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - user-service-postgres
+      volumes:
+        - ./server/user-service:/usr/src/user-service
+      links:
+        - user-service-postgres
+    user-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-service-postgres
+      container_name: user-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${USER_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### PAYMENT SERVICE ###
+    payment-service-node:
+      build:
+        context: ./server/payment-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=payment-service
+      hostname: payment-service-node
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - payment-service-postgres
+      volumes:
+        - ./server/payment-service:/usr/src/payment-service
+      links:
+        - payment-service-postgres
+    payment-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: payment-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${PAYMENT_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${PAYMENT_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
+      volumes:
+        - payment-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### AUTH SERVICE ###
+    auth-service-node:
+      build:
+        context: ./server/auth-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=auth-service
+      hostname: auth-service-node
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - auth-service-postgres
+      volumes:
+        - ./server/auth-service:/usr/src/auth-service
+      links:
+        - auth-service-postgres
+    auth-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: auth-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${AUTH_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${AUTH_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
+      volumes:
+        - auth-service-postgres-dev:/var/lib/postgresql/data
+
+    ### USER DECK SERVICE ###
+    user-deck-service-node:
+      build:
+        context: ./server/user-deck-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=user-deck-service
+      hostname: user-deck-service-node
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - user-deck-service-postgres
+      volumes:
+        - ./server/user-deck-service:/usr/src/user-deck-service
+      links:
+        - user-deck-service-postgres
+    user-deck-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: user-deck-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${USER_DECK_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${USER_DECK_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
+      volumes:
+        - user-deck-service-postgres-dev:/var/lib/postgresql/data
+
+
+    ### MAILER SERVICE ###
+    mailer-service-node:
+      build:
+        context: ./server/mailer-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+      hostname: mailer-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - mailcatcher
+      volumes:
+        - ./server/mailer-service:/usr/src/app
+      links:
+        - mailcatcher
+
+    ### ADMINER ###
+    adminer:
+      image: adminer:4.8.1
+      hostname: adminer
+      networks:
+        - backend-dev
+      ports:
+        - "9000:8080"
+
+
+    ### MAILCATCHER ###
+    mailcatcher:
+      image: jderusse/mailcatcher:latest
+      hostname: mailcatcher
+      networks:
+        - backend-dev
+      ports:
+        - "9025:80"
+
+
+
+networks:
+  backend-dev:
+    driver: bridge
+  frontend-dev:
+    driver: bridge
+
+volumes:
+    card-service-postgres-dev:
+    user-service-postgres-dev:
+    payment-service-postgres-dev:
+    auth-service-postgres-dev:
+    user-deck-service-postgres-dev:
