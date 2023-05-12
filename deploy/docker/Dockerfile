@@ -7,8 +7,7 @@ WORKDIR /usr/src/${SERVICE_NAME}
 
 COPY package*.json yarn*.lock tsconfig*.json ./
 
-CMD yarn install && \
-    yarn start:dev
+CMD yarn install && yarn start:dev
 
 FROM node:19.0.0-alpine as prod
 ARG SERVICE_NAME

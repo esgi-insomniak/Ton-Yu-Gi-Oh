@@ -18,7 +18,8 @@ env:
 
 
 jobs:
-  build-publish-deploy:
+
+  test-build-publish-deploy:
     name: Build, Publish, Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -26,8 +27,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
+        #
+        # Tests the Docker image.
+        #
+      - name: Testing
+        run: deploy/scripts/test.sh {{ROUTE}}
 
         #
         # Builds the Docker image.

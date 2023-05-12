@@ -49,3 +49,15 @@ spec:
       port: 5432
       targetPort: 5432
   type: ClusterIP # Can be accessed from other pods in the cluster
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-service-db-data
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+        storage: 1Gi

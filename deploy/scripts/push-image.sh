@@ -20,6 +20,8 @@
 #
 #       .deploy/scripts/push-image.sh service
 #
+# This script will push the image to the container registry.
+# #################################################################################################
 
 set -u # or set -o nounset
 : "$1"
