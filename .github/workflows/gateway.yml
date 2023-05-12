@@ -42,10 +42,10 @@ jobs:
         # Migrates the database.
         #
       - name: Migrate DB
-        run: docker exec -it gateway-node yarn typeorm:migrate
+        run: docker exec -i gateway-node yarn typeorm:migrate
 
       - name: run tests
-        run: docker exec -it gateway-node yarn test
+        run: docker exec -i gateway-node yarn test
 
         #
         # Builds the Docker image.
