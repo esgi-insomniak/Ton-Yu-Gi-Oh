@@ -25,6 +25,5 @@ echo "Testing $SERVICE"
 
 # launch a container from the image for the service
 cp -f .env.dev.example .env.dev
-# docker build -f .deploy/dockerfiles/Dockerfile -t $SERVICE-node --target test .
-docker-compose -f docker-compose.test.yml --env-file=.env.dev build $SERVICE-node
+docker-compose -f docker-compose.test.yml --env-file=.env.dev up --build $SERVICE-node
 
