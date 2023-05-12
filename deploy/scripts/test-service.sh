@@ -24,6 +24,6 @@ export SERVICE=$1
 echo "Testing $SERVICE"
 
 # launch a container from the image for the service
-# docker run --rm --name $SERVICE ton-yugi-$SERVICE:latest yarn test
 cp -f .env.dev.example .env.dev
-docker compose --env-file=.env.dev run --rm $SERVICE-node yarn test
+docker-compose -f docker-compose.test.yml --env-file .env.dev run --rm $SERVICE-node yarn test
+

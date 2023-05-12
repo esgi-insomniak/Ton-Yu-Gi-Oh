@@ -1,22 +1,22 @@
-FROM node:19.0.0-alpine as dev
+FROM node:19.0.0-alpine as base
 ARG SERVICE_NAME
-
-ENV NODE_ENV=development
-
 WORKDIR /usr/src/${SERVICE_NAME}
-
 COPY package*.json yarn*.lock tsconfig*.json ./
 
+
+FROM base as test
+ENV NODE_ENV=development
+RUN yarn install
+RUN yarn test
+
+
+FROM base as dev
+ENV NODE_ENV=development
 CMD yarn install && yarn start:dev
 
-FROM node:19.0.0-alpine as prod
-ARG SERVICE_NAME
 
+FROM base as prod
 ENV NODE_ENV=production
-
-WORKDIR /usr/src/${SERVICE_NAME}
-
-COPY package*.json yarn*.lock tsconfig*.json ./
 
 RUN yarn install --production
 RUN yarn build
