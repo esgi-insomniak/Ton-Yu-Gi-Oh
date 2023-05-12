@@ -42,7 +42,8 @@ jobs:
         # Migrates the database.
         #
       - name: Migrate DB
-        run: docker exec -i {{ROUTE}}-node yarn typeorm:migrate
+        run:  docker-compose -f docker-compose.test.yml --env-file=.env.dev run --rm {{ROUTE}}-node yarn typeorm:migrate
+
 
       - name: run tests
         run: docker exec -i {{ROUTE}}-node yarn test
