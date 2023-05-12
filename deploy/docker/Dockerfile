@@ -8,6 +8,7 @@ FROM base as test
 ENV NODE_ENV=development
 RUN yarn install
 COPY . .
+RUN yarn test
 
 
 FROM base as dev
