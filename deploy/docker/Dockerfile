@@ -9,7 +9,6 @@ ENV NODE_ENV=development
 RUN yarn install
 COPY . .
 
-
 FROM base as dev
 ENV NODE_ENV=development
 CMD yarn install && yarn start:dev
