@@ -30,6 +30,7 @@ import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { Permission } from 'src/decorators/permission.decorator';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
+import { GetUserCardSetsQuery } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.query.dto';
 
 @Controller('user_card_sets')
 @ApiTags('UserCardSet')
@@ -124,7 +125,7 @@ export class UserController {
   })
   public async getUserCardSetsByUserId(
     @Param() params: GetItemByIdDto,
-    @Query() query: GetItemsPaginationDto,
+    @Query() query: GetUserCardSetsQuery,
   ): Promise<GetUserCardSetsResponseDto> {
     const userResponse = await firstValueFrom(
       this.userServiceClient.send('get_user_by_id', {
@@ -143,10 +144,6 @@ export class UserController {
           params: {
             id: params.id,
           },
-          query: {
-            limit: query.limit,
-            offset: query.offset,
-          },
         }),
       );
 
@@ -162,6 +159,7 @@ export class UserController {
       await firstValueFrom(
         this.cardServiceClient.send('get_cardsets_by_ids', {
           ids: userCardSetResponse.items.map((item) => item.cardSetId),
+          query,
         }),
       );
 
@@ -174,15 +172,17 @@ export class UserController {
 
     // create response with combined data of cardSets and userCardSets
     const result: GetUserCardSetsResponseDto = {
-      data: userCardSetResponse.items.map((partialUserCardSet) => {
-        const cardSet: IUserCardSet = {
-          id: partialUserCardSet.id,
-          userId: partialUserCardSet.userId,
-          cardSet: cardSetsResponse.items.find(
-            (item) => item.id === partialUserCardSet.cardSetId,
-          ),
+      data: cardSetsResponse.items.map((cardSet) => {
+        const userCardSet: IUserCardSet = {
+          id: userCardSetResponse.items.find(
+            (item) => item.cardSetId === cardSet.id,
+          ).id,
+          userId: userCardSetResponse.items.find(
+            (item) => item.cardSetId === cardSet.id,
+          ).userId,
+          cardSet,
         };
-        return cardSet;
+        return userCardSet;
       }),
     };
 

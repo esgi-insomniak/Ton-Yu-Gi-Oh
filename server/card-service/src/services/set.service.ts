@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { Set } from 'src/entities/set.entity';
-import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
-import { DataSource } from 'typeorm';
+import { SetsQuery } from 'src/interfaces/common/common.query.interface';
+import { DataSource, In } from 'typeorm';
 
 @Injectable()
 export class SetService {
   constructor(private readonly dataSource: DataSource) {}
 
-  async getSets(query: QueryGetItems): Promise<Set[]> {
+  async getSets(query: SetsQuery): Promise<Set[]> {
     const sets = await this.dataSource.getRepository(Set).find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
+      where: {
+        id: query.setId ? query.setId : null,
+        code: query.setCodes ? In(query.setCodes) : null,
+      },
     });
     return sets;
   }
@@ -18,7 +22,7 @@ export class SetService {
   async getSetById(id: string): Promise<Set> {
     const set = await this.dataSource.getRepository(Set).findOne({
       where: { id },
-      relations: ['cardSets'],
+      relations: ['cardSets.card'],
     });
     return set;
   }

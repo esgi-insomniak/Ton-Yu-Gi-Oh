@@ -9,6 +9,7 @@ import {
 } from 'src/interfaces/common/common.response.interface';
 import { UserCardSet } from 'src/entities/user-card-set.entity';
 import { UserCardSetService } from 'src/services/user-card-set.service';
+import { UserCardSetsQuery } from 'src/interfaces/common/common.query.interface';
 
 @Controller('user_card_set')
 export class UserCardSetController {
@@ -60,11 +61,10 @@ export class UserCardSetController {
   @MessagePattern('get_usercardsets_by_user_id')
   public async getUserCardSetsByUserId(request: {
     params: ParamGetItemById;
-    query: QueryGetItems;
+    query: UserCardSetsQuery;
   }): Promise<GetResponseArray<UserCardSet>> {
     const userCardSets = await this.userCardSetService.getUserCardSetsByUserId(
       request.params.id,
-      request.query,
     );
     const result: GetResponseArray<UserCardSet> = {
       status: userCardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,

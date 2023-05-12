@@ -8,13 +8,14 @@ import {
 } from '../interfaces/common/common.response.interface';
 import { Set } from 'src/entities/set.entity';
 import { SetService } from 'src/services/set.service';
+import { SetsQuery } from 'src/interfaces/common/common.query.interface';
 
 @Controller('set')
 export class SetController {
   constructor(private readonly setService: SetService) {}
 
   @MessagePattern('get_sets')
-  public async getSets(query: QueryGetItems): Promise<GetResponseArray<Set>> {
+  public async getSets(query: SetsQuery): Promise<GetResponseArray<Set>> {
     const sets = await this.setService.getSets(query);
     const result: GetResponseArray<Set> = {
       status: HttpStatus.OK,

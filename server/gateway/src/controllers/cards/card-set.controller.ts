@@ -10,7 +10,6 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
   GetResponseArray,
   GetResponseOne,
@@ -21,6 +20,7 @@ import {
   GetCardCardSetsResponseDto,
 } from 'src/interfaces/card-service/cardSet/card-set.response.dto';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
+import { GetCardSetsQuery } from 'src/interfaces/card-service/cardSet/card-set.query.dto';
 
 @Controller('card_sets')
 @ApiTags('CardSet')
@@ -34,15 +34,10 @@ export class CardSetController {
     type: GetCardCardSetsResponseDto,
   })
   public async getCardCardSets(
-    @Query() query: GetItemsPaginationDto,
+    @Query() query: GetCardSetsQuery,
   ): Promise<GetCardCardSetsResponseDto> {
     const cardCardSetResponse: GetResponseArray<ICardCardSet> =
-      await firstValueFrom(
-        this.cardServiceClient.send('get_cardsets', {
-          limit: query.limit,
-          offset: query.offset,
-        }),
-      );
+      await firstValueFrom(this.cardServiceClient.send('get_cardsets', query));
 
     if (cardCardSetResponse.status !== HttpStatus.OK) {
       throw new HttpException(

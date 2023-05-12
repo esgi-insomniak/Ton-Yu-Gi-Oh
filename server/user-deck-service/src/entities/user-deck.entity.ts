@@ -15,6 +15,9 @@ export class UserDeck {
   @Column('uuid')
   userId: string;
 
+  @Column()
+  name: string;
+
   @ManyToMany(() => UserCardSet)
   @JoinTable({
     name: 'deck_cardSet',
