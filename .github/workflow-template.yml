@@ -38,10 +38,8 @@ jobs:
       - name: Testing
         run: deploy/scripts/test-service.sh {{ROUTE}}
 
-      - name: Wait for 15 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '15s'
+      - name: Migrate DB
+        run: docker exec -it {{ROUTE}}-node yarn typeorm:migrate
 
       - name: run tests
         run: docker exec -it {{ROUTE}}-node yarn test
