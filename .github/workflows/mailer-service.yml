@@ -5,6 +5,9 @@ on:
     paths:
       - "server/mailer-service/**"
       - ".github/workflows/mailer-service.yml"
+      - "deploy/k8s/mailer-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
 env:
   CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}

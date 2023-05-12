@@ -5,6 +5,9 @@ on:
     paths:
       - "server/gateway/**"
       - ".github/workflows/gateway.yml"
+      - "deploy/k8s/gateway/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
 env:
   CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
