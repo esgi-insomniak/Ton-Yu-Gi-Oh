@@ -1,9 +1,17 @@
 import { apiRequest } from '@/helpers/api'
-import { responseSendPayementIcToStripeSchema, sendPayementIcToStripeSchema } from '@/helpers/utils/schema/shop'
-import { useMutation } from 'react-query'
+import { ApiGetItemResponse } from '@/helpers/types/common'
+import { BoosterApiResponse } from '@/helpers/types/shop'
+import {
+    responseSendPayementIcToStripeSchema, responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchema, responseBuyBoosterSchemaType, responseBuyBoosterSchema, sendBuyAmountSchema
+} from '@/helpers/utils/schema/shop'
+import React from 'react'
+import { useMutation, useQuery } from 'react-query'
 
 const QUERY_URLS = {
-    payment: '/payment_checkout'
+    payment: '/payment_checkout',
+    confirmPayment: (sessionId: string) => `/payment_checkout/${sessionId}`,
+    buyBooster: (boosterId: string) => `/sets/${boosterId}/buy`,
+    getBooster: (setCodes: string[]) => `/sets?${new URLSearchParams(setCodes.map(s => ['setCodes', s])).toString()}`
 } as const
 
 const token = localStorage.getItem('token')
@@ -13,16 +21,38 @@ const requestPayment = (productId: string) => apiRequest({
     method: 'POST',
     body: { productId },
     token: !!token ? token : undefined
-}, sendPayementIcToStripeSchema)
+}, responseSendPayementIcToStripeSchema)
 
-const usePayment = () =>
-    useMutation<typeof responseSendPayementIcToStripeSchema, Error, string>((productId) => requestPayment(productId), {
-        onSuccess: (data) => {
-            console.log('hook success', data)
-        },
-        onError: (error) => {
-            console.log('hook err', error)
-        }
-    })
+const confirmPayement = (sessionId: string) => apiRequest({
+    url: QUERY_URLS.confirmPayment(sessionId),
+    method: 'PATCH',
+    token: !!token ? token : undefined
+}, responseConfirmPayementIcToStripeSchema)
 
-export { usePayment }
+const buyBooster = (amount: number, boosterId: string) => apiRequest({
+    url: QUERY_URLS.buyBooster(boosterId),
+    method: 'POST',
+    body: { amount },
+    token: !!token ? token : undefined
+}, responseBuyBoosterSchema)
+
+const getFirstGenerationBooster = () => apiRequest({
+    url: QUERY_URLS.getBooster(["LOB", "MRD", "BLAR", "PSV", "LON", "LOD", "PGD", "MFC", "DCR", "IOC"]),
+    method: 'GET',
+    token: !!token ? token : undefined
+})
+
+export const usePayment = () =>
+    useMutation<responseSendPayementIcToStripeSchemaType, Error, string>((productId) => requestPayment(productId))
+
+export const useConfirmPayment = () =>
+    useMutation<responseConfirmPayementIcToStripeSchemaType, Error, string>((sessionId) => confirmPayement(sessionId))
+
+export const useBuyBooster = () =>
+    useMutation<responseBuyBoosterSchemaType, Error, { amount: number, boosterId: string }>((money) => buyBooster(money.amount, money.boosterId))
+
+export const useGetFirstGenerationBooster = () => {
+    const { data, isLoading, error } = useQuery<ApiGetItemResponse<BoosterApiResponse[]>>(['getFirstGenerationBooster'], () => getFirstGenerationBooster(), {})
+
+    return React.useMemo(() => ({ data, isLoading, error }), [data, isLoading, error])
+}

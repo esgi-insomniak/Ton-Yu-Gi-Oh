@@ -16,8 +16,7 @@ const CardCoins = ({ amount, price, id, bonus }: CardCoinsProps) => {
     const handleStripe = () => {
         sendPayement.mutate(id, {
             onSuccess: (data) => {
-                console.log(data);
-                // window.location.href =
+                window.location.href = data.data.url
             },
             onError: (err) => {
                 alert?.error('Une erreur est survenu lors du paiement')
