@@ -154,11 +154,16 @@ export class UserController {
       );
     }
 
+    // get all unique cardSetIds
+    const cardSetIds = userCardSetResponse.items
+      .map((item) => item.cardSetId)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
     // get cardSets
     const cardSetsResponse: GetResponseArray<ICardCardSet> =
       await firstValueFrom(
         this.cardServiceClient.send('get_cardsets_by_ids', {
-          ids: userCardSetResponse.items.map((item) => item.cardSetId),
+          ids: cardSetIds,
           query,
         }),
       );
@@ -172,15 +177,13 @@ export class UserController {
 
     // create response with combined data of cardSets and userCardSets
     const result: GetUserCardSetsResponseDto = {
-      data: cardSetsResponse.items.map((cardSet) => {
+      data: userCardSetResponse.items.map((partialCardSet) => {
         const userCardSet: IUserCardSet = {
-          id: userCardSetResponse.items.find(
-            (item) => item.cardSetId === cardSet.id,
-          ).id,
-          userId: userCardSetResponse.items.find(
-            (item) => item.cardSetId === cardSet.id,
-          ).userId,
-          cardSet,
+          id: partialCardSet.id,
+          userId: partialCardSet.userId,
+          cardSet: cardSetsResponse.items.find(
+            (item) => item.id === partialCardSet.cardSetId,
+          ),
         };
         return userCardSet;
       }),

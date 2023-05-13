@@ -43,11 +43,11 @@ export class CardSetController {
   @MessagePattern('get_cardsets_by_ids')
   public async getCardSetsByIds(params: {
     ids: string[];
-    query: CardSetsQuery;
+    query: CardSetsQuery | undefined;
   }): Promise<GetResponseArray<CardSet>> {
     const cardSets = await this.cardSetService.getCardSetsByIds(
       params.ids,
-      params.query,
+      params.query || ({} as CardSetsQuery),
     );
     const result: GetResponseArray<CardSet> = {
       status: cardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
