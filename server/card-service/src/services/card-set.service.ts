@@ -18,7 +18,7 @@ export class CardSetService {
             code: query.setCodes ? In(query.setCodes) : null,
           },
           card: {
-            name: query.cardName ? ILike(`%${query.cardName}%`) : null,
+            name: query.cardName ? ILike(`%${query.cardName}%`) : ILike('%%'),
             archetype: { id: query.archetypeId ? query.archetypeId : null },
             attribute: { id: query.attributeId ? query.attributeId : null },
             frameType: { id: query.frameTypeId ? query.frameTypeId : null },
@@ -33,7 +33,7 @@ export class CardSetService {
             code: query.setCodes ? In(query.setCodes) : null,
           },
           card: {
-            enName: query.cardName ? ILike(`%${query.cardName}%`) : null,
+            enName: query.cardName ? ILike(`%${query.cardName}%`) : ILike('%%'),
             archetype: { id: query.archetypeId ? query.archetypeId : null },
             attribute: { id: query.attributeId ? query.attributeId : null },
             frameType: { id: query.frameTypeId ? query.frameTypeId : null },
@@ -93,7 +93,7 @@ export class CardSetService {
               code: query.setCodes ? In(query.setCodes) : null,
             },
             card: {
-              name: query.cardName ? ILike(`%${query.cardName}%`) : null,
+              name: query.cardName ? ILike(`%${query.cardName}%`) : ILike('%%'),
               archetype: { id: query.archetypeId ? query.archetypeId : null },
               attribute: { id: query.attributeId ? query.attributeId : null },
               frameType: { id: query.frameTypeId ? query.frameTypeId : null },
@@ -109,7 +109,9 @@ export class CardSetService {
               code: query.setCodes ? In(query.setCodes) : null,
             },
             card: {
-              enName: query.cardName ? ILike(`%${query.cardName}%`) : null,
+              enName: query.cardName
+                ? ILike(`%${query.cardName}%`)
+                : ILike('%%'),
               archetype: { id: query.archetypeId ? query.archetypeId : null },
               attribute: { id: query.attributeId ? query.attributeId : null },
               frameType: { id: query.frameTypeId ? query.frameTypeId : null },
