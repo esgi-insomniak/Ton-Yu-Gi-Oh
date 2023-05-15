@@ -4,10 +4,10 @@ import { useAuth } from "@/helpers/api/hooks"
 import { useMe } from "@/helpers/api/hooks/users"
 import { useModal } from "@/helpers/providers/modal"
 import React from "react"
-import { getScreenSize } from "insomniak-sdk-analytics"
 import { useNavigate, useParams } from "react-router-dom"
 import { useBuyBooster, useConfirmPayment, useGetFirstGenerationBooster } from "@/helpers/api/hooks/shop"
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider"
+import { BoosterApiResponse } from "@/helpers/types/shop"
 
 const Shop = () => {
     const { user } = useAuth()
@@ -43,11 +43,11 @@ const Shop = () => {
             {
                 yes: { action: () => { }, title: "" }, no: { action: () => { }, title: "" }
             },
-            getScreenSize(window)
+            "xl"
         )
     }
 
-    const handlePreviewBoosterModal = (booster: any) => {
+    const handlePreviewBoosterModal = (booster: BoosterApiResponse) => {
         openModal(
             <div className="flex space-x-2 justify-center items-center w-full h-full">
 
@@ -61,7 +61,7 @@ const Shop = () => {
         )
     }
 
-    const handleBuyBooster = (booster: any) => {
+    const handleBuyBooster = (booster: BoosterApiResponse) => {
         buyBooster.mutate({ amount: 1, boosterId: booster.id }, {
             onSuccess: (res) => {
                 alert?.success(`Vous avez bien acheté le booster ${booster.id} !`)
@@ -82,6 +82,7 @@ const Shop = () => {
                 },
                 onError: (err) => {
                     alert?.error('Une erreur est survenue lors de l\'achat')
+                    router('/shop')
                 }
             })
         }
@@ -101,14 +102,26 @@ const Shop = () => {
                     <span className="cursor-pointer text-2xl w-10" onClick={handleBuyCoinsModal}>🏧</span>
                 </div>
             </div>
-            <div className="grid grid-cols-5 gap-5 p-10 h-[calc(100vh-5rem)]">
-                {
-                    boosters?.data?.map((booster, i) => (
-                        <div key={i} className="h-full">
-                            <img src={booster.image} alt={booster.name} className="h-full w-full" />
-                        </div>
-                    ))
-                }
+            <div className="p-10 h-[calc(100vh-5rem)] overflow-y-auto w-full justify-center items-center">
+                <div className="grid grid-cols-5 gap-3">
+                    {
+                        boosters?.data?.map((booster, i) => (
+                            <div key={i} className="h-full flex flex-col w-full relative group">
+                                <img src={booster.image} alt={booster.name} className="h-full w-full rounded-md drop-shadow-lg shadow-lg" />
+                                <div className={`hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/20`}>
+                                    <button onClick={() => handlePreviewBoosterModal(booster)} className="t-btn min-w-[10rem]">
+                                        <p>Voir les cartes</p>
+                                    </button>
+                                    <button
+                                        onClick={() => handleBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
+                                    >
+                                        <p>Acheter</p>
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
             </div>
         </div>
     )
