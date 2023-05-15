@@ -25,10 +25,16 @@ const sendBuyAmountSchema = zod.object({
 });
 
 const responseBuyBoosterSchema = zod.object({
-    data: zod.object({
+    data: zod.array(zod.object({
         id: zod.string(),
+        set: zod.object({
+            id: zod.string(),
+            name: zod.string(),
+            code: zod.string(),
+            image: zod.string(),
+        }),
         userId: zod.string()
-    }),
+    })),
 });
 
 type responseSendPayementIcToStripeSchemaType = zod.infer<typeof responseSendPayementIcToStripeSchema>;

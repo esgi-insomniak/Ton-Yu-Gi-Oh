@@ -47,7 +47,7 @@ const Shop = () => {
         )
     }
 
-    const handlePreviewBoosterModal = (booster: BoosterApiResponse) => {
+    const handlePreviewBoosterModal = React.useCallback((boosterId: string) => {
         openModal(
             <div className="flex space-x-2 justify-center items-center w-full h-full">
 
@@ -59,12 +59,12 @@ const Shop = () => {
             },
             "xl"
         )
-    }
+    }, [])
 
     const handleBuyBooster = (booster: BoosterApiResponse) => {
         buyBooster.mutate({ amount: 1, boosterId: booster.id }, {
             onSuccess: (res) => {
-                alert?.success(`Vous avez bien acheté le booster ${booster.id} !`)
+                alert?.success(`Vous avez bien acheté le booster ${booster.name} !`)
             },
             onError: (err) => {
                 alert?.error('Une erreur est survenue lors de l\'achat')
@@ -76,7 +76,6 @@ const Shop = () => {
         if (sessionId) {
             confirmPayment.mutate(sessionId, {
                 onSuccess: (res) => {
-                    console.log(res)
                     router('/shop')
                     alert?.success(`Vous avez bien acheté ${res.data.coins} coins !`)
                 },
@@ -102,21 +101,22 @@ const Shop = () => {
                     <span className="cursor-pointer text-2xl w-10" onClick={handleBuyCoinsModal}>🏧</span>
                 </div>
             </div>
-            <div className="p-10 h-[calc(100vh-5rem)] overflow-y-auto w-full justify-center items-center">
-                <div className="grid grid-cols-5 gap-3">
+            <div className="h-[calc(100vh-5rem)] flex justify-center items-center p-12">
+                <div className="grid grid-cols-5 gap-3 w-3/4">
                     {
-                        boosters?.data?.map((booster, i) => (
-                            <div key={i} className="h-full flex flex-col w-full relative group">
-                                <img src={booster.image} alt={booster.name} className="h-full w-full rounded-md drop-shadow-lg shadow-lg" />
-                                <div className={`hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/20`}>
-                                    <button onClick={() => handlePreviewBoosterModal(booster)} className="t-btn min-w-[10rem]">
-                                        <p>Voir les cartes</p>
-                                    </button>
-                                    <button
+                        boosters?.data?.map((booster) => (
+                            <div key={booster.code} className="h-full flex flex-col w-full relative group">
+                                <img src={booster.image} alt={booster.name} className="h-full w-full rounded drop-shadow-lg shadow-lg" />
+                                <div className="hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/20">
+                                    <div onClick={() => handlePreviewBoosterModal(booster.id)} className="t-btn min-w-[10rem]">
+                                        Voir les cartes
+                                    </div>
+                                    <div
                                         onClick={() => handleBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
                                     >
-                                        <p>Acheter</p>
-                                    </button>
+                                        <span className="font-bold text-red-500">- 100</span>
+                                        <img src="/InsomniakCoins.png" alt="" className="h-5 w-5" />
+                                    </div>
                                 </div>
                             </div>
                         ))
