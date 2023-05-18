@@ -1,35 +1,26 @@
 import React from "react";
 import { useAuth } from "@/helpers/api/hooks";
 import { useGetAllUserDecks } from "@/helpers/api/hooks/decks";
+import Deck from "@/components/Decks/Deck";
 
 const Decks = () => {
   const { user } = useAuth();
   const { data, isLoading, isError } = useGetAllUserDecks(user?.id);
   return (
     <React.Fragment>
-      <h1>Mes decks</h1>
-      <button onClick={() => history.back()} className="btn">
+      <h1 className="m-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Création de mes decks</h1>
+      <button onClick={() => history.back()} className="btn m-4">
         Revenir en arrière
       </button>
 
-      <div className="flex">
+      <div className="flex justify-around items-start mt-5">
         {data &&
           data.data.length > 0 &&
           !isLoading &&
           !isError &&
           data.data.map((deck: any, index: number) => {
             return (
-              <div key={index} className="flex flex-col">
-                <a href="#">
-                  <div className="flex flex-col justify-center items-center">
-                    <img
-                      src={deck.cardSets[0].cardSet.card.imageUrlSmall}
-                      alt={`Deck ${deck.name}`}
-                    />
-                    <p>{deck.name}</p>
-                  </div>
-                </a>
-              </div>
+                <Deck deck={deck} key={index} />
             );
           })}
         <a href="/decks/new" className="">
