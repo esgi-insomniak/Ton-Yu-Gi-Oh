@@ -68,7 +68,7 @@ services:
       hostname: user-service-node
       container_name: user-service-node
       tty: true
-      # command: sh -c "yarn typeorm:migrate"
+      command: sh -c "yarn typeorm:migrate && yarn test"
       networks:
         - backend-dev
       env_file:
