@@ -11,6 +11,7 @@ services:
         args:
           - SERVICE_NAME=gateway
       hostname: gateway
+      command: sh -c "yarn install && yarn test"
       env_file:
         - .env.dev
       volumes:
@@ -31,7 +32,7 @@ services:
         args:
           - SERVICE_NAME=card-service
       hostname: card-service-node
-      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn test"
       networks:
         - backend-dev
       env_file:
@@ -103,7 +104,7 @@ services:
         args:
           - SERVICE_NAME=payment-service
       hostname: payment-service-node
-      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn test"
       networks:
         - backend-dev
       env_file:
@@ -138,7 +139,7 @@ services:
         args:
           - SERVICE_NAME=auth-service
       hostname: auth-service-node
-      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn test"
       networks:
         - backend-dev
       env_file:
@@ -172,7 +173,7 @@ services:
         args:
           - SERVICE_NAME=user-deck-service
       hostname: user-deck-service-node
-      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn test"
       networks:
         - backend-dev
       env_file:
