@@ -56,8 +56,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: auth-service-db-data
 spec:
-    accessModes:
-        - ReadWriteOnce
-    resources:
-        requests:
-        storage: 1Gi
+  accessModes:
+      - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

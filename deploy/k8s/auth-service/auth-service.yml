@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: maeljamin/ton-yugi-auth-service:82746b01
+          image: maeljamin/ton-yugi-auth-service:test
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3003
