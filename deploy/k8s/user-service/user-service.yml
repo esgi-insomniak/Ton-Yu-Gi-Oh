@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: maeljamin/ton-yugi-user-service:82746b01
+          image: maeljamin/ton-yugi-user-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3003
