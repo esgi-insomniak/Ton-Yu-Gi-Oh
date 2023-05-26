@@ -1,91 +1,50 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { ModalContextProps } from "@/helpers/types/modal";
+import React, { Fragment } from 'react';
+import ReactDOM from 'react-dom';
+import { UseModalType } from '@/helpers/types/modal'
 
-interface ModalProps {
-    onClose: () => void;
-    title?: ModalContextProps["title"];
-    yesNo?: ModalContextProps["yesNo"];
-    yesNoAction?: ModalContextProps["yesNoAction"];
-    size?: ModalContextProps["size"];
-    content: ModalContextProps["content"];
-    isOpen: ModalContextProps["isOpen"];
-}
-
-const Modal: React.FC<ModalProps> = ({ onClose, title, yesNoAction, yesNo, content, isOpen, size }) => {
-    const handleYesClick = () => {
-        if (yesNoAction && yesNoAction.yes && yesNoAction.yes.action) {
-            yesNoAction.yes.action();
-        }
-        onClose();
-    };
-
-    const handleNoClick = () => {
-        if (yesNoAction && yesNoAction.no && yesNoAction.no.action) {
-            yesNoAction.no.action();
-        }
-        onClose();
-    };
-
-    const getSizeClassName = (size?: ModalContextProps["size"]) => {
-        switch (size) {
-            case "sm":
-                return "max-w-xl min-h-[20rem] ";
-            case "md":
-                return "max-w-2xl min-h-[25rem]";
-            case "lg":
-                return "max-w-4xl min-h-[30rem]";
-            case "xl":
-                return "max-w-7xl min-h-[45rem]";
-            default:
-                return "max-w-lg";
-        }
-    };
-
-    return isOpen
-        ? ReactDOM.createPortal(
-            <div className="fixed z-10 inset-0 overflow-y-auto text-white">
-                <div className="flex items-center justify-center min-h-screen">
-                    <div className="fixed inset-0 transition-opacity">
-                        <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={onClose}></div>
+export const Modal = ({ isShowing, toggle, yesNo, yesNoAction, title, text, content }: UseModalType) => isShowing ? ReactDOM.createPortal(
+    <Fragment>
+        {isShowing && (
+            <div className="fixed inset-0 z-10 overflow-y-auto">
+                <div className="flex items-end justify-center min-h-screen mx-auto pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                        <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={toggle}></div>
                     </div>
-                    <div className={`bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all w-full h-full ${getSizeClassName(size)} flex justify-between flex-col`}>
-                        {title && (
-                            <div className=" py-4 px-6 text-lg font-semibold">{title}</div>
-                        )}
-                        <div className={`px-6 py-4 ${size === 'xl' ? 'max-h-max' : ''}`}>{content}</div>
-                        {yesNo && (
-                            <div className="px-6 py-4 flex justify-end">
-                                <button
-                                    className="bg-gray-200 px-4 py-2 mr-2 rounded"
-                                    onClick={handleNoClick}
-                                >
-                                    {yesNoAction?.no?.title || "No"}
-                                </button>
-                                <button
-                                    className="bg-blue-500 px-4 py-2 text-white rounded"
-                                    onClick={handleYesClick}
-                                >
-                                    {yesNoAction?.yes?.title || "Yes"}
-                                </button>
+                    <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    <div
+                        className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-fit mx-28" role="dialog" aria-modal="true" aria-labelledby="modal-headline"
+                    >
+                        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div className="sm:flex sm:items-start w-full">
+                                <div className="mt-3 text-center sm:mt-0 sm:text-left w-full flex flex-col">
+                                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                                        {title}
+                                    </h3>
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-500">
+                                            {text}
+                                        </p>
+                                    </div>
+                                    <div className='w-full'>
+                                        {content}
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                        {!yesNo && (
-                            <div className="px-6 py-4 flex justify-end">
-                                <button
-                                    className="t-btn"
-                                    onClick={onClose}
-                                >
-                                    Close
-                                </button>
+                        </div>
+                        {yesNo ? (
+                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                {
+                                    yesNoAction && yesNoAction.map((btn, index) => (
+                                        <button key={index} type="button" className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${btn.type === 'yes' ? 'bg-red-600' : 'bg-white'}  text-base font-medium ${btn.type === 'yes' ? 'text-white hover:bg-red-700' : 'text-gray-700 hover:bg-gray-50'}  focus:outline-none focus:ring-2 focus:ring-offset-2 ${btn.type === 'yes' ? 'focus:ring-red-500' : 'focus:ring-indigo-500'} sm:ml-3 sm:w-auto sm:text-sm`} onClick={btn.action}>
+                                            {btn.text}
+                                        </button>
+                                    ))
+                                }
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </div>
-            </div>,
-            document.body
-        )
-        : null;
-};
-
-export default Modal;
+            </div>
+        )}
+    </Fragment>, document.body
+) : null;

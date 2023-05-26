@@ -3,7 +3,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { UserContextProvider } from '@/helpers/providers/users/usersProvider';
 import { TrackingProvider } from 'insomniak-sdk-analytics'
-import { ModalProvider } from '@/helpers/providers/modal';
 
 function App() {
   const queryClient = new QueryClient()
@@ -11,13 +10,11 @@ function App() {
     <div className="App">
       <QueryClientProvider client={queryClient}>
         <TrackingProvider appId=''>
-          <ModalProvider>
-            <UserContextProvider>
-              <BrowserRouter>
-                <Router />
-              </BrowserRouter>
-            </UserContextProvider>
-          </ModalProvider>
+          <UserContextProvider>
+            <BrowserRouter>
+              <Router />
+            </BrowserRouter>
+          </UserContextProvider>
         </TrackingProvider>
       </QueryClientProvider>
     </div>
