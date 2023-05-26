@@ -38,6 +38,10 @@ jobs:
       - name: Testing
         run: deploy/scripts/test-service.sh payment-service
 
+
+      - name: "Wait for docker to finish building"
+        run: sleep 30
+
         #
         # Migrates the database.
         #
@@ -46,8 +50,8 @@ jobs:
         # run:  docker-compose -f docker-compose.test.yml --env-file=.env.dev run --rm payment-service-node yarn typeorm:migrate
 
 
-      # - name: run tests
-        # run: docker exec -i payment-service-node yarn test
+      - name: run tests
+        run: docker exec -it payment-service-node yarn test
 
         #
         # Builds the Docker image.

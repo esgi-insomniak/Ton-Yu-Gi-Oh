@@ -38,6 +38,10 @@ jobs:
       - name: Testing
         run: deploy/scripts/test-service.sh {{ROUTE}}
 
+
+      - name: "Wait for docker to finish building"
+        run: sleep 30
+
         #
         # Migrates the database.
         #
@@ -46,8 +50,8 @@ jobs:
         # run:  docker-compose -f docker-compose.test.yml --env-file=.env.dev run --rm {{ROUTE}}-node yarn typeorm:migrate
 
 
-      # - name: run tests
-        # run: docker exec -i {{ROUTE}}-node yarn test
+      - name: run tests
+        run: docker exec -it {{ROUTE}}-node yarn test
 
         #
         # Builds the Docker image.
