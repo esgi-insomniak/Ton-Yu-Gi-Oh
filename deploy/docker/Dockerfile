@@ -6,7 +6,6 @@ COPY package*.json yarn*.lock tsconfig*.json ./
 
 FROM base as test
 ENV NODE_ENV=development
-RUN yarn install
 COPY . .
 
 FROM base as dev

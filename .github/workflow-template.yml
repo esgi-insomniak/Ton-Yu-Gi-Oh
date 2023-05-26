@@ -51,7 +51,7 @@ jobs:
 
 
       - name: run tests
-        run: docker exec -it {{ROUTE}}-node yarn test
+        run: docker exec -i {{ROUTE}}-node yarn test
 
         #
         # Builds the Docker image.

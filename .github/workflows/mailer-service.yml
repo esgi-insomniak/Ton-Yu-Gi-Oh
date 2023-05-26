@@ -51,7 +51,7 @@ jobs:
 
 
       - name: run tests
-        run: docker exec -it mailer-service-node yarn test
+        run: docker exec -i mailer-service-node yarn test
 
         #
         # Builds the Docker image.

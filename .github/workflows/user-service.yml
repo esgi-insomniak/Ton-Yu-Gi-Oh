@@ -51,7 +51,7 @@ jobs:
 
 
       - name: run tests
-        run: docker exec -it user-service-node yarn test
+        run: docker exec -i user-service-node yarn test
 
         #
         # Builds the Docker image.
