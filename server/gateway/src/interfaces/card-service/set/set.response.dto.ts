@@ -41,6 +41,32 @@ export class GetCardSetByIdResponseDto {
             imageUrl: 'https://images.ygoprodeck.com/images/cards/37478723.jpg',
             imageUrlSmall:
               'https://images.ygoprodeck.com/images/cards_small/37478723.jpg',
+            type: {
+              id: 'ed1f516c-2ba2-4111-a7bd-205222556a29',
+              name: 'Spell Card',
+            },
+            frameType: {
+              id: '92328241-e02c-4fa0-af93-7fc9940cfc08',
+              name: 'spell',
+            },
+            race: {
+              id: 'f2ac7bd4-0366-4ec0-aa3d-0de22dd3c5d2',
+              name: 'Equip',
+            },
+            archetype: {
+              id: 'eec7aaf1-e1a6-47c8-a352-60934327d6ea',
+              name: 'Noble Knight',
+            },
+            attribute: null,
+            price: {
+              id: '28a55e02-094d-4a23-9f6a-459dbfc0549d',
+              cardMarketPrice: 0.1,
+              tcgPlayerPrice: 0.08,
+              ebayPrice: 0.99,
+              amazonPrice: 2.96,
+              coolStuffIncPrice: 0,
+            },
+            linkMarkers: [],
           },
         },
       ],
