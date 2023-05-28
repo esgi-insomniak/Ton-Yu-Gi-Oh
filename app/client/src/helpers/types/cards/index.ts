@@ -12,7 +12,7 @@ interface ICommonNameId {
   name: string;
 }
 
-export interface CardIArchetype extends ICommonNameId {}
+export interface CardIArchetype extends ICommonNameId { }
 
 export interface CardIAttribute extends ICommonNameId {
   name: keyof typeof CardAttribute;
@@ -51,7 +51,7 @@ export interface CardIFrameType extends ICommonNameId {
   name: keyof typeof CardFrameType;
 }
 
-export interface CardILinkMarker extends ICommonNameId {}
+export interface CardILinkMarker extends ICommonNameId { }
 
 export interface CardIPrice {
   id: string;
@@ -69,6 +69,7 @@ export interface CardIRace extends ICommonNameId {
 
 export interface CardIRarity extends ICommonNameId {
   name: keyof typeof CardRarity;
+  code: string
 }
 
 export interface CardISet extends ICommonNameId {
@@ -104,4 +105,10 @@ export interface IGameCardContextProps {
   setIsLoaded: (card: IGameCard, isLoaded: boolean) => void;
   sortCardSets: (result: DropResult) => void;
   deactivateAllCardSets: () => void;
+}
+
+export interface CardSet {
+  id: string;
+  price: number;
+  card: ICard;
 }

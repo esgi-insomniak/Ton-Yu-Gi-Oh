@@ -19,6 +19,17 @@ export const cardSetPartialSchema = zod.object({
   price: zod.number(),
 });
 
+export const cardSetBuyableSchema = zod.object({
+  id: zod.string().uuid(),
+  userId: zod.string().uuid(),
+  set: zod.object({
+    id: zod.string().uuid(),
+    name: zod.string(),
+    code: zod.string(),
+    image: zod.string(),
+  }),
+});
+
 export const cardSetOneResponseSchema = zod.object({
   data: cardSetSchema,
 });

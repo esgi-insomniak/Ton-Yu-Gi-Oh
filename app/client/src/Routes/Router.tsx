@@ -27,7 +27,6 @@ be loaded when they are actually needed, instead of being loaded all at once whe
 starts. This can improve the performance of the application by reducing the initial load time. The
 `import()` function is used to dynamically import the components. */
 const HomePage = React.lazy(() => import('@/pages/Home'));
-const DisplayCards = React.lazy(() => import('@/pages/DisplayCards'));
 const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
 const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
 const LogoutPage = React.lazy(() => import('@/pages/Auth/Logout'));
@@ -36,6 +35,7 @@ const RegisterPage = React.lazy(() => import('@/pages/Auth/Register'));
 const ConfirmAccPage = React.lazy(() => import('@/pages/Auth/ConfirmAcc'));
 const ResetPwdPage = React.lazy(() => import('@/pages/Auth/ResetPwd'));
 const CollectionPage = React.lazy(() => import('@/pages/Collection'));
+const ShopPage = React.lazy(() => import('@/pages/Shop'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -57,11 +57,6 @@ const Router: React.FC = () => {
                         </ProtectedRoute>
                     }
                 >
-                    <Route path="/display-cards" element={
-                        <GameCardProvider>
-                            <DisplayCards />
-                        </GameCardProvider>
-                    } />
                     <Route path="/" element={<HomePage />} />
                     <Route path="/opening" element={<BoosterPage />} />
                     <Route path="/collection" element={
@@ -69,6 +64,8 @@ const Router: React.FC = () => {
                             <CollectionPage />
                         </GameCardProvider>
                     } />
+                    <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/shop/:sessionId" element={<ShopPage />} />
                 </Route>
 
                 <Route

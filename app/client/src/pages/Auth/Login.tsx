@@ -76,13 +76,13 @@ const Login = () => {
                             Mot de passe oublié
                         </span>
                     </div>
-                    <button type="submit" className="t-btn">
+                    <button type="submit" className="t-btn bg-blue-500 text-white hover:bg-blue-300">
                         <p>Se connecter</p>
                         <BiLockOpenAlt className="font-bold scale-105" />
                     </button>
                 </form>
                 <div className="divider text-black">ou</div>
-                <div className="t-btn bg-slate-400 hover:bg-slate-500" onClick={() => router('/register')}>
+                <div className="t-btn bg-slate-400 hover:bg-slate-500 text-white hover:text-white" onClick={() => router('/register')}>
                     <p>S'incrire</p>
                     <BiLockOpenAlt className="font-bold scale-105" />
                 </div>
