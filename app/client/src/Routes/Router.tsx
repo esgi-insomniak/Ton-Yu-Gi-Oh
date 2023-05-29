@@ -38,6 +38,8 @@ const ConfirmAccPage = React.lazy(() => import('@/pages/Auth/ConfirmAcc'));
 const ResetPwdPage = React.lazy(() => import('@/pages/Auth/ResetPwd'));
 const CollectionPage = React.lazy(() => import('@/pages/Collection'));
 const ShopPage = React.lazy(() => import('@/pages/Shop'));
+const DecksPage = React.lazy(() => import('@/pages/Decks'));
+const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -69,6 +71,8 @@ const Router: React.FC = () => {
                     } />
                     <Route path="/shop" element={<ShopPage />} />
                     <Route path="/shop/:sessionId" element={<ShopPage />} />
+                    <Route path="/decks" element={<DecksPage />} />
+                    <Route path="/decks/new" element={<NewDecksPage />} />
                 </Route>
 
                 <Route

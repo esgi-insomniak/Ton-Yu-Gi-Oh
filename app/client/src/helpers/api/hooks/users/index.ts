@@ -5,7 +5,8 @@ import React from 'react'
 import { useQuery } from 'react-query'
 
 const QUERY_URLS = {
-    me: (id: string) => `/users/${id}`
+    me: (id: string) => `/users/${id}`,
+    userCardSets: (userId: string) => `/users/${userId}/user_card_sets?limit=100`,
 } as const
 
 const userKeys = {
@@ -30,3 +31,32 @@ export const useMe = (id: string) => {
 
     return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
 }
+
+const requestUserCardSets = (userId: string) =>
+  apiRequest({
+    url: QUERY_URLS.userCardSets(userId),
+    method: "GET",
+    token: !!token ? token : undefined,
+  });
+
+export const useGetAllMyUserCardSets = (userId: string) => {
+  const myCards = useQuery(["userCardSets", userId], () =>
+    requestUserCardSets(userId)
+  );
+
+  return myCards;
+};
+
+export const getAllCardInDoubleAndIncrement = (myCards: any) => {
+  let myObj: any = {};
+  Object.values(myCards.data || {}).forEach((card: any) => {
+    const cardSetId = card.cardSet.id;
+    if (myObj[cardSetId]) {
+      myObj[cardSetId].count++;
+      myObj[cardSetId].userCardSetIds.push(card.id);
+    } else {
+      myObj[cardSetId] = { item: card, count: 1, userCardSetIds: [card.id] };
+    }
+  });
+  return Object.values(myObj);
+};
