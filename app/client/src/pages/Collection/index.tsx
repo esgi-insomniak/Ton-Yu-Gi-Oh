@@ -1,22 +1,38 @@
-import Checkbox from "@/components/Checkbox";
 import GameCard from "@/components/GameCard/GameCard";
 import { useGetCardSets } from "@/helpers/api/hooks/cards/card-set.hook";
 import { useGetAllArchetypes } from "@/helpers/api/hooks/cards/archetype.hook";
 import React from "react";
-import { ICard, IGameCard } from "@/helpers/types/cards";
+import { IGameCard } from "@/helpers/types/cards";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
-import { useGetAllAttributes } from "@/helpers/api/hooks/cards/attribute.hook";
+import { useGetAllAttributes, useGetAllRarities } from "@/helpers/api/hooks/cards/attribute.hook";
+import { Input, Select } from "@/components/Input";
+import { set } from "react-hook-form";
+
+interface FiltersProps {
+    search: string;
+    archetype: string;
+    attributeId: string;
+    rarity: string;
+}
 
 const Collection = () => {
     const [page, setPage] = React.useState<number>(0)
-    const [searchValue, setSearchValue] = React.useState<string>("")
-    const { data: cardSetsResponse } = useGetCardSets(page, 18)
-    // const { data: attributesResponse } = useGetAllAttributes()
+    const [filters, setFilters] = React.useState<FiltersProps>({
+        attributeId: "",
+        rarity: "",
+        archetype: "",
+        search: "",
+    })
+
+    const { data: cardSetsResponse, refetch } = useGetCardSets(page, 24, filters.attributeId, filters.rarity, filters.archetype, filters.search)
     const { cardSets, setCardSets, sortCardSets } = useGameCard()
+    const { data: archetypes } = useGetAllArchetypes()
+    const { data: rarities } = useGetAllRarities()
+    const { data: attributes } = useGetAllAttributes()
 
     React.useEffect(() => {
         if (cardSetsResponse?.data === undefined || cardSetsResponse?.data.length === 0) return;
-        const apiCardSets = cardSetsResponse.data.map((cardSet) => {
+        const apiCardSets = cardSetsResponse.data.map<IGameCard>((cardSet) => {
             return {
                 ...cardSet,
                 isActive: false,
@@ -26,146 +42,63 @@ const Collection = () => {
                 isDraggable: false,
                 canPop: true,
                 canFlip: false,
-            } as IGameCard
+            }
         })
         setCardSets(apiCardSets)
     }, [cardSetsResponse])
 
-    const [collapsed, setCollapsed] = React.useState({
-        attribute: false,
-        frameType: false,
-        race: false,
-        rarity: false,
-        set: false,
-        type: false,
-    })
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
 
-    interface IFilter {
-        id: string;
-        name: string;
-        checked: boolean;
+        const formData = new FormData(e.currentTarget)
+        const search = formData.get("searchBar")
+        const archetype = formData.get("archetype")
+        const attributeId = formData.get("attributeId")
+        const rarity = formData.get("rarities")
+
+        setFilters({
+            search: search as string,
+            archetype: archetype as string,
+            attributeId: attributeId as string,
+            rarity: rarity as string,
+        })
+        setPage(0)
+        refetch()
     }
 
-    const filters: { [key: string]: IFilter[] }
-        = React.useMemo(() => {
-            return {
-                attribute: [],
-                frameType: [],
-                race: [],
-                rarity: [],
-                set: [],
-                type: [],
-            }
-        }, [])
-
-    const handleCheckboxChange = React.useCallback((tabName: keyof typeof filters, name: string, checked: boolean) => {
-        filters[tabName].map((item: { name: string; checked: boolean; }) => {
-            if (item.name === name) {
-                item.checked = !checked
-            }
+    const handleClear = () => {
+        setFilters({
+            search: "",
+            archetype: "",
+            attributeId: "",
+            rarity: "",
         })
-    }, [filters])
-
-    const handleUpdateFilters = React.useCallback(() => {
-        const checkedFilters = Object.keys(filters).map((key) => {
-            return filters[key as keyof typeof filters].filter((item) => item.checked).map((item) => item.name)
-        })
-    }, [filters])
+        setPage(0)
+        refetch()
+    }
 
     return (
-        <div className="flex gap-5 w-full overflow-scroll p-5">
-            <div className="h-full flex flex-col p-3 w-3/12 bg-white/20 rounded-md drop-shadow-md overflow-scroll scrollbar-none">
-                <div className="divider">Rechercher</div>
-                <input
-                    type="text"
-                    placeholder="Rechercher une carte"
-                    className="bg-transparent outline-none w-full text-white border border-white p-3 rounded-md"
-                    onChange={(e) => setSearchValue(e.target.value)}
-                />
-                <div className="divider cursor-pointer select-none hover:font-bold" onClick={() => setCollapsed({ ...collapsed, attribute: !collapsed.attribute })}>
-                    Attributes {collapsed.attribute ? '-' : '+'}
-                </div>
-                {
-                    collapsed.attribute && (
-                        <React.Fragment>
-                            {filters.attribute.map((attr, i) => (
-                                <Checkbox key={i} title={attr.name} checked={attr.checked} hc={() => handleCheckboxChange('attribute', attr.name, attr.checked)} />
-                            ))}
-                        </React.Fragment>
-                    )
-                }
-                <div className="divider cursor-pointer select-none hover:font-bold" onClick={() => setCollapsed({ ...collapsed, frameType: !collapsed.frameType })}>
-                    Frame Types {collapsed.frameType ? '-' : '+'}
-                </div>
-                {
-                    collapsed.frameType && (
-                        <React.Fragment>
-                            {filters.frameType.map((ft, i) => (
-                                <Checkbox key={i} title={ft.name} checked={ft.checked} hc={() => handleCheckboxChange('frameType', ft.name, ft.checked)} />
-                            ))}
-                        </React.Fragment>
-                    )
-                }
-
-                <div className="divider cursor-pointer select-none hover:font-bold" onClick={() => setCollapsed({ ...collapsed, rarity: !collapsed.rarity })}>
-                    Rarity {collapsed.rarity ? '-' : '+'}
-                </div>
-                {
-                    collapsed.rarity && (
-                        <React.Fragment>
-                            {filters.rarity.map((r, i) => (
-                                <Checkbox key={i} title={r.name} checked={r.checked} hc={() => handleCheckboxChange('rarity', r.name, r.checked)} />
-                            ))}
-                        </React.Fragment>
-                    )
-                }
-
-                <div className="divider cursor-pointer select-none hover:font-bold" onClick={() => setCollapsed({ ...collapsed, type: !collapsed.type })}>
-                    Type {collapsed.type ? '-' : '+'}
-                </div>
-                {
-                    collapsed.type && (
-                        <React.Fragment>
-                            {filters.type.map((type_, i) => (
-                                <Checkbox key={i} title={type_.name} checked={type_.checked} hc={() => handleCheckboxChange('type', type_.name, type_.checked)} />
-                            ))}
-                        </React.Fragment>
-                    )
-                }
-
-                <div className="divider">Pages</div>
-                <div className="flex gap-2">
-                    <div className="btn-group mx-auto">
-                        <button
-                            className="btn bg-white/20 text-white hover:bg-gray-700"
-                            onClick={() => setPage(page - 1)}
-                            disabled={page === 0}
-                        >
-                            «
-                        </button>
-                        <button className="btn bg-white/20 text-white hover:bg-gray-700">{page + 1}</button>
-                        <button
-                            className="btn bg-white/20 text-white hover:bg-gray-700"
-                            onClick={() => setPage(page + 1)}
-                        // get max page from api
-                        >
-                            »
-                        </button>
-                    </div>
-                    <button
-                        className="t-btn bg-white/20 hover:bg-gray-700"
-                        onClick={handleUpdateFilters}
-                    >
-                        Filtrer
-                    </button>
-                </div>
-
-            </div>
-            <div className="grid grid-cols-6 px-3 w-full gap-5 scrollbar-none">
+        <div className="flex gap-5 w-full overflow-scroll p-5 flex-col h-screen">
+            <form className="flex w-full space-x-2 items-center justify-center" onSubmit={handleSearch}>
+                <input type="text" className="input input-bordered" name="searchBar" placeholder="Rechercher" />
+                <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" />
+                <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" />
+                <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" />
+                <button className="btn" type="submit">Rechercher</button>
+                <button className="btn" onClick={handleClear}>Vider</button>
+            </form>
+            <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
                 {cardSets
                     .map((cardSet, i) => (
                         <GameCard key={i} {...cardSet} />
                     ))}
+            </div>
+            <div className="w-full flex items-end justify-center h-fit">
+                <div className="btn-group">
+                    <button className="btn" onClick={() => setPage((prev) => prev - 1)} disabled={page - 1 < 0}>«</button>
+                    <button className="btn">{page + 1}</button>
+                    <button className="btn" onClick={() => setPage((prev) => prev + 1)}>»</button>
+                </div>
             </div>
         </div>
     )

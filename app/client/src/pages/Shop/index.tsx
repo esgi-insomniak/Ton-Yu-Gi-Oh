@@ -14,7 +14,7 @@ import { PreviewSets } from "@/pages/Shop/previewSets"
 
 const Shop = () => {
     const { user } = useAuth()
-    const { data: me } = useMe(user.id)
+    const { data: me, refetch } = useMe(user.id)
     const { toggle: buyCoinsToggle, isShowing: buyCoinsShowing } = useModal()
     const { toggle: previewBoosterToggle, isShowing: previewBoosterShowing } = useModal()
     const { sessionId } = useParams<{ sessionId: string }>()
@@ -40,6 +40,7 @@ const Shop = () => {
         buyBooster.mutate({ amount: 1, boosterId: booster.id }, {
             onSuccess: (res) => {
                 alert?.success(`Vous avez bien acheté le booster ${booster.name} !`)
+                refetch()
             },
             onError: (err) => {
                 alert?.error('Une erreur est survenue lors de l\'achat')

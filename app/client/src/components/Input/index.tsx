@@ -36,6 +36,7 @@ export const Input = <T extends FieldValues>({
                     type={showPassword ? "text" : type}
                     placeholder={placeholder}
                     {...register && register(name)}
+                    defaultValue={""}
                 />
                 {passwordIcon && (
                     <div
@@ -54,3 +55,22 @@ export const Input = <T extends FieldValues>({
         </div>
     );
 };
+
+export const Select = <T extends FieldValues>({
+    options,
+    name,
+    placeholder,
+}: {
+    options: Array<any> | undefined;
+    name: Path<T>;
+    placeholder?: string;
+}) => {
+    return options ? (
+        <select className="select select-bordered w-full max-w-xs" name={name}>
+            {placeholder && <option value="">{placeholder}</option>}
+            {options.map((option, i) => (
+                <option key={i} value={option.id}>{option.name}</option>
+            ))}
+        </select>
+    ) : null
+}

@@ -22,11 +22,11 @@ const requestMe = (id: string) => apiRequest({
 }, responseRegisterSchema)
 
 export const useMe = (id: string) => {
-    const { data, isLoading, error } = useQuery<UserMe>(userKeys.me(id, token), () => requestMe(id), {
+    const { data, isLoading, error, refetch } = useQuery<UserMe>(userKeys.me(id, token), () => requestMe(id), {
         enabled: !!id,
         refetchOnReconnect: "always",
         refetchOnWindowFocus: false,
     })
 
-    return React.useMemo(() => ({ data, isLoading, error }), [data, isLoading, error])
+    return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
 }

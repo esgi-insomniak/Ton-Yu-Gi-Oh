@@ -10,3 +10,5 @@ export const archetypeOneResponseSchema = zod.object({
 export const archetypeArrayResponseSchema = zod.object({
   data: archetypeSchema.array(),
 });
+
+export type ArchetypeI = zod.infer<typeof archetypeSchema>;

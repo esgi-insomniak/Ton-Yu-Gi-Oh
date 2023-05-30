@@ -12,3 +12,5 @@ export const rarityOneResponseSchema = zod.object({
 export const rarityArrayResponseSchema = zod.object({
   data: raritySchema.array(),
 });
+
+export type RarityI = zod.infer<typeof raritySchema>;
