@@ -25,13 +25,13 @@ const Collection = () => {
     })
 
     const { data: cardSetsResponse, refetch } = useGetCardSets(page, 24, filters.attributeId, filters.rarity, filters.archetype, filters.search)
-    const { cardSets, setCardSets, sortCardSets } = useGameCard()
+    const { cardSets, setCardSets } = useGameCard()
     const { data: archetypes } = useGetAllArchetypes()
     const { data: rarities } = useGetAllRarities()
     const { data: attributes } = useGetAllAttributes()
 
     React.useEffect(() => {
-        if (cardSetsResponse?.data === undefined || cardSetsResponse?.data.length === 0) return;
+        if (cardSetsResponse?.data === undefined) return;
         const apiCardSets = cardSetsResponse.data.map<IGameCard>((cardSet) => {
             return {
                 ...cardSet,
