@@ -7,11 +7,12 @@ import {
 import { useGetCardDeckUser } from "@/helpers/api/hooks/decks";
 import UserCardSets from "@/components/Decks/UserCardSets";
 import DeckCard from "@/components/Decks/DeckCard";
-import { useParams } from "react-router-dom";
-import { set } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { Card, CountCard, DecksImages, SameCards } from "@/helpers/types/decks";
 
 const EditDeck = () => {
-  const { id } = useParams<{ id: string }>();
+  const id = useParams<string>();
   const { user } = useAuth();
   const { data, isLoading, isError } = useGetAllMyUserCardSets(user?.id);
   const {
@@ -19,15 +20,15 @@ const EditDeck = () => {
     isLoading: isLoadingDeck,
     isError: isErrorDeck,
   } = useGetCardDeckUser(id);
-  const [allUserCards, setAllUserCards] = React.useState<Array<any>>([]);
-  const [decksImages, setDecksImages] = React.useState<
-    Array<[any, number, any]>
-  >([]);
+  const [allUserCards, setAllUserCards] = React.useState<SameCards[]>([]);
+  const [decksImages, setDecksImages] = React.useState<DecksImages[]>([]);
   const [decks, setDecks] = React.useState<Array<string>>([]);
-  const [countCard, setCountCard] = React.useState<any>({});
-  const [initialState, setInitialState] = React.useState<Array<any>>([]);
+  const [countCard, setCountCard] = React.useState<CountCard>({});
+  const [initialState, setInitialState] = React.useState<SameCards[]>([]);
   const [deckName, setDeckName] = React.useState("");
-
+  const navigate = useNavigate();
+  const alert = useAlert();
+  
   if (!isLoading && !isError && data) {
     if (allUserCards.length === 0) {
       setAllUserCards(getAllCardInDoubleAndIncrement(data));
@@ -39,22 +40,20 @@ const EditDeck = () => {
 
   if (!isLoadingDeck && !isErrorDeck && dataDeck) {
     if (decksImages.length === 0) {
-      setDecksImages(dataDeck.data.cardSets.map((card: any) => [card, 0, 0]));
+      setDecksImages(dataDeck.data.cardSets.map((card: Card) => [card, 0, 0]));
     }
     if (decks.length === 0) {
-      setDecks(dataDeck.data.cardSets.map((card: any) => card.id));
+      setDecks(dataDeck.data.cardSets.map((card: Card) => card.id));
     }
     if (deckName === "") {
       setDeckName(dataDeck.data.name);
     }
   }
-  console.log(allUserCards);
-  console.log(countCard);
 
   const AddCard = (index: number, isUpdated = false, isUpdateDeck = false) => {
     const [userCardSetId] = allUserCards[index]["userCardSetIds"];
 
-    setCountCard((prevCountCard: any) => {
+    setCountCard((prevCountCard) => {
       const itemId = allUserCards[index]["item"].cardSet.id;
       const newCount = itemId in prevCountCard ? prevCountCard[itemId] + 1 : 1;
 
@@ -80,7 +79,11 @@ const EditDeck = () => {
 
       setDecksImages((prevSelectedCards) => [
         ...prevSelectedCards,
-        [allUserCards[index]["item"], index, userCardSetId],
+        {
+          id: userCardSetId,
+          cardSet: allUserCards[index]["item"].cardSet,
+          index: index,
+        },
       ]);
       if (!isUpdateDeck) {
         setDecks((prevSelectedCards) => [...prevSelectedCards, userCardSetId]);
@@ -94,7 +97,6 @@ const EditDeck = () => {
     index: number,
     isUpdated = false,
     isUpdateDeck = false,
-    card: any,
     cardIdDeck: any
   ) => {
     setCountCard(
@@ -106,7 +108,7 @@ const EditDeck = () => {
           }
         : { ...countCard, [allUserCards[index]["item"].cardSet.id]: 1 }
     );
-    const cardIndex = decksImages.findIndex((card) => card[1] === index);
+    const cardIndex = decksImages.findIndex((card) => card.index === index);
 
     if (cardIndex !== -1) {
       setDecksImages((prevSelectedCards) =>
@@ -149,17 +151,16 @@ const EditDeck = () => {
     }
   };
 
+  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeckName(e.target.value);
+  };
+
   const handleSubmitDeck = () => {
     if (decks.length > 40 && decks.length < 60) {
-      setDeckName(
-        (document.getElementById("deckName") as HTMLInputElement).value
-      );
       //postDeck.mutate({ userCardSetIds: decks, name: deckName });
+      alert?.success("Votre deck a bien été créé");
     } else {
-      console.log(
-        "Veuillez ajouter plus de carte ou en retirer (limites : 40-60 cartes)"
-      );
-      console.log(decks.length);
+      alert?.error("Votre deck doit contenir entre 40 et 60 cartes");
     }
   };
 
@@ -167,7 +168,7 @@ const EditDeck = () => {
     <React.Fragment>
       <div className="flex flex-col w-1/3">
         <div className="flex justify-between my-3 mx-3">
-          <button onClick={() => history.back()} className="btn">
+          <button onClick={() => navigate('/decks')} className="btn">
             Revenir en arrière
           </button>
           <button className="btn" onClick={handleSubmitDeck}>
@@ -180,7 +181,7 @@ const EditDeck = () => {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mx-3 my-3"
           id="deckName"
           value={deckName}
-          onChange={(e) => setDeckName(e.target.value)}
+          onChange={handleChangeName}
         />
       </div>
       <div className="flex justify-between w-full">

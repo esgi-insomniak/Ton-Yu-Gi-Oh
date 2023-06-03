@@ -141,7 +141,6 @@ const NewDecks = () => {
 
   const handleSubmitDeck = () => {
     if (decks.length > 40 && decks.length < 60) {
-      console.log(decks, deckName)
       postDeck.mutate({ userCardSetIds: decks, name: deckName });
       alert?.success("Votre deck a bien été créé");
     } else {
