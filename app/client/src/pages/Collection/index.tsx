@@ -6,7 +6,6 @@ import { IGameCard } from "@/helpers/types/cards";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useGetAllAttributes, useGetAllRarities } from "@/helpers/api/hooks/cards/attribute.hook";
 import { Input, Select } from "@/components/Input";
-import { set } from "react-hook-form";
 
 interface FiltersProps {
     search: string;
@@ -78,7 +77,7 @@ const Collection = () => {
     }
 
     return (
-        <div className="flex gap-5 w-full overflow-scroll p-5 flex-col h-screen">
+        <div className="flex gap-5 w-full overflow-scroll p-5 flex-col h-full">
             <form className="flex w-full space-x-2 items-center justify-center" onSubmit={handleSearch}>
                 <input type="text" className="input input-bordered" name="searchBar" placeholder="Rechercher" />
                 <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" />
@@ -87,12 +86,18 @@ const Collection = () => {
                 <button className="btn" type="submit">Rechercher</button>
                 <button className="btn" onClick={handleClear}>Vider</button>
             </form>
-            <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
-                {cardSets
-                    .map((cardSet, i) => (
-                        <GameCard key={i} {...cardSet} />
-                    ))}
-            </div>
+            {cardSets.length === 0 ? (
+                <div className="flex items-center justify-center w-full h-full">
+                    <iframe allow="fullscreen" frameBorder="0" height="370" src="https://giphy.com/embed/Z8Py9bJGWHhCBtmjJk/video" width="480"></iframe>
+                </div>
+            ) : (
+                <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
+                    {cardSets
+                        .map((cardSet, i) => (
+                            <GameCard key={i} {...cardSet} />
+                        ))}
+                </div>
+            )}
             <div className="w-full flex items-end justify-center h-fit">
                 <div className="btn-group">
                     <button className="btn" onClick={() => setPage((prev) => prev - 1)} disabled={page - 1 < 0}>«</button>

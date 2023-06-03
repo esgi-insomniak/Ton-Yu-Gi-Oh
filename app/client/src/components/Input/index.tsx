@@ -61,7 +61,8 @@ export const Select = <T extends FieldValues>({
     name,
     placeholder,
 }: {
-    options: Array<any> | undefined;
+    // generic options type
+    options: Array<{ id: string; name: string }> | undefined;
     name: Path<T>;
     placeholder?: string;
 }) => {

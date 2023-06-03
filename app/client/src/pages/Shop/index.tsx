@@ -1,4 +1,3 @@
-import OurLogoWithoutRect from "@/assets/insomniak2"
 import { CardCoins } from "@/components/Cards"
 import { useAuth } from "@/helpers/api/hooks"
 import { useMe } from "@/helpers/api/hooks/users"
@@ -14,7 +13,7 @@ import { PreviewSets } from "@/pages/Shop/previewSets"
 
 const Shop = () => {
     const { user } = useAuth()
-    const { data: me, refetch } = useMe(user.id)
+    const { refetch } = useMe(user.id)
     const { toggle: buyCoinsToggle, isShowing: buyCoinsShowing } = useModal()
     const { toggle: previewBoosterToggle, isShowing: previewBoosterShowing } = useModal()
     const { sessionId } = useParams<{ sessionId: string }>()
@@ -70,40 +69,29 @@ const Shop = () => {
 
     return (
         <React.Fragment>
-            <div>
-                <div className="h-20 w-full flex bg-white/10 items-center justify-between px-10">
-                    <div onClick={() => router('/')}>
-                        <OurLogoWithoutRect width="50" height="50" />
-                    </div>
-                    <div className="flex items-center space-x-2 bg-black/20 rounded-full w-fit">
-                        <div className="space-x-2 rounded-full drop-shadow-2xl bg-orange-50 p-2 flex items-center">
-                            <img src="/InsomniakCoins.png" alt="" className="h-7 w-7" />
-                            <span className="text-lg text-green-500">{me?.data.coins || 0}</span>
-                        </div>
-                        <span className="cursor-pointer text-2xl w-10" onClick={buyCoinsToggle}>🏧</span>
-                    </div>
+            <div className="h-[calc(100vh-5rem)] flex justify-center items-center p-12 flex-col space-y-3">
+                <div className="flex w-3/4 h-fit justify-end">
+                    <div className="btn" onClick={buyCoinsToggle}>Acheter des Insomniak Coins</div>
                 </div>
-                <div className="h-[calc(100vh-5rem)] flex justify-center items-center p-12">
-                    <div className="grid grid-cols-5 gap-8 w-3/4">
-                        {
-                            boosters?.data?.map((booster) => (
-                                <div key={booster.code} className="h-full flex flex-col w-full relative group">
-                                    <img src={booster.image} alt={booster.name} className="h-full w-full rounded drop-shadow-lg shadow-lg " />
-                                    <div className="hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/20">
-                                        <div onClick={() => handlePreviewBooster(booster.id)} className="t-btn min-w-[10rem]">
-                                            Voir les cartes
-                                        </div>
-                                        <div
-                                            onClick={() => handleBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
-                                        >
-                                            <span className="font-bold text-red-500">- 100</span>
-                                            <img src="/InsomniakCoins.png" alt="" className="h-5 w-5" />
-                                        </div>
+                <div className="grid grid-cols-5 gap-8 w-3/4">
+                    {
+                        boosters?.data?.map((booster) => (
+                            <div key={booster.code} className="h-full flex flex-col w-full relative group">
+                                <img src={booster.image} alt={booster.name} className="h-full w-full rounded drop-shadow-lg shadow-lg " />
+                                <div className="hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/20">
+                                    <div onClick={() => handlePreviewBooster(booster.id)} className="t-btn min-w-[10rem]">
+                                        Voir les cartes
+                                    </div>
+                                    <div
+                                        onClick={() => handleBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
+                                    >
+                                        <span className="font-bold text-red-500">- 100</span>
+                                        <img src="/InsomniakCoins.png" alt="" className="h-5 w-5" />
                                     </div>
                                 </div>
-                            ))
-                        }
-                    </div>
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
             <Modal
