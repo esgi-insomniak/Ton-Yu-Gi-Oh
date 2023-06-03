@@ -1,19 +1,15 @@
+import { UserCardSetsProps } from "@/helpers/types/decks";
 import React from "react";
 
-const UserCardSets: React.FC<{
-  countCard: any;
-  addCard: any;
-  allUserCards: any;
-  isLoading: boolean;
-  isError: boolean;
-}> = ({ countCard, addCard, allUserCards, isLoading, isError }) => {
+const UserCardSets: React.FC<UserCardSetsProps> = ({ countCard, addCard, allUserCards, isLoading, isError }) => {
+
   return (
     <React.Fragment>
       <div className="flex justify-around items-center flex-wrap w-8/12 mx-auto my-5">
         {!isLoading &&
           !isError &&
           allUserCards.length > 0 &&
-          allUserCards.map((card: any, index: number) => {
+          allUserCards.map((card, index: number) => {
             return (
               <div
                 key={index}
@@ -49,7 +45,7 @@ const UserCardSets: React.FC<{
                       }
                     }}
                     src={card["item"].cardSet.card.imageUrlSmall}
-                    alt={card["item"].cardSet.card.name}
+                    alt={card["item"].cardSet.card.enName}
                   />
                 </div>
               </div>

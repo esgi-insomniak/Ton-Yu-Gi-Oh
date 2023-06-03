@@ -2,23 +2,27 @@ import React from "react";
 import { useAuth } from "@/helpers/api/hooks";
 import { useGetAllUserDecks } from "@/helpers/api/hooks/decks";
 import Deck from "@/components/Decks/Deck";
+import { useNavigate } from "react-router-dom";
+import { DeckProps } from "@/helpers/types/decks";
 
 const Decks = () => {
   const { user } = useAuth();
   const { data, isLoading, isError } = useGetAllUserDecks(user?.id);
+  
+  const navigate = useNavigate();
   return (
     <React.Fragment>
       <h1 className="m-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Création de mes decks</h1>
-      <button onClick={() => history.back()} className="btn m-4">
+      <button onClick={() => navigate('/')} className="btn m-4">
         Revenir en arrière
       </button>
 
       <div className="flex justify-around items-start mt-5">
         {data &&
-          data.data.length > 0 &&
           !isLoading &&
           !isError &&
-          data.data.map((deck: any, index: number) => {
+          data.data.map((deck: DeckProps, index: number) => {
+            console.log(deck)
             return (
                 <Deck deck={deck} key={index} />
             );

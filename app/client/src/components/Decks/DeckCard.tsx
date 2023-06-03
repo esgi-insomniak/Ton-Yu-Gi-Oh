@@ -1,10 +1,12 @@
+import { DeckCardType, DecksImages } from "@/helpers/types/decks";
 import React from "react";
 
 const DeckCard: React.FC<{
-  decks: any;
-  decksImages: any;
-  removeCard: any;
+  decks: Array<string>;
+  decksImages: DecksImages[];
+  removeCard: (index: number, isUpdated: boolean, isUpdateDeck: boolean, cardIdDeck: string) => void;
 }> = ({ decks, decksImages, removeCard }) => {
+  
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -31,15 +33,15 @@ const DeckCard: React.FC<{
           style={{ maxHeight: "80vh" }}
           ref={containerRef}
         >
-          {decksImages.map((card: any, index: number) => {
+          {decksImages.map((cardImage, index: number) => {
             return (
               <div key={index} className="my-3 mx-auto">
                 <img
                   onClick={() =>
-                    removeCard(card[1], false, false, card[0], card[2])
+                    removeCard(cardImage.index, false, false, cardImage.id)
                   }
-                  src={card[0].cardSet.card.imageUrlSmall}
-                  alt={card[0].cardSet.card.name}
+                  src={cardImage.cardSet.card.imageUrlSmall}
+                  alt={cardImage.cardSet.card.enName}
                 />
               </div>
             );

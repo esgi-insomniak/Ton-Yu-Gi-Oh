@@ -2,25 +2,20 @@ import React from "react";
 import { BsFillTrashFill } from "react-icons/bs";
 import { AiFillEye } from "react-icons/ai";
 import { useDeleteUserDeck } from "@/helpers/api/hooks/decks";
+import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { DeckProps } from "@/helpers/types/decks";
 
-const Deck = (deck: any) => {
-  const myDeck = deck.deck;
+const Deck: React.FC<DeckProps> = ({ deck }) => {
+  const myDeck = deck;
   const deleteUserDeck = useDeleteUserDeck();
+  const alert = useAlert()
 
   const handleDeleteDeck = (id: string) => () => {
     if (confirm("Etes vous sur de vouloir supprimer ce deck ?")) {
-      console.log(id);
       deleteUserDeck.mutate(id);
+      alert?.success('Deck supprimé avec succès')
     }
   };
-
-  React.useEffect(() => {
-    if (deleteUserDeck.isSuccess) {
-      window.location.reload();
-    } else if (deleteUserDeck.isError) {
-      alert(deleteUserDeck.error);
-    }
-  }, [deleteUserDeck]);
 
   return (
     <React.Fragment>
@@ -43,7 +38,10 @@ const Deck = (deck: any) => {
                 >
                   <BsFillTrashFill />
                 </button>
-                <a href={`/decks/edit/${myDeck.id}`} className="btn btn-primary">
+                <a
+                  href={`/decks/edit/${myDeck.id}`}
+                  className="btn btn-primary"
+                >
                   <AiFillEye />
                 </a>
               </div>

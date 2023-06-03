@@ -8,7 +8,7 @@ const QUERY_URLS = {
   requestUserDeck: (userDeckId: string) => `/user_decks/${userDeckId}`,
 } as const;
 
-const token = JSON.parse(localStorage.getItem("token") as string);
+const token = localStorage.getItem('token')
 
 const requestUserDecks = (userId: string) =>
   apiRequest({
@@ -47,7 +47,7 @@ export const useGetAllUserDecks = (userId: string) => {
   return userDecks;
 };
 
-export const useGetCardDeckUser = (userDeckId: any) => {
+export const useGetCardDeckUser = (userDeckId: string) => {
   const userCardsDeck = useQuery(["userDecksId", userDeckId], () =>
     requestDeckUserId(userDeckId)
   );
