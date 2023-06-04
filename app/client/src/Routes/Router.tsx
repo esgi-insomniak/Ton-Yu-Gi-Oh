@@ -1,12 +1,14 @@
 import React from "react";
-import { Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/helpers/api/hooks";
 import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
+import Layout from "@/components/Layout";
 
 interface ProtectedRouteProps {
     redirect: string;
     condition: boolean;
     children: React.ReactNode;
+    withLayout?: boolean;
 }
 
 /**
@@ -17,8 +19,8 @@ interface ProtectedRouteProps {
  * render the `children` prop wrapped in a `React.Fragment`. If the `condition` prop is false, it will
  * render a `Navigate` component with the `to` prop set to the `redirect` prop.
  */
-const ProtectedRoute = ({ redirect, condition, children }: ProtectedRouteProps) => {
-    if (condition) return <React.Fragment>{children}</React.Fragment>
+const ProtectedRoute = ({ redirect, condition, children, withLayout }: ProtectedRouteProps) => {
+    if (condition) return withLayout ? <Layout>{children}</Layout> : <React.Fragment>{children}</React.Fragment>
     else return <Navigate to={redirect} />;
 };
 
@@ -42,7 +44,7 @@ const ShopPage = React.lazy(() => import('@/pages/Shop'));
  */
 const Router: React.FC = () => {
     const { user, isLoggedIn } = useAuth()
-
+    const router = useLocation().pathname
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
             <Routes>
@@ -52,6 +54,7 @@ const Router: React.FC = () => {
                         <ProtectedRoute
                             condition={isLoggedIn}
                             redirect="/login"
+                            withLayout={router !== '/'}
                         >
                             <Outlet />
                         </ProtectedRoute>

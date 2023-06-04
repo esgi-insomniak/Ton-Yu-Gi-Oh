@@ -1,6 +1,6 @@
 
-import React from 'react'
-import { animated, useSpring, to } from '@react-spring/web'
+import React from 'react';
+import { animated, useSpring, to } from '@react-spring/web';
 import { round, clamp, adjust } from '@/helpers/utils/AdvancedMath';
 import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, CardStaticStyles } from '.';
 import GameCardContext from '@/helpers/context/cards/GameCardContext';
@@ -23,7 +23,6 @@ const GameCard = (props: IGameCard) => {
     };
 
     const backImg = "https://images.ygoprodeck.com/images/cards/back_high.jpg";
-    const frontImg = props.card.imageUrl;
 
     const thisCardElement = React.useRef<HTMLDivElement>();
 
@@ -31,6 +30,7 @@ const GameCard = (props: IGameCard) => {
 
     const { cardSets, setIsDraggable, setIsActive, setIsHidden, setCanFlip, setIsLoaded, deactivateAllCardSets } = React.useContext(GameCardContext);
     const currentCardSet = cardSets.find((cardSet) => cardSet.id === props.id) as IGameCard;
+    const [frontImg, setFrontImg] = React.useState('');
 
     const [repositionTimer, setRepositionTimer] = React.useState<number>();
     const [interacting, setInteracting] = React.useState(false);
@@ -321,9 +321,16 @@ const GameCard = (props: IGameCard) => {
     //     }
     // }, [componentIsLoaded]);
 
+    React.useEffect(() => {
+        if (currentCardSet.isLoaded) return;
+        // set the front image on mount so that
+        // the lazyloading can work correctly
+        setFrontImg(`${currentCardSet.card.imageUrl}?k=${Date.now()}`);
+    }, [currentCardSet.isLoaded]);
+
     return (
         <animated.div
-            className={`yugi-card ${props.card.attribute ? props.card.attribute.name.replace(/\W/g, '-').toLowerCase() : ''} / yugi-interactive /${currentCardSet.isHidden ? ' yugi-hidden' : ''}${currentCardSet.isActive ? ' yugi-active' : ''}${interacting ? ' yugi-interacting' : ''}${!currentCardSet.isLoaded ? ' yugi-loading' : ''}`}
+            className={`yugi-card ${props.card.attribute ? `yugi-${props.card.attribute.name.replace(/\W/g, '-').toLowerCase()}` : ''} / yugi-interactive /${currentCardSet.isHidden ? ' yugi-hidden' : ''}${currentCardSet.isActive ? ' yugi-active' : ''}${interacting ? ' yugi-interacting' : ''}${!currentCardSet.isLoaded ? ' yugi-loading' : ''}`}
             data-number={props.id}
             data-set={props.set.code}
             data-type={props.card.type.name.replace(/\W/g, '-').toLowerCase()}
