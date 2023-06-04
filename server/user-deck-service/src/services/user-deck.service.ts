@@ -30,6 +30,14 @@ export class UserDeckService {
     return userDecks;
   }
 
+  async getUserDecksByUserCardSetId(id: string): Promise<UserDeck[]> {
+    const userDecks = await this.dataSource.getRepository(UserDeck).find({
+      where: { cardSets: { id } },
+      relations: ['cardSets'],
+    });
+    return userDecks;
+  }
+
   async getUserDeckById(id: string): Promise<UserDeck> {
     const userDeck = await this.dataSource.getRepository(UserDeck).findOne({
       where: { id },

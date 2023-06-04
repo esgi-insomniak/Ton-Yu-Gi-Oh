@@ -84,3 +84,14 @@ export class GetUserCardSetByIdResponseDto {
   })
   data: IUserCardSet;
 }
+
+export class ScrapUserCardSetByIdResponseDto {
+  @ApiProperty({
+    example: {
+      coinsEarned: 5,
+    },
+  })
+  data: {
+    coinsEarned: number;
+  };
+}

@@ -81,4 +81,20 @@ export class UserDeckController {
 
     return result;
   }
+
+  @MessagePattern('get_userdecks_by_usercardset_id')
+  public async getUserDecksByUserCardSetId(
+    params: ParamGetItemById,
+  ): Promise<GetResponseArray<UserDeck>> {
+    const userDecks = await this.userDeckService.getUserDecksByUserCardSetId(
+      params.id,
+    );
+    const result: GetResponseArray<UserDeck> = {
+      status: HttpStatus.OK,
+      message: null,
+      items: userDecks,
+    };
+
+    return result;
+  }
 }
