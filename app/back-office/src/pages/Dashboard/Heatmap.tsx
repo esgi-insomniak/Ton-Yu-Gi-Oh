@@ -1,12 +1,13 @@
-import React from 'react';
-import OurLogoWithoutRect from '@/assets/logo';
-import Charts from '@/components/Charts';
-import { useParams } from 'react-router-dom';
+import React from "react";
+import OurLogoWithoutRect from "@/assets/logo";
+import Charts from "@/components/Charts";
+import { useParams } from "react-router-dom";
 
 const Heatmap = () => {
-
+  const [showSubmenu, setShowSubmenu] = React.useState(false);
+  const [showNotification, setShowNotification] = React.useState(false);
   const params = useParams();
-  console.log(params)
+  console.log(params);
 
   let noise = getNoiseHelper();
   let xData: number[] = [];
@@ -35,11 +36,11 @@ const Heatmap = () => {
   const option = {
     tooltip: {},
     xAxis: {
-      type: 'category',
+      type: "category",
       data: xData,
     },
     yAxis: {
-      type: 'category',
+      type: "category",
       data: yData,
     },
     visualMap: {
@@ -49,33 +50,33 @@ const Heatmap = () => {
       realtime: false,
       inRange: {
         color: [
-          '#313695',
-          '#4575b4',
-          '#74add1',
-          '#abd9e9',
-          '#e0f3f8',
-          '#ffffbf',
-          '#fee090',
-          '#fdae61',
-          '#f46d43',
-          '#d73027',
-          '#a50026',
+          "#313695",
+          "#4575b4",
+          "#74add1",
+          "#abd9e9",
+          "#e0f3f8",
+          "#ffffbf",
+          "#fee090",
+          "#fdae61",
+          "#f46d43",
+          "#d73027",
+          "#a50026",
         ],
       },
     },
     series: [
       {
-        name: 'Gaussian',
-        type: 'heatmap',
+        name: "Gaussian",
+        type: "heatmap",
         data: data,
         emphasis: {
           itemStyle: {
-            borderColor: '#333',
-            borderWidth: 1
-          }
+            borderColor: "#333",
+            borderWidth: 1,
+          },
         },
         progressive: 1000,
-        animation: false
+        animation: false,
       },
     ],
   };
@@ -215,6 +216,10 @@ const Heatmap = () => {
                   className="p-2 bg-white text-green-400 align-middle rounded-full hover:text-white hover:bg-green-400 focus:outline-none "
                   aria-label="Notifications"
                   aria-haspopup="true"
+                  onClick={() => {
+                    setShowNotification(!showNotification),
+                      setShowSubmenu(false);
+                  }}
                 >
                   <div className="flex items-cemter">
                     <svg
@@ -237,21 +242,23 @@ const Heatmap = () => {
                     className="absolute top-0 right-0 inline-block w-3 h-3 transform translate-x-1 -translate-y-1 bg-red-600 border-2 border-white rounded-full dark:border-gray-800"
                   ></span>
                 </button>
-                <template>
-                  <ul className="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-green-400 border border-green-500 rounded-md shadow-md">
-                    <li className="flex">
-                      <a
-                        className="text-white inline-flex items-center justify-between w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
-                        href="#"
-                      >
-                        <span>Messages</span>
-                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-600 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-600">
-                          13
-                        </span>
-                      </a>
-                    </li>
-                  </ul>
-                </template>
+                <div>
+                  {showNotification && (
+                    <ul className="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-green-400 border border-green-500 rounded-md shadow-md">
+                      <li className="flex">
+                        <a
+                          className="text-white inline-flex items-center justify-between w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
+                          href="#"
+                        >
+                          <span>Messages</span>
+                          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-600 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-600">
+                            13
+                          </span>
+                        </a>
+                      </li>
+                    </ul>
+                  )}
+                </div>
               </li>
 
               <li className="relative">
@@ -259,6 +266,9 @@ const Heatmap = () => {
                   className="p-2 bg-white text-green-400 align-middle rounded-full hover:text-white hover:bg-green-400 focus:outline-none "
                   aria-label="Account"
                   aria-haspopup="true"
+                  onClick={() => {
+                    setShowSubmenu(!showSubmenu), setShowNotification(false);
+                  }}
                 >
                   <div className="flex items-center">
                     <svg
@@ -283,57 +293,59 @@ const Heatmap = () => {
                     </svg>
                   </div>
                 </button>
-                <template>
-                  <ul
-                    className="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-green-400 border border-green-500 rounded-md shadow-md"
-                    aria-label="submenu"
-                  >
-                    <li className="flex">
-                      <a
-                        className=" text-white inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
-                        href="#"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5 mr-2"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                <div>
+                  {showSubmenu && (
+                    <ul
+                      className="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-green-400 border border-green-500 rounded-md shadow-md block"
+                      aria-label="submenu"
+                    >
+                      <li className="flex">
+                        <a
+                          className=" text-white inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
+                          href="#"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <span>Profile</span>
-                      </a>
-                    </li>
-                    <li className="flex">
-                      <a
-                        className="text-white inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
-                        href="#"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5 mr-2"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-5 h-5 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <span>Profil</span>
+                        </a>
+                      </li>
+                      <li className="flex">
+                        <a
+                          className="text-white inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
+                          href="/logout"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                          />
-                        </svg>
-                        <span>Log out</span>
-                      </a>
-                    </li>
-                  </ul>
-                </template>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-5 h-5 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            />
+                          </svg>
+                          <span>Se déconnecter</span>
+                        </a>
+                      </li>
+                    </ul>
+                  )}
+                </div>
               </li>
             </ul>
           </div>
@@ -342,7 +354,12 @@ const Heatmap = () => {
           <div className="grid pb-5 px-8 rounded-3xl bg-gray-100">
             <div className="grid grid-cols-12 gap-6">
               <div className="grid grid-cols-12 col-span-12 gap-6 xxl:col-span-9">
-                <div className='col-span-12 cursor-pointer mt-8' onClick={() => {history.back()}}>
+                <div
+                  className="col-span-12 cursor-pointer mt-8"
+                  onClick={() => {
+                    history.back();
+                  }}
+                >
                   <p>← Retour à la page précédente</p>
                 </div>
                 <div className="col-span-12">
