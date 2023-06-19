@@ -9,6 +9,7 @@ export class GetCardSetsResponseDto {
         name: 'The Lost Art Promotion K',
         code: 'LART',
         image: 'https://images.ygoprodeck.com/images/sets/LART.jpg',
+        cardSetsOnOpen: 9,
       },
     ],
   })
@@ -70,6 +71,7 @@ export class GetCardSetByIdResponseDto {
           },
         },
       ],
+      cardSetsOnOpen: 9,
     },
   })
   data: ICardSet;

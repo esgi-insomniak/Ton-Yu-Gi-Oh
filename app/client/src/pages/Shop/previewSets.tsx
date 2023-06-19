@@ -1,21 +1,40 @@
-import { CardICardSet, CardSet } from "@/helpers/types/cards";
+import GameCard from "@/components/GameCard/GameCard";
+import { CardICardSet } from "@/helpers/types/cards";
 import { CardRarity } from "@/helpers/utils/enum/card";
+import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import React from "react";
 
-const PreviewSets = ({ cardSets }: { cardSets: CardICardSet[] | undefined }) => {
+const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | undefined }) => {
+    const { cardSets, setCardSets } = useGameCard()
+
+    React.useEffect(() => {
+        if (!cardSetsProps?.length) return;
+        const gameCardSets = cardSetsProps.map((cardSet) => {
+            return {
+                ...cardSet,
+                isActive: false,
+                isHidden: false,
+                isFocused: false,
+                isLoaded: false,
+                isDraggable: false,
+                canPop: true,
+                canFlip: false,
+            }
+        })
+        setCardSets(gameCardSets)
+    }, [cardSetsProps])
+
     return (
         <div className="h-[calc(100vh-15rem)] flex flex-col  w-full overflow-scroll">
             {Object.values(CardRarity).map((rarity) => {
-                const tamer = cardSets?.filter((cardSet) => cardSet.rarity.name === rarity)
-                if (!tamer?.length) return null
+                const cardSetsByRarity = cardSets?.filter((cardSet) => cardSet.rarity.name === rarity)
+                if (!cardSetsByRarity?.length) return null
                 return (
                     <div key={rarity} className="flex flex-col space-y-2 my-1">
                         <span className="text-2xl font-bold">{rarity}</span>
                         <div className="grid grid-cols-10 gap-2">
-                            {tamer?.map((cardSet) => (
-                                <div key={cardSet.id}>
-                                    <img src={cardSet.card.imageUrl} alt={cardSet.card.enName} className="h-auto w-auto" />
-                                </div>
+                            {cardSetsByRarity?.map((cardSet, i) => (
+                                <GameCard key={i} {...cardSet} />
                             ))}
                         </div>
                     </div>

@@ -90,6 +90,22 @@ export class UserCardSetController {
     return result;
   }
 
+  @MessagePattern('post_usercardsets_by_cardset_ids')
+  public async postUserCardSetsByCardSetIds(query: {
+    userId: string;
+    cardSetIds: string[];
+  }): Promise<GetResponseArray<UserCardSet>> {
+    const userCardSets =
+      await this.userCardSetService.createUserCardSetsByCardSetIds(query);
+    const result: GetResponseArray<UserCardSet> = {
+      status: userCardSets ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
+      message: userCardSets ? null : 'UserCardSets not created',
+      items: userCardSets,
+    };
+
+    return result;
+  }
+
   @MessagePattern('delete_usercardset')
   public async deleteUserCardSet(params: ParamGetItemById) {
     const userCardSetIsDeleted =

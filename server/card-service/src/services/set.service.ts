@@ -19,19 +19,10 @@ export class SetService {
     return sets;
   }
 
-  async getSetById(id: string): Promise<Set> {
+  async getSetById(id: string, relations: string[]): Promise<Set> {
     const set = await this.dataSource.getRepository(Set).findOne({
       where: { id },
-      relations: [
-        'cardSets.card',
-        'cardSets.card.type',
-        'cardSets.card.frameType',
-        'cardSets.card.race',
-        'cardSets.card.archetype',
-        'cardSets.card.attribute',
-        'cardSets.card.price',
-        'cardSets.card.linkMarkers',
-      ],
+      relations,
     });
     return set;
   }
@@ -41,7 +32,6 @@ export class SetService {
     for (const id of ids) {
       const set = await this.dataSource.getRepository(Set).findOne({
         where: { id },
-        relations: ['cardSets'],
       });
       sets.push(set);
     }

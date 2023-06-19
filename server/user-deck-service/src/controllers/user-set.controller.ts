@@ -68,4 +68,9 @@ export class UserSetController {
 
     return result;
   }
+
+  @MessagePattern('delete_userset_by_id')
+  public async deleteUserSetById(params: ParamGetItemById): Promise<boolean> {
+    return await this.userSetService.deleteUserSetById(params.id);
+  }
 }

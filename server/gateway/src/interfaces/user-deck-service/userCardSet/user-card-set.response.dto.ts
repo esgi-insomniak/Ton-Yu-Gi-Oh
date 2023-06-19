@@ -30,6 +30,7 @@ export class GetUserCardSetsResponseDto {
             name: 'The Lost Art Promotion I',
             code: 'LART',
             image: 'https://images.ygoprodeck.com/images/sets/LART.jpg',
+            cardSetsOnOpen: 9,
           },
           price: 15.06,
           rarity: {
@@ -72,6 +73,7 @@ export class GetUserCardSetByIdResponseDto {
           name: 'The Lost Art Promotion I',
           code: 'LART',
           image: 'https://images.ygoprodeck.com/images/sets/LART.jpg',
+          cardSetsOnOpen: 9,
         },
         price: 15.06,
         rarity: {

@@ -10,6 +10,7 @@ import { useGetBoosterById } from "@/helpers/api/hooks/cards/card-set.hook"
 import useModal from "@/helpers/api/hooks/modal"
 import { Modal } from "@/components/Modal"
 import { PreviewSets } from "@/pages/Shop/previewSets"
+import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider"
 
 const Shop = () => {
     const { user } = useAuth()
@@ -110,8 +111,7 @@ const Shop = () => {
                 isShowing={previewBoosterShowing}
                 toggle={previewBoosterToggle}
                 title="Aperçu du booster"
-                content={<PreviewSets cardSets={booster?.data?.data} />
-                }
+                content={<GameCardProvider><PreviewSets cardSets={booster?.data?.data} /></GameCardProvider>}
             />
         </React.Fragment>
     )

@@ -7,15 +7,11 @@ import {
   Param,
   Query,
   Post,
+  Req,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
   GetResponseArray,
@@ -33,6 +29,13 @@ import {
 import { GetUserCardSetsResponseDto } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { ICardSet } from 'src/interfaces/card-service/set/set.interface';
+import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
+import { ICardRarityDropTable } from 'src/interfaces/card-service/rarityDropTable/rarity-drop-table.interface';
+import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
+import {
+  IUserCardSet,
+  IUserCardSetPartial,
+} from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
 
 @Controller('user_sets')
 @ApiTags('UserSet')
@@ -95,13 +98,186 @@ export class UserSetController {
   @ApiCreatedResponse({
     type: GetUserCardSetsResponseDto,
   })
-  @ApiOperation({
-    summary: 'NOT IMPLEMENTED YET',
-  })
   public async openUserSet(
     @Param() params: GetItemByIdDto,
+    @Req() request: IAuthorizedRequest,
   ): Promise<GetUserCardSetsResponseDto> {
-    return;
+    // get userSet by id
+    const userSetResponse: GetResponseOne<IUserSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_userset_by_id', {
+          id: params.id,
+        }),
+      );
+
+    if (userSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(userSetResponse.message, userSetResponse.status);
+    }
+
+    // check if user is owner of the set
+    if (userSetResponse.item.userId !== request.user.id) {
+      throw new HttpException(
+        'You are not allowed to open this set',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // get set by id
+    const setResponse: GetResponseOne<ICardSet> = await firstValueFrom(
+      this.cardServiceClient.send('get_set_by_id', {
+        id: userSetResponse.item.setId,
+        relations: ['cardSets.rarity.dropTable'],
+      }),
+    );
+
+    if (setResponse.status !== HttpStatus.OK) {
+      throw new HttpException(setResponse.message, setResponse.status);
+    }
+
+    // get all the different rarities in the set
+    const raritiesInSet: ICardRarityDropTable[] = setResponse.item.cardSets
+      .reduce((acc, cardSet) => {
+        if (!acc.find((item) => item.id === cardSet.rarity.dropTable.id)) {
+          acc.push(cardSet.rarity.dropTable);
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => a.priority - b.priority);
+
+    const commonRaritySlots = raritiesInSet[0];
+    const higherRaritySlots = raritiesInSet.slice(1);
+    const cardSetsTmpCommonOnHigherRarity: ICardCardSet[] = [];
+    const cardSetsEarned: ICardCardSet[] = [];
+
+    for (let i = 0; i < setResponse.item.cardSetsOnOpen; i++) {
+      // 100% change to get common rarity on common reserved slots
+      if (i < setResponse.item.cardSetsOnOpen - higherRaritySlots.length) {
+        const filteredEarnableCommonCardSets = setResponse.item.cardSets.filter(
+          (cardSet) =>
+            cardSet.rarity.dropTable.id === commonRaritySlots.id &&
+            !cardSetsEarned.find((item) => item.id === cardSet.id),
+        );
+
+        cardSetsEarned.push(
+          filteredEarnableCommonCardSets[
+            Math.floor(Math.random() * filteredEarnableCommonCardSets.length)
+          ],
+        );
+
+        continue;
+      }
+
+      // 100% chance to get a higher rarity on first slot
+      if (i === setResponse.item.cardSetsOnOpen - higherRaritySlots.length) {
+        const filteredEarnableHigherRarityCardSets =
+          setResponse.item.cardSets.filter(
+            (cardSet) =>
+              cardSet.rarity.dropTable.id === higherRaritySlots[0].id &&
+              !cardSetsEarned.find((item) => item.id === cardSet.id),
+          );
+
+        cardSetsEarned.push(
+          filteredEarnableHigherRarityCardSets[
+            Math.floor(
+              Math.random() * filteredEarnableHigherRarityCardSets.length,
+            )
+          ],
+        );
+
+        continue;
+      }
+
+      // for other slots, % chance to get a higher rarity or a common
+      // dropRate is a % chance
+      if (
+        Math.random() <
+        higherRaritySlots[
+          i - (setResponse.item.cardSetsOnOpen - higherRaritySlots.length)
+        ].dropRate /
+          100
+      ) {
+        const filteredEarnableHigherRarityCardSets =
+          setResponse.item.cardSets.filter(
+            (cardSet) =>
+              cardSet.rarity.dropTable.id ===
+                higherRaritySlots[
+                  i -
+                    (setResponse.item.cardSetsOnOpen - higherRaritySlots.length)
+                ].id && !cardSetsEarned.find((item) => item.id === cardSet.id),
+          );
+
+        cardSetsEarned.push(
+          filteredEarnableHigherRarityCardSets[
+            Math.floor(
+              Math.random() * filteredEarnableHigherRarityCardSets.length,
+            )
+          ],
+        );
+
+        continue;
+      }
+
+      const filteredEarnableCommonCardSets = setResponse.item.cardSets.filter(
+        (cardSet) =>
+          cardSet.rarity.dropTable.id === commonRaritySlots.id &&
+          !cardSetsEarned.find((item) => item.id === cardSet.id) &&
+          !cardSetsTmpCommonOnHigherRarity.find(
+            (item) => item.id === cardSet.id,
+          ),
+      );
+
+      cardSetsTmpCommonOnHigherRarity.push(
+        filteredEarnableCommonCardSets[
+          Math.floor(Math.random() * filteredEarnableCommonCardSets.length)
+        ],
+      );
+    }
+
+    cardSetsEarned.push(...cardSetsTmpCommonOnHigherRarity);
+
+    // delete the userSet
+    this.userDeckServiceClient.emit('delete_userset_by_id', {
+      id: userSetResponse.item.id,
+    });
+
+    // create a new userCardSets from the cardSetsEarned
+    const earnedUserCardSetsPartial: GetResponseArray<IUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('post_usercardsets_by_cardset_ids', {
+          userId: request.user.id,
+          cardSetIds: cardSetsEarned.map((cardSet) => cardSet.id),
+        }),
+      );
+
+    // get cardSets
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: earnedUserCardSetsPartial.items.map((item) => item.cardSetId),
+        }),
+      );
+
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    const earnedUserCardSets: IUserCardSet[] =
+      earnedUserCardSetsPartial.items.map((item) => ({
+        id: item.id,
+        userId: item.userId,
+        cardSet: cardSetsResponse.items.find(
+          (cardSet) => cardSet.id === item.cardSetId,
+        ),
+      }));
+
+    const result: GetUserCardSetsResponseDto = {
+      data: earnedUserCardSets,
+    };
+
+    return result;
   }
 }
 
