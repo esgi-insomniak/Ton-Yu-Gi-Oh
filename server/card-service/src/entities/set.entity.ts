@@ -9,6 +9,9 @@ export class Set {
   @OneToMany(() => CardSet, (cardSet) => cardSet.set)
   cardSets: CardSet[];
 
+  @Column({ default: 9 })
+  cardSetsOnOpen: number;
+
   @Column()
   name: string;
 

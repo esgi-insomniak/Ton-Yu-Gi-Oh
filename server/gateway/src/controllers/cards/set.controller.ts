@@ -167,6 +167,7 @@ export class SetController {
           code: cardSetResponse.item.code,
           image: cardSetResponse.item.image,
           cardSets: undefined,
+          cardSetsOnOpen: cardSetResponse.item.cardSetsOnOpen,
         };
 
         const set: IUserSet = {

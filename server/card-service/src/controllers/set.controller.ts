@@ -4,7 +4,6 @@ import {
   GetResponseArray,
   GetResponseOne,
   ParamGetItemById,
-  QueryGetItems,
 } from '../interfaces/common/common.response.interface';
 import { Set } from 'src/entities/set.entity';
 import { SetService } from 'src/services/set.service';
@@ -27,9 +26,22 @@ export class SetController {
 
   @MessagePattern('get_set_by_id')
   public async getSetById(
-    params: ParamGetItemById,
+    params: ParamGetItemById & { relations: string[] },
   ): Promise<GetResponseOne<Set>> {
-    const set = await this.setService.getSetById(params.id);
+    const relations = params.relations
+      ? params.relations
+      : [
+          'cardSets.card',
+          'cardSets.card.type',
+          'cardSets.card.frameType',
+          'cardSets.card.race',
+          'cardSets.card.archetype',
+          'cardSets.card.attribute',
+          'cardSets.card.price',
+          'cardSets.card.linkMarkers',
+          'cardSets.rarity',
+        ];
+    const set = await this.setService.getSetById(params.id, relations);
     const result: GetResponseOne<Set> = {
       status: set ? HttpStatus.OK : HttpStatus.NOT_FOUND,
       message: set ? null : 'Set not found',

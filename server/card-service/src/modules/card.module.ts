@@ -26,6 +26,8 @@ import { RaceService } from 'src/services/race.service';
 import { RarityService } from 'src/services/rarity.service';
 import { SetService } from 'src/services/set.service';
 import { TypeService } from 'src/services/type.service';
+import { RarityDropTableController } from 'src/controllers/rarity-drop-table.controller';
+import { RarityDropTableService } from 'src/services/rarity-drop-table.service';
 
 @Module({
   imports: [PostgresModule, ScheduleModule.forRoot()],
@@ -38,6 +40,7 @@ import { TypeService } from 'src/services/type.service';
     FrameTypeController,
     LinkMarkerController,
     RaceController,
+    RarityDropTableController,
     RarityController,
     SetController,
     TypeController,
@@ -52,6 +55,7 @@ import { TypeService } from 'src/services/type.service';
     FrameTypeService,
     LinkMarkerService,
     RaceService,
+    RarityDropTableService,
     RarityService,
     SetService,
     TypeService,
