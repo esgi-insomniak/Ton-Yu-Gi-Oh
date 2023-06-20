@@ -80,9 +80,9 @@ jobs:
         #
         # Applies the Kubernetes files.
         #
-      - name: Apply Kubernetes files
-        run: |
-            kubectl apply -f deploy/k8s/gateway/gateway.yml                        
+      # - name: Apply Kubernetes files
+        # run: |
+        #    kubectl apply -f deploy/k8s/gateway/gateway.yml
 
         #
         # Deploys the Docker image to the Kubernetes cluster.
