@@ -21,18 +21,14 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
-          env:
-            - name: POSTGRES_USER
-              value: "postgres"
-            - name: POSTGRES_PASSWORD
-              value: "postgres"
-            - name: POSTGRES_DB
-              value: "auth_service"
+          envFrom:
+              - configMapRef:
+                  name: auth-service-db-config
           volumeMounts:
-            - name: auth-service-db-data
-              mountPath: /var/lib/postgresql/data/auth_service
+            - name: auth-service-db
+              mountPath: /var/lib/postgresql/data
       volumes:
-        - name: auth-service-db-data
+        - name: auth-service-db
           persistentVolumeClaim:
             claimName: auth-service-db-data
 ---
@@ -49,6 +45,18 @@ spec:
       port: 5432
       targetPort: 5432
   type: ClusterIP # Can be accessed from other pods in the cluster
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-db-config
+data:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: auth_service
+  PGDATA: /var/lib/postgresql/data/pgdata
 
 ---
 apiVersion: v1

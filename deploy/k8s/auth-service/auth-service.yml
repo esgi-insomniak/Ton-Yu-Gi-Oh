@@ -20,7 +20,7 @@ spec:
           image: maeljamin/ton-yugi-auth-service:{{VERSION}}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3003
+            - containerPort: 8000
           env:
             - name: AUTH_SERVICE_POSTGRES_HOST
               value: "auth-service-db"
@@ -44,5 +44,5 @@ spec:
     app: auth-service # which pods will receive the traffic
   ports:
     - name: http
-      port: 3003
+      port: 8000
   type: ClusterIP # Can be accessed from other pods in the cluster

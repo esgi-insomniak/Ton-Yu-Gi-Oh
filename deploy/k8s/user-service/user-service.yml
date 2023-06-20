@@ -20,7 +20,7 @@ spec:
           image: maeljamin/ton-yugi-user-service:{{VERSION}}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3003
+            - containerPort: 8000
           env:
             - name: USER_SERVICE_POSTGRES_HOST
               value: "user-service-db"
@@ -44,5 +44,5 @@ spec:
     app: user-service # which pods will receive the traffic
   ports:
     - name: http
-      port: 3002
+      port: 8000
   type: ClusterIP # Can be accessed from other pods in the cluster
