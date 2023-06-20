@@ -19,7 +19,6 @@ env:
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
   VERSION: ${{ github.sha }}
 
-
 jobs:
 
   test-build-publish-deploy:
