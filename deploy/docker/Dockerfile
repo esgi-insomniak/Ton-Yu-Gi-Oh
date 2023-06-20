@@ -17,9 +17,10 @@ FROM base as prod
 ENV NODE_ENV=production
 
 RUN yarn install --production
-RUN yarn build
-RUN yarn cache clean
 
 COPY . .
 
-CMD yarn start:prod
+RUN yarn build
+RUN yarn cache clean
+
+CMD ["node", "dist/main.js"]
