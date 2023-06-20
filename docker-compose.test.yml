@@ -3,7 +3,7 @@ services:
 
 
     ### FRONTEND GATEWAY ###
-    gateway:
+    gateway-node:
       build:
         context: ./server/gateway
         dockerfile: ../../deploy/docker/Dockerfile
