@@ -45,4 +45,4 @@ spec:
   ports:
     - name: http
       port: 8000
-  type: ClusterIP # Can be accessed from other pods in the cluster
+  type: LoadBalancer # Can be accessed from other pods in the cluster
