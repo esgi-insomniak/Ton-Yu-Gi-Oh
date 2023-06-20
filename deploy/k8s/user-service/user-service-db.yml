@@ -30,7 +30,7 @@ spec:
               value: "user_service"
           volumeMounts:
             - name: user-service-db-data
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql/data/user_service
       volumes:
         - name: user-service-db-data
           persistentVolumeClaim:

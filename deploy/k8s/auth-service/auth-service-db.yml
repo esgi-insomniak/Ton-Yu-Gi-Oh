@@ -30,7 +30,7 @@ spec:
               value: "auth_service"
           volumeMounts:
             - name: auth-service-db-data
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql/data/auth_service
       volumes:
         - name: auth-service-db-data
           persistentVolumeClaim:

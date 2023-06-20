@@ -24,4 +24,5 @@ set -u # or set -o nounset
 : "$CONTAINER_REGISTRY"
 
 export DIR=$1
-echo "Deploying $CONTAINER_REGISTRY/ton-yugi-$DIR:latest"
+echo "Deploying $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION"
+sed -i "s|image: $CONTAINER_REGISTRY/ton-yugi-$DIR:{{VERSION}}|image: $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION|g" ./deploy/k8s/$DIR/$DIR.yml
