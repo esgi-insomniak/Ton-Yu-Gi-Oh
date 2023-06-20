@@ -26,4 +26,3 @@ set -u # or set -o nounset
 export DIR=$1
 echo "Deploying $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION"
 sed -i "s|image: $CONTAINER_REGISTRY/ton-yugi-$DIR:{{VERSION}}|image: $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION|g" ./deploy/k8s/$DIR/$DIR.yml
-kubectl apply -f deploy/k8s/{{ROUTE}}/{{ROUTE}}.yml

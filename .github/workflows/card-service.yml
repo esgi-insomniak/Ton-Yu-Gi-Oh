@@ -78,14 +78,15 @@ jobs:
             kubectl config current-context
 
         #
-        # Applies the Kubernetes files.
-        #
-      # - name: Apply Kubernetes files
-        # run: |
-        #    kubectl apply -f deploy/k8s/card-service/card-service.yml
-
-        #
         # Deploys the Docker image to the Kubernetes cluster.
         #
       - name: Deploy Image
         run: deploy/scripts/deploy-image.sh card-service
+
+        #
+        # Applies the Kubernetes files.
+        #
+      - name: Apply Kubernetes files
+        run: |
+          kubectl apply -f deploy/k8s/card-service/card-service.yml
+
