@@ -20,4 +20,6 @@ RUN yarn install --production
 RUN yarn build
 RUN yarn cache clean
 
+COPY . .
+
 CMD yarn start:prod
