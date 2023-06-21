@@ -8,6 +8,6 @@ export interface IUser {
 }
 
 export enum IUserRoles {
-  'admin',
-  'user',
+  admin = 'admin',
+  user = 'user',
 }

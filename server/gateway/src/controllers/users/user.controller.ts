@@ -26,7 +26,10 @@ import {
   GetResponseArray,
   GetResponseOne,
 } from 'src/interfaces/common/common.response';
-import { IUser } from 'src/interfaces/user-service/user/user.interface';
+import {
+  IUser,
+  IUserRoles,
+} from 'src/interfaces/user-service/user/user.interface';
 import { GetItemByIdDto } from 'src/interfaces/common/common.params.dto';
 import { Permission } from 'src/decorators/permission.decorator';
 import { IBasicAuth } from 'src/interfaces/auth-service/auth/basic-auth.interface';
@@ -42,7 +45,7 @@ export class UserController {
 
   @Get()
   @Authorization(true)
-  @Permission(['admin'])
+  @Permission([IUserRoles.admin])
   @ApiCreatedResponse({
     type: GetUsersResponseDto,
   })

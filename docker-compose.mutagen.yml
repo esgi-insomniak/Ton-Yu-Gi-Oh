@@ -1,10 +1,13 @@
 version: "3.4"
 services:
+    ### FRONTEND GATEWAY ###
     gateway:
       build:
         context: ./server/gateway
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=gateway
       hostname: gateway
       command: >
         sh -c "yarn install &&
@@ -15,17 +18,21 @@ services:
         - card-service-node
         - user-service-node
       volumes:
-        - gateway-dev:/usr/src/app
+        - gateway-dev:/usr/src/gateway
       ports:
         - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
       networks:
         - backend-dev
         - frontend-dev
+
+    ### CARD SERVICE ###
     card-service-node:
       build:
         context: ./server/card-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=card-service
       hostname: card-service-node
       command: >
         sh -c "yarn install &&
@@ -38,7 +45,7 @@ services:
       depends_on:
         - card-service-postgres
       volumes:
-        - card-service-node-dev:/usr/src/app
+        - card-service-node-dev:/usr/src/card-service
       links:
         - card-service-postgres
     card-service-postgres:
@@ -54,11 +61,15 @@ services:
         - POSTGRES_DB=${CARD_SERVICE_POSTGRES_DB}
       volumes:
         - card-service-postgres-dev:/var/lib/postgresql/data
+
+    ### USER SERVICE ###
     user-service-node:
       build:
         context: ./server/user-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=user-service
       hostname: user-service-node
       command: >
         sh -c "yarn install &&
@@ -71,7 +82,7 @@ services:
       depends_on:
         - user-service-postgres
       volumes:
-        - user-service-node-dev:/usr/src/app
+        - user-service-node-dev:/usr/src/user-service
       links:
         - user-service-postgres
     user-service-postgres:
@@ -87,11 +98,15 @@ services:
         - POSTGRES_DB=${USER_SERVICE_POSTGRES_DB}
       volumes:
         - user-service-postgres-dev:/var/lib/postgresql/data
+
+    ### PAYMENT SERVICE ###
     payment-service-node:
       build:
         context: ./server/payment-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=payment-service
       hostname: payment-service-node
       command: >
         sh -c "yarn install &&
@@ -104,7 +119,7 @@ services:
       depends_on:
         - payment-service-postgres
       volumes:
-        - payment-service-node-dev:/usr/src/app
+        - payment-service-node-dev:/usr/src/payment-service
       links:
         - payment-service-postgres
     payment-service-postgres:
@@ -120,11 +135,15 @@ services:
         - POSTGRES_DB=${PAYMENT_SERVICE_POSTGRES_DB}
       volumes:
         - payment-service-postgres-dev:/var/lib/postgresql/data
+
+    ### AUTH SERVICE ###
     auth-service-node:
       build:
         context: ./server/auth-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=auth-service
       hostname: auth-service-node
       command: >
         sh -c "yarn install &&
@@ -137,7 +156,7 @@ services:
       depends_on:
         - auth-service-postgres
       volumes:
-        - auth-service-node-dev:/usr/src/app
+        - auth-service-node-dev:/usr/src/auth-service
       links:
         - auth-service-postgres
     auth-service-postgres:
@@ -153,11 +172,15 @@ services:
         - POSTGRES_DB=${AUTH_SERVICE_POSTGRES_DB}
       volumes:
         - auth-service-postgres-dev:/var/lib/postgresql/data
+    
+    ### USER DECK SERVICE ###
     user-deck-service-node:
       build:
         context: ./server/user-deck-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
+        args:
+          - SERVICE_NAME=user-deck-service
       hostname: user-deck-service-node
       command: >
         sh -c "yarn install &&
@@ -170,7 +193,7 @@ services:
       depends_on:
         - user-deck-service-postgres
       volumes:
-        - user-deck-service-node-dev:/usr/src/app
+        - user-deck-service-node-dev:/usr/src/user-deck-service
       links:
         - user-deck-service-postgres
     user-deck-service-postgres:
@@ -186,10 +209,49 @@ services:
         - POSTGRES_DB=${USER_DECK_SERVICE_POSTGRES_DB}
       volumes:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
+
+    ### PROMO SERVICE ###
+    promo-service-node:
+      build:
+        context: ./server/promo-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=promo-service
+      hostname: promo-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - promo-service-postgres
+      volumes:
+        - promo-service-node-dev:/usr/src/promo-service
+      links:
+        - promo-service-postgres
+    promo-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: promo-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${PROMO_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${PROMO_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${PROMO_SERVICE_POSTGRES_DB}
+      volumes:
+        - promo-service-postgres-dev:/var/lib/postgresql/data
+
+    ### MAILER SERVICE ###
     mailer-service-node:
       build:
         context: ./server/mailer-service
-        dockerfile: Dockerfile
+        dockerfile: ../../deploy/docker/Dockerfile
         target: dev
       hostname: mailer-service-node
       command: >
@@ -205,6 +267,8 @@ services:
         - mailer-service-node-dev:/usr/src/app
       links:
         - mailcatcher
+
+    ### ADMINER ###
     adminer:
       image: adminer:4.8.1
       hostname: adminer
@@ -212,6 +276,8 @@ services:
         - backend-dev
       ports:
         - 9000:8080
+
+    ### MAILCATCHER ###
     mailcatcher:
       image: jderusse/mailcatcher:latest
       hostname: mailcatcher
@@ -233,12 +299,14 @@ volumes:
     payment-service-postgres-dev:
     auth-service-postgres-dev:
     user-deck-service-postgres-dev:
+    promo-service-postgres-dev:
     gateway-dev:
     card-service-node-dev:
     user-service-node-dev:
     payment-service-node-dev:
     auth-service-node-dev:
     user-deck-service-node-dev:
+    promo-service-node-dev:
     mailer-service-node-dev:
 
 x-mutagen:
@@ -251,6 +319,8 @@ x-mutagen:
           - .DS_Store
           - .history
           - .idea
+    
+    ### GATEWAY VOLUMES SYNC ###
     gateway:
       alpha: ./server/gateway
       beta: volume://gateway-dev
@@ -268,6 +338,8 @@ x-mutagen:
           - "*"
           - "!node_modules/**"
           - "!dist/**"
+    
+    ### CARD SERVICE VOLUMES SYNC ###
     card-service:
       alpha: ./server/card-service
       beta: volume://card-service-node-dev
@@ -285,6 +357,8 @@ x-mutagen:
           - "*"
           - "!node_modules/**"
           - "!dist/**"
+
+    ### USER SERVICE VOLUMES SYNC ###
     user-service:
       alpha: ./server/user-service
       beta: volume://user-service-node-dev
@@ -302,6 +376,8 @@ x-mutagen:
           - "*"
           - "!node_modules/**"
           - "!dist/**"
+    
+    ### PAYMENT SERVICE VOLUMES SYNC ###
     payment-service:
       alpha: ./server/payment-service
       beta: volume://payment-service-node-dev
@@ -319,6 +395,8 @@ x-mutagen:
           - "*"
           - "!node_modules/**"
           - "!dist/**"
+    
+    ### AUTH SERVICE VOLUMES SYNC ###
     auth-service:
       alpha: ./server/auth-service
       beta: volume://auth-service-node-dev
@@ -336,6 +414,8 @@ x-mutagen:
           - "*"
           - "!node_modules/**"
           - "!dist/**"
+
+    ### USER DECK SERVICE VOLUMES SYNC ###
     user-deck-service:
       alpha: ./server/user-deck-service
       beta: volume://user-deck-service-node-dev
@@ -353,6 +433,27 @@ x-mutagen:
           - "*"
           - "!node_modules/**"
           - "!dist/**"
+
+    ### PROMO SERVICE VOLUMES SYNC ###
+    promo-service:
+      alpha: ./server/promo-service
+      beta: volume://promo-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    promo-service-replica:
+      alpha: volume://promo-service-node-dev
+      beta: ./server/promo-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+
+    ### MAILER SERVICE VOLUMES SYNC ###
     mailer-service:
       alpha: ./server/mailer-service
       beta: volume://mailer-service-node-dev
