@@ -12,6 +12,7 @@ import { UserModule } from './user.module';
 import { AuthModule } from './auth.module';
 import { MailerModule } from './mailer.module';
 import { WebsocketModule } from './websoket.module';
+import { PromoModule } from './promo.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { WebsocketModule } from './websoket.module';
     PaymentModule,
     UserModule,
     AuthModule,
+    PromoModule,
     MailerModule,
     WebsocketModule,
   ],
@@ -66,6 +68,14 @@ import { WebsocketModule } from './websoket.module';
       inject: [ConfigService],
     },
     {
+      provide: 'PROMO_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const promoServiceOptions = configService.get('promoService');
+        return ClientProxyFactory.create(promoServiceOptions);
+      },
+      inject: [ConfigService],
+    },
+    {
       provide: 'MAILER_SERVICE',
       useFactory: (configService: ConfigService) => {
         const mailerServiceOptions = configService.get('mailerService');
@@ -88,6 +98,7 @@ import { WebsocketModule } from './websoket.module';
     'PAYMENT_SERVICE',
     'AUTH_SERVICE',
     'USER_DECK_SERVICE',
+    'PROMO_SERVICE',
     'MAILER_SERVICE',
   ],
 })

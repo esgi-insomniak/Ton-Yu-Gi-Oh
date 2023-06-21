@@ -212,6 +212,42 @@ services:
       volumes:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
 
+    ### PROMO SERVICE ###
+    promo-service-node:
+      build:
+        context: ./server/promo-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=promo-service
+      hostname: promo-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - promo-service-postgres
+      volumes:
+        - ./server/promo-service:/usr/src/promo-service
+      links:
+        - promo-service-postgres
+    promo-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: promo-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${PROMO_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${PROMO_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${PROMO_SERVICE_POSTGRES_DB}
+      volumes:
+        - promo-service-postgres-dev:/var/lib/postgresql/data
 
     ### MAILER SERVICE ###
     mailer-service-node:
@@ -267,3 +303,4 @@ volumes:
     payment-service-postgres-dev:
     auth-service-postgres-dev:
     user-deck-service-postgres-dev:
+    promo-service-postgres-dev:
