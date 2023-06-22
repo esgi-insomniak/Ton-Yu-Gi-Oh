@@ -8,10 +8,11 @@ export const setSchema = commonIdNameSchema.extend({
   cardSets: zod.array(zod.lazy(() => cardSetPartialSchema)),
 });
 
-export const setPartialSchema = zod.object({
+export const setPartialSchema = commonIdNameSchema.extend({
   code: zod.string(),
   image: zod.string(),
   cardSets: zod.string().array().optional(),
+  cardSetsOnOpen: zod.number()
 });
 
 export const setOneResponseSchema = zod.object({

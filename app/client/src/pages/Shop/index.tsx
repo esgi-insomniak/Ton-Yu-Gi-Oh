@@ -70,9 +70,14 @@ const Shop = () => {
                 if (res.data.rewardCoinsAmount !== null) {
                     alert?.success(`Vous avez bien reçu ${res.data.rewardCoinsAmount} Insomniak Coins !`)
                     refetch()
-                } else alert?.success(`Vous avez bien reçu le booster : ${res.data.rewardSetId} !`)
+                    // clear input
+                    e.target[0].value = ''
+                } else {
+                    alert?.success(`Vous avez bien reçu le booster : ${res.data.rewardSet?.name} !`)
+                    e.target[0].value = ''
+                }
             },
-            onError: (err) => alert?.error('Le code fourni est invalide ou a déjà été utilisé')
+            onError: (err) => alert?.error("Le code n'existe pas ou a déjà été utilisé")
         })
     }
 

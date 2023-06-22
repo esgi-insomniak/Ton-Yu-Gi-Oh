@@ -1,4 +1,5 @@
 import * as zod from 'zod';
+import { setPartialSchema } from '../cards/set.schema';
 
 const sendPayementIcToStripeSchema = zod.object({
     productId: zod.string(),
@@ -41,10 +42,10 @@ const responsePromoCodeSchema = zod.object({
     data: zod.object({
         id: zod.string(),
         code: zod.string(),
-        rewardCoinsAmount: zod.number(),
-        rewardSetId: zod.string().nullable(),
-        rewardSetAmount: zod.string().nullable(),
-        expirationDate: zod.string()
+        rewardCoinsAmount: zod.number().nullable(),
+        rewardSet: setPartialSchema.nullable(),
+        rewardSetAmount: zod.number().nullable(),
+        expirationDate: zod.string().nullable(),
     }),
 });
 
