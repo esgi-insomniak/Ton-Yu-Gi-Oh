@@ -94,7 +94,7 @@ export class PermissionGuard implements CanActivate {
 
     const userInfo: GetResponseOne<IUser> = await firstValueFrom(
       this.userService.send('get_user_by_id', {
-        id: socket.user.id,
+        id: socket.userId,
       }),
     );
 

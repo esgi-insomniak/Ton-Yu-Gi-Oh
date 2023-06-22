@@ -14,7 +14,6 @@ import { IUser } from 'src/interfaces/user-service/user/user.interface';
 import { IAuthorizedSocket } from 'src/interfaces/websocket/socket/socket.interface';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { WsException } from '@nestjs/websockets';
-import { userInfo } from 'os';
 import { ISocketMessage } from 'src/interfaces/websocket/socket-message/socket-message.interface';
 
 @Injectable()
@@ -114,21 +113,7 @@ export class AuthGuard implements CanActivate {
       throw new WsException(userTokenInfo.message);
     }
 
-    const userInfo: GetResponseOne<IUser> = await firstValueFrom(
-      this.userServiceClient.send('get_user_by_id', {
-        id: userTokenInfo.item.userId,
-      }),
-    );
-
-    if (userInfo.status !== HttpStatus.OK) {
-      socket.send({
-        statusCode: userInfo.status,
-        message: userTokenInfo.message,
-      } as ISocketMessage);
-      throw new WsException(userInfo.message);
-    }
-
-    socket.user = userInfo.item;
+    socket.userId = userTokenInfo.item.userId;
     return true;
   }
 }

@@ -1,5 +1,6 @@
 import {
   HttpStatus,
+  Inject,
   Logger,
   SetMetadata,
   UseGuards,
@@ -17,16 +18,23 @@ import {
 } from '@nestjs/websockets';
 import { Namespace } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
-import { AuthGuard } from './services/guard/authorization.guard';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
+import { ClientProxy } from '@nestjs/microservices';
+import { GetResponseOne } from './interfaces/common/common.response';
+import { IUser } from './interfaces/user-service/user/user.interface';
+import { firstValueFrom } from 'rxjs';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway()
 export class WebsocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  private readonly logger = new Logger(WebsocketGateway.name);
+  protected readonly logger = new Logger(WebsocketGateway.name);
+
+  constructor(
+    @Inject('USER_SERVICE') protected readonly userServiceClient: ClientProxy,
+  ) {}
 
   @WebSocketServer() io: Namespace;
 
@@ -35,22 +43,22 @@ export class WebsocketGateway
   }
 
   async handleConnection(client: IAuthorizedSocket) {
-    if (client.user === undefined) {
-      return this.logger.debug(`Connected user anonymous id: ${client.id}`);
-    }
-    this.logger.debug(`Connected user: ${client.user.username}`);
+    this.userServiceClient.emit('set_user_is_online', {
+      id: client.userId,
+      isOnline: true,
+    });
+    client.join(client.userId);
   }
 
   async handleDisconnect(client: IAuthorizedSocket) {
-    if (client.user === undefined) {
-      return this.logger.debug(`Disconnected user anonymous id: ${client.id}`);
-    }
-    this.logger.debug(`Disconnected user: ${client.user.username}`);
+    this.userServiceClient.emit('set_user_is_online', {
+      id: client.userId,
+      isOnline: false,
+    });
   }
 
-  @SetMetadata('secured', true)
   @SetMetadata('permission', { roles: ['admin'], areAuthorized: true })
-  @UseGuards(AuthGuard, PermissionGuard)
+  @UseGuards(PermissionGuard)
   @SubscribeMessage('ping')
   async test(@ConnectedSocket() client: IAuthorizedSocket) {
     client.send({
