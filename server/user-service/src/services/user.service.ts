@@ -75,4 +75,10 @@ export class UserService {
     user.coins -= coins;
     return this.userRepository.save(user);
   }
+
+  async setUserIsOnline(userId: string, isOnline: boolean): Promise<User> {
+    const user = await this.getUserById({ id: userId });
+    user.isOnline = isOnline;
+    return this.userRepository.save(user);
+  }
 }

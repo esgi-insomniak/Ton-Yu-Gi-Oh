@@ -380,10 +380,7 @@ export class PromoCodeController {
       (promoCode.expirationDate !== null &&
         new Date(promoCode.expirationDate) < new Date())
     ) {
-      throw new HttpException(
-        'Promo code not found or expired',
-        getPromoCodeByCodeResponse.status,
-      );
+      throw new HttpException('Promo code not found or expired', 404);
     }
 
     const createClaimedPromoCodeResponse: GetResponseOne<IClaimedPromoCode> =
