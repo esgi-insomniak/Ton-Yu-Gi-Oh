@@ -37,9 +37,21 @@ const responseBuyBoosterSchema = zod.object({
     })),
 });
 
+const responsePromoCodeSchema = zod.object({
+    data: zod.object({
+        id: zod.string(),
+        code: zod.string(),
+        rewardCoinsAmount: zod.number(),
+        rewardSetId: zod.string().nullable(),
+        rewardSetAmount: zod.string().nullable(),
+        expirationDate: zod.string()
+    }),
+});
+
 type responseSendPayementIcToStripeSchemaType = zod.infer<typeof responseSendPayementIcToStripeSchema>;
 type responseConfirmPayementIcToStripeSchemaType = zod.infer<typeof responseConfirmPayementIcToStripeSchema>;
 type responseBuyBoosterSchemaType = zod.infer<typeof responseBuyBoosterSchema>;
+type responsePromoCodeSchemaType = zod.infer<typeof responsePromoCodeSchema>;
 
-export { sendPayementIcToStripeSchema, responseSendPayementIcToStripeSchema, responseConfirmPayementIcToStripeSchema, sendBuyAmountSchema, responseBuyBoosterSchema }
-export type { responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseBuyBoosterSchemaType }
+export { sendPayementIcToStripeSchema, responseSendPayementIcToStripeSchema, responseConfirmPayementIcToStripeSchema, sendBuyAmountSchema, responseBuyBoosterSchema, responsePromoCodeSchema }
+export type { responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseBuyBoosterSchemaType, responsePromoCodeSchemaType }

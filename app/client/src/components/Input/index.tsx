@@ -11,6 +11,7 @@ interface InputProps<T extends FieldValues> {
     type?: "text" | "password" | "email";
     icons?: React.ReactNode;
     passwordIcon?: boolean;
+    uppercase?: boolean;
 }
 
 export const Input = <T extends FieldValues>({
@@ -22,6 +23,7 @@ export const Input = <T extends FieldValues>({
     type = "text",
     icons,
     passwordIcon,
+    uppercase,
 }: InputProps<T>) => {
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
@@ -32,7 +34,7 @@ export const Input = <T extends FieldValues>({
             <div className={`rounded-md pr-5 pl-3 py-3 bg-transparent border-gray-400 border flex items-center space-x-2 focus-within:text-blue-500 focus-within:border-blue-500`}>
                 {icons}
                 <input
-                    className="bg-transparent outline-none w-full text-gray-600"
+                    className={`bg-transparent outline-none w-full text-gray-600 ${uppercase ? "uppercase" : ""}`}
                     type={showPassword ? "text" : type}
                     placeholder={placeholder}
                     {...register && register(name)}
