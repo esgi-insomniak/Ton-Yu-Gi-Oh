@@ -373,9 +373,12 @@ export class PromoCodeController {
         }),
       );
 
+    const promoCode = getPromoCodeByCodeResponse.item;
+
     if (
       getPromoCodeByCodeResponse.status !== HttpStatus.OK ||
-      new Date(getPromoCodeByCodeResponse.item.expirationDate) < new Date()
+      (promoCode.expirationDate !== null &&
+        new Date(promoCode.expirationDate) < new Date())
     ) {
       throw new HttpException(
         'Promo code not found or expired',
@@ -387,7 +390,7 @@ export class PromoCodeController {
       await firstValueFrom(
         this.promoServiceClient.send('create_claimed_promo_code', {
           userId: request.user.id,
-          promoCode: getPromoCodeByCodeResponse.item.id,
+          promoCode: promoCode.id,
         }),
       );
 
@@ -397,8 +400,6 @@ export class PromoCodeController {
         createClaimedPromoCodeResponse.status,
       );
     }
-
-    const promoCode = getPromoCodeByCodeResponse.item;
 
     // add reward to user
     if (

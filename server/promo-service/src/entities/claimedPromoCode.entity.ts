@@ -16,6 +16,6 @@ export class ClaimedPromoCode {
   @Column()
   userId: string;
 
-  @ManyToOne(() => PromoCode, { nullable: false, cascade: true })
+  @ManyToOne(() => PromoCode, { nullable: false, onDelete: 'CASCADE' })
   promoCode: PromoCode;
 }

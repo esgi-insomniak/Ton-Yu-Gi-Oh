@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { ClaimedPromoCode } from './claimedPromoCode.entity';
 
 @Entity()
 export class PromoCode {
