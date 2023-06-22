@@ -16,7 +16,12 @@ const AlertProvider = ({ children }: { children: React.ReactElement }) => {
     const contextValue = React.useMemo(
         () => ({
             success: (text: string) => toast.success(text, toastConfig),
-            error: (text: string) => toast.error(text, toastConfig)
+            error: (text: string) => toast.error(text, toastConfig),
+            info: (text: { loading: string, success: string, fail: string }, promise: Promise<any>) => toast.promise(promise, {
+                loading: text.loading,
+                success: <b>{text.success}</b>,
+                error: <b>{text.fail}</b>
+            }),
         }),
         []
     );
