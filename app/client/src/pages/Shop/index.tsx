@@ -3,7 +3,7 @@ import { useAuth } from "@/helpers/api/hooks"
 import { useMe } from "@/helpers/api/hooks/users"
 import React from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { useBuyBooster, useConfirmPayment, useGetFirstGenerationBooster } from "@/helpers/api/hooks/shop"
+import { useBuyBooster, useConfirmPayment, useGetFirstGenerationBooster, useRedeemPromoCode } from "@/helpers/api/hooks/shop"
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider"
 import { BoosterApiResponse } from "@/helpers/types/shop"
 import { useGetBoosterById } from "@/helpers/api/hooks/cards/card-set.hook"
@@ -11,12 +11,14 @@ import useModal from "@/helpers/api/hooks/modal"
 import { Modal } from "@/components/Modal"
 import { PreviewSets } from "@/pages/Shop/previewSets"
 import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider"
+import { Input } from "@/components/Input"
 
 const Shop = () => {
     const { user } = useAuth()
     const { refetch } = useMe(user.id)
     const { toggle: buyCoinsToggle, isShowing: buyCoinsShowing } = useModal()
     const { toggle: previewBoosterToggle, isShowing: previewBoosterShowing } = useModal()
+    const { toggle: confirmBuyBoosterToggle, isShowing: confirmBuyBoosterShowing } = useModal()
     const { sessionId } = useParams<{ sessionId: string }>()
     const { data: boosters } = useGetFirstGenerationBooster()
     const { setId, booster } = useGetBoosterById()
@@ -25,6 +27,9 @@ const Shop = () => {
     const alert = useAlert()
     const buyBooster = useBuyBooster()
     const router = useNavigate()
+    const redeemCode = useRedeemPromoCode()
+
+    const [selectedBooster, setSelectedBooster] = React.useState<BoosterApiResponse | null>(null)
 
     const Coins = React.useMemo(() => {
         return [
@@ -53,6 +58,29 @@ const Shop = () => {
         previewBoosterToggle()
     }
 
+    const handleConfirmBuyBooster = (booster: BoosterApiResponse) => {
+        confirmBuyBoosterToggle()
+        setSelectedBooster(booster)
+    }
+
+    const handleSubmitPromoCode = (e: React.BaseSyntheticEvent) => {
+        e.preventDefault()
+        redeemCode.mutate(e.target[0].value.toUpperCase(), {
+            onSuccess: (res) => {
+                if (res.data.rewardCoinsAmount !== null) {
+                    alert?.success(`Vous avez bien reçu ${res.data.rewardCoinsAmount} Insomniak Coins !`)
+                    refetch()
+                    // clear input
+                    e.target[0].value = ''
+                } else {
+                    alert?.success(`Vous avez bien reçu le booster : ${res.data.rewardSet?.name} !`)
+                    e.target[0].value = ''
+                }
+            },
+            onError: (err) => alert?.error("Le code n'existe pas ou a déjà été utilisé")
+        })
+    }
+
     React.useEffect(() => {
         if (sessionId) {
             confirmPayment.mutate(sessionId, {
@@ -70,10 +98,7 @@ const Shop = () => {
 
     return (
         <React.Fragment>
-            <div className="h-[calc(100vh-5rem)] flex justify-center items-center p-12 flex-col space-y-3">
-                <div className="flex w-3/4 h-fit justify-end">
-                    <div className="btn" onClick={buyCoinsToggle}>Acheter des Insomniak Coins</div>
-                </div>
+            <div className="h-[calc(100vh-5rem)] flex justify-center items-center p-12 space-x-12">
                 <div className="grid grid-cols-5 gap-8 w-3/4">
                     {
                         boosters?.data?.map((booster) => (
@@ -84,7 +109,7 @@ const Shop = () => {
                                         Voir les cartes
                                     </div>
                                     <div
-                                        onClick={() => handleBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
+                                        onClick={() => handleConfirmBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
                                     >
                                         <span className="font-bold text-red-500">- 100</span>
                                         <img src="/InsomniakCoins.png" alt="" className="h-5 w-5" />
@@ -93,6 +118,16 @@ const Shop = () => {
                             </div>
                         ))
                     }
+                </div>
+                <div className="flex w-1/4 h-full justify-start flex-col items-center space-y-7">
+                    <div className="btn" onClick={buyCoinsToggle}>Acheter des Insomniak Coins</div>
+                    <form className="w-full bg-white p-5 rounded-lg space-y-3" onSubmit={handleSubmitPromoCode}>
+                        <span className="w-full flex justify-center">Code Promos</span>
+                        <Input label="Ton code" name="code" uppercase />
+                        <div className="w-full flex justify-end">
+                            <button className="btn" type="submit">Valider</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <Modal
@@ -113,7 +148,17 @@ const Shop = () => {
                 title="Aperçu du booster"
                 content={<GameCardProvider><PreviewSets cardSets={booster?.data?.data} /></GameCardProvider>}
             />
-        </React.Fragment>
+            <Modal
+                isShowing={confirmBuyBoosterShowing}
+                toggle={confirmBuyBoosterToggle}
+                title="Confirmation d'achat"
+                yesNo
+                yesNoAction={[
+                    { text: 'Annuler', action: confirmBuyBoosterToggle, type: 'no' },
+                    { text: 'Acheter', action: () => handleBuyBooster(selectedBooster!), type: 'yes' }
+                ]}
+            />
+        </React.Fragment >
     )
 }
 
