@@ -1,0 +1,25 @@
+version: '3.5'
+
+services:
+  node-api:
+    image: node:18.2.0
+    container_name: node-kpi
+    working_dir: /var/www/
+    command: /bin/bash -c "yarn && yarn start"
+    env_file: ./.env
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/var/www/
+
+  mongo:
+    image: mongo:5.0.9
+    container_name: mongo-kpi
+    env_file: ./.env
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data: {}
