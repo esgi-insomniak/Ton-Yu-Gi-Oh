@@ -247,6 +247,43 @@ services:
       volumes:
         - promo-service-postgres-dev:/var/lib/postgresql/data
 
+    ### DUEL SERVICE ###
+    duel-service-node:
+      build:
+        context: ./server/duel-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=duel-service
+      hostname: duel-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - duel-service-postgres
+      volumes:
+        - duel-service-node-dev:/usr/src/duel-service
+      links:
+        - duel-service-postgres
+    duel-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: duel-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${DUEL_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${DUEL_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${DUEL_SERVICE_POSTGRES_DB}
+      volumes:
+        - duel-service-postgres-dev:/var/lib/postgresql/data
+
     ### MAILER SERVICE ###
     mailer-service-node:
       build:
@@ -300,6 +337,7 @@ volumes:
     auth-service-postgres-dev:
     user-deck-service-postgres-dev:
     promo-service-postgres-dev:
+    duel-service-postgres-dev:
     gateway-dev:
     card-service-node-dev:
     user-service-node-dev:
@@ -307,6 +345,7 @@ volumes:
     auth-service-node-dev:
     user-deck-service-node-dev:
     promo-service-node-dev:
+    duel-service-node-dev:
     mailer-service-node-dev:
 
 x-mutagen:
@@ -446,6 +485,25 @@ x-mutagen:
     promo-service-replica:
       alpha: volume://promo-service-node-dev
       beta: ./server/promo-service
+      mode: one-way-replica
+      ignore:
+        paths:
+          - "*"
+          - "!node_modules/**"
+          - "!dist/**"
+
+    ### DUEL SERVICE VOLUMES SYNC ###
+    duel-service:
+      alpha: ./server/duel-service
+      beta: volume://duel-service-node-dev
+      mode: two-way-resolved
+      ignore:
+        paths:
+          - node_modules/
+          - dist/
+    duel-service-replica:
+      alpha: volume://duel-service-node-dev
+      beta: ./server/duel-service
       mode: one-way-replica
       ignore:
         paths:

@@ -1,4 +1,12 @@
+export enum ISocketEventMethod {
+  GET = 'GET',
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+}
+
 export interface ISocketEvent {
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  object: any;
+  event: string;
+  method: keyof typeof ISocketEventMethod;
+  data: any;
 }
