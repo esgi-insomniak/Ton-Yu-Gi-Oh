@@ -6,7 +6,6 @@ import React from "react";
 
 const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | undefined }) => {
     const { cardSets, setCardSets } = useGameCard()
-
     React.useEffect(() => {
         if (!cardSetsProps?.length) return;
         const gameCardSets = cardSetsProps.map((cardSet) => {

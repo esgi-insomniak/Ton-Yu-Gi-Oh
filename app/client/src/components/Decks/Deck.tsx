@@ -1,19 +1,27 @@
 import React from "react";
 import { BsFillTrashFill } from "react-icons/bs";
 import { AiFillEye } from "react-icons/ai";
-import { useDeleteUserDeck } from "@/helpers/api/hooks/decks";
+import {
+  useDeleteUserDeck,
+  useGetCardDeckUser,
+} from "@/helpers/api/hooks/decks";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { DeckProps } from "@/helpers/types/decks";
 
-const Deck: React.FC<DeckProps> = ({ deck }) => {
+const Deck: React.FC<
+  DeckProps & {
+    togglePreviewDeck: (myDeck: string) => void;
+    setId: (id: string | null) => void;
+  }
+> = ({ deck, togglePreviewDeck, setId }) => {
   const myDeck = deck;
   const deleteUserDeck = useDeleteUserDeck();
-  const alert = useAlert()
+  const alert = useAlert();
 
   const handleDeleteDeck = (id: string) => () => {
     if (confirm("Etes vous sur de vouloir supprimer ce deck ?")) {
       deleteUserDeck.mutate(id);
-      alert?.success('Deck supprimé avec succès')
+      alert?.success("Deck supprimé avec succès");
     }
   };
 
@@ -38,12 +46,9 @@ const Deck: React.FC<DeckProps> = ({ deck }) => {
                 >
                   <BsFillTrashFill />
                 </button>
-                <a
-                  href={`/decks/edit/${myDeck.id}`}
-                  className="btn btn-primary"
-                >
+                <div className="btn btn-primary" onClick={() => togglePreviewDeck(myDeck.id)}>
                   <AiFillEye />
-                </a>
+                </div>
               </div>
             </div>
           </div>

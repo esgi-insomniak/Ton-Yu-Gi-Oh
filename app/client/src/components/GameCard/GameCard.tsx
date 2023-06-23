@@ -10,6 +10,7 @@ import { IGameCard } from '@/helpers/types/cards';
 
 const GameCard = (props: IGameCard) => {
     // CONTEXTE POUR showcase
+    console.log(props)
     const showcase = false;
 
     const randomSeed = {
