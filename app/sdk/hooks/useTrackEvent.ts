@@ -1,12 +1,12 @@
 import React from "react";
+import { useTrackingContext } from "../providers";
+import { apiRequest } from "../common";
 
 type TypeOfEvent = "click" | "hover" | "scroll" | "time";
 
 interface TrackEventProps {
     tag: string;
     type: TypeOfEvent;
-    clientId: string;
-    appId: string;
 }
 
 /**
@@ -18,19 +18,25 @@ interface TrackEventProps {
  * listener to the DOM element, which sends a tracking event to a server when the specified event type
  * is triggered on the element.
  */
-export const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type, clientId, appId }: TrackEventProps) => {
+export const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type }: TrackEventProps) => {
     const ref = React.useRef<TargetElement | null>(null);
+
+    const { visitorId, appId } = useTrackingContext()
 
     React.useEffect(() => {
         const track = () => {
-            navigator.sendBeacon("/api/track", JSON.stringify({
-                event: type,
-                tag,
-                timestamp: Date.now(),
-                clientId,
-                appId
-            }));
-
+            apiRequest({
+                beacon: true,
+                url: "/api/track",
+                method: "POST",
+                payload: {
+                    event: type,
+                    tag,
+                    timestamp: Date.now(),
+                    visitorId,
+                    appId
+                }
+            })
         };
 
         if (ref.current) {
@@ -42,7 +48,7 @@ export const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type, cl
                 ref.current.removeEventListener(type, track);
             }
         }
-    }, [ref, clientId]);
+    }, [ref, visitorId]);
 
     return {
         ref

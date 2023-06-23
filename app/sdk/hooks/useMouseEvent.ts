@@ -1,5 +1,6 @@
-import React, { RefObject } from "react"
-import { getScreenSize } from "../common";
+import React, { RefObject, MouseEvent } from "react"
+import { apiRequest, getScreenSize, throttle } from "../common";
+import { useTrackingContext } from "../providers";
 
 interface TrackMouseMovementProps {
     x: number;
@@ -10,8 +11,6 @@ interface TrackMouseMovementProps {
 
 interface TrackMouseMouvementType {
     ref: RefObject<Element>;
-    appId: string;
-    clientId: string;
 }
 
 /**
@@ -21,7 +20,9 @@ interface TrackMouseMouvementType {
  * @returns The function `useTrackMouseMovement` returns an object of type `TrackMouseMovementProps`,
  * which contains the current mouse position, timestamp, and screen size.
  */
-const useTrackMouseMovement = ({ ref, appId, clientId }: TrackMouseMouvementType): TrackMouseMovementProps => {
+const useTrackMouseMovement = ({ ref }: TrackMouseMouvementType): TrackMouseMovementProps => {
+
+    const { visitorId, appId } = useTrackingContext()
     const [mousePosition, setMousePosition] = React.useState<TrackMouseMovementProps>({
         x: 0,
         y: 0,
@@ -29,7 +30,7 @@ const useTrackMouseMovement = ({ ref, appId, clientId }: TrackMouseMouvementType
         screenSize: getScreenSize(window)
     });
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = (event: MouseEvent<Element, MouseEvent>): void => {
         const { clientX, clientY, timeStamp } = event;
         setMousePosition({
             x: clientX,
@@ -41,24 +42,31 @@ const useTrackMouseMovement = ({ ref, appId, clientId }: TrackMouseMouvementType
 
     React.useEffect(() => {
         const track = () => {
-            navigator.sendBeacon("/api/track", JSON.stringify({
-                event: "mouseMovement",
-                tag: "mouseMovement",
-                timestamp: mousePosition.timestamp,
-                clientId,
-                appId,
-                mousePosition
-            }));
+            apiRequest({
+                beacon: true,
+                url: "/api/track",
+                method: "POST",
+                payload: {
+                    event: "mouse",
+                    timestamp: Date.now(),
+                    visitorId,
+                    appId,
+                    mousePosition
+                }
+            })
         };
 
+        let handleThrottledMouseMove: EventListenerOrEventListenerObject | null = null
+
         if (ref.current) {
-            ref.current.addEventListener("mousemove", () => handleMouseMove);
+            handleThrottledMouseMove = throttle(handleMouseMove, 100)
+            ref.current.addEventListener("mousemove", handleThrottledMouseMove);
             ref.current.addEventListener("mouseleave", track);
         }
 
         return () => {
             if (ref.current) {
-                ref.current.removeEventListener("mousemove", () => handleMouseMove);
+                ref.current.removeEventListener("mousemove", handleThrottledMouseMove as EventListenerOrEventListenerObject);
                 ref.current.removeEventListener("mouseleave", track);
             }
         }
