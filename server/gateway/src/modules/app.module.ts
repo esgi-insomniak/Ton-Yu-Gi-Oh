@@ -13,6 +13,7 @@ import { AuthModule } from './auth.module';
 import { MailerModule } from './mailer.module';
 import { WebsocketModule } from './websoket.module';
 import { PromoModule } from './promo.module';
+import { DuelModule } from './duel.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PromoModule } from './promo.module';
     UserModule,
     AuthModule,
     PromoModule,
+    DuelModule,
     MailerModule,
     WebsocketModule,
   ],
@@ -76,6 +78,14 @@ import { PromoModule } from './promo.module';
       inject: [ConfigService],
     },
     {
+      provide: 'DUEL_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const duelServiceOptions = configService.get('duelService');
+        return ClientProxyFactory.create(duelServiceOptions);
+      },
+      inject: [ConfigService],
+    },
+    {
       provide: 'MAILER_SERVICE',
       useFactory: (configService: ConfigService) => {
         const mailerServiceOptions = configService.get('mailerService');
@@ -99,6 +109,7 @@ import { PromoModule } from './promo.module';
     'AUTH_SERVICE',
     'USER_DECK_SERVICE',
     'PROMO_SERVICE',
+    'DUEL_SERVICE',
     'MAILER_SERVICE',
   ],
 })

@@ -21,9 +21,11 @@ import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interfac
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
 import { ClientProxy } from '@nestjs/microservices';
-import { GetResponseOne } from './interfaces/common/common.response';
-import { IUser } from './interfaces/user-service/user/user.interface';
-import { firstValueFrom } from 'rxjs';
+
+import {
+  ISocketEvent,
+  ISocketEventMethod,
+} from './interfaces/websocket/socket-emit/socket-event.interface';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway()
@@ -34,6 +36,10 @@ export class WebsocketGateway
 
   constructor(
     @Inject('USER_SERVICE') protected readonly userServiceClient: ClientProxy,
+    @Inject('DUEL_SERVICE') protected readonly duelServiceClient: ClientProxy,
+    @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
+    @Inject('USER_DECK_SERVICE')
+    private readonly userDeckServiceClient: ClientProxy,
   ) {}
 
   @WebSocketServer() io: Namespace;
@@ -60,10 +66,21 @@ export class WebsocketGateway
   @SetMetadata('permission', { roles: ['admin'], areAuthorized: true })
   @UseGuards(PermissionGuard)
   @SubscribeMessage('ping')
-  async test(@ConnectedSocket() client: IAuthorizedSocket) {
+  async ping(@ConnectedSocket() client: IAuthorizedSocket) {
     client.send({
       statusCode: HttpStatus.OK,
       message: 'pong',
     } as ISocketMessage);
+  }
+
+  @SubscribeMessage('duel__join_queue')
+  async waitingForDuel(@ConnectedSocket() client: IAuthorizedSocket) {
+    const eventName = 'duel__join_queue';
+
+    client.send({
+      event: eventName,
+      method: ISocketEventMethod.GET,
+      data: null,
+    } as ISocketEvent);
   }
 }
