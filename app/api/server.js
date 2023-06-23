@@ -15,13 +15,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 // MongoDB configuration
+console.log(process.env.MONGO_CON_STRING);
 mongoose
-    .connect('mongodb://localhost:27017/web-analytics', { useNewUrlParser: true })
+    .connect(process.env.MONGO_CON_STRING, { useNewUrlParser: true })
     .then(() => console.log('MongoDB connected'))
     .catch((err) => console.log(err));
-
-// Load Swagger documentation
-swagger(app);
 
 // Models
 const { Tunnel, Tag, Stat, User } = require('./models');
@@ -32,9 +30,9 @@ app.post('/register', (req, res) => {
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
     const terms = req.body.terms;
-    if(terms === "on"){
-        if(password === confirmPassword){
-            bcrypt.hash(password, 10, function(err, hash) {
+    if (terms === "on") {
+        if (password === confirmPassword) {
+            bcrypt.hash(password, 10, function (err, hash) {
                 const user = new User({
                     email: email,
                     password: hash
@@ -43,11 +41,11 @@ app.post('/register', (req, res) => {
                     res.json(user);
                 });
             });
-        }else{
-            res.json({message: "Passwords do not match"});
+        } else {
+            res.json({ message: "Passwords do not match" });
         }
-    }else{
-        res.json({message: "You must accept the terms and conditions"});
+    } else {
+        res.json({ message: "You must accept the terms and conditions" });
     }
 });
 
@@ -55,12 +53,12 @@ app.post('/login', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    const user = User.findOne({email: email}).then((user) => {
-        bcrypt.compare(password, user.password, function(err, result) {
-            if(result){
-                res.json({message: "Login successful", user: user});
-            }else{
-                res.json({message: "Login failed"});
+    const user = User.findOne({ email: email }).then((user) => {
+        bcrypt.compare(password, user.password, function (err, result) {
+            if (result) {
+                res.json({ message: "Login successful", user: user });
+            } else {
+                res.json({ message: "Login failed" });
             }
         });
     });
@@ -141,6 +139,10 @@ app.post('/createAppId', async (req, res) => {
     await appId.save();
     res.json(appId);
 });
+
+
+// Load Swagger documentation
+swagger(app);
 
 // Start server
 const port = process.env.PORT || 3000;

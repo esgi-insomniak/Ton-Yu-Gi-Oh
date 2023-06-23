@@ -15,6 +15,7 @@ services:
   mongo:
     image: mongo:5.0.9
     container_name: mongo-kpi
+    hostname: mongo
     env_file: ./.env
     ports:
       - 27017:27017
