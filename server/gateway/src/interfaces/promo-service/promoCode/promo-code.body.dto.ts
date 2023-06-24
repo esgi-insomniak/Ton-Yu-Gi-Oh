@@ -1,12 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsAlpha,
   IsEmpty,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
+  IsUppercase,
   Max,
   MaxLength,
   Min,
@@ -18,6 +20,8 @@ export class CreatePromoCodeBodyDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsString()
+  @IsUppercase()
+  @IsAlpha()
   @MinLength(3)
   @MaxLength(20)
   code: string;
@@ -56,6 +60,8 @@ export class UpdatePromoCodeBodyDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @IsUppercase()
+  @IsAlpha()
   @MinLength(3)
   @MaxLength(20)
   code: string;
