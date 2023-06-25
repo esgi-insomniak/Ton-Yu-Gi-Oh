@@ -11,3 +11,8 @@ export interface ISocketEvent {
   type: keyof typeof ISocketEventType;
   data: any;
 }
+
+export interface ISocketMessage {
+  statusCode: number;
+  message: string;
+}

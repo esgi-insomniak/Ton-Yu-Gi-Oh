@@ -21,10 +21,10 @@ const AlertProvider = ({ children }: { children: React.ReactElement }) => {
             custom: (text: string, getDismiss?: boolean) => toast.custom((t) => (
                 <AlertCustom text={text} t={t} getDismiss={getDismiss} />
             ), {
-                duration: Infinity,
+                duration: 60000,
                 position: 'top-center',
-            })
-
+            }),
+            closeAll: () => toast.dismiss(),
         }),
         []
     );

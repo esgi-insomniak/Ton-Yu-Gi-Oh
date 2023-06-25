@@ -1,22 +1,31 @@
 import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
-import { ISocketEvent } from "@/helpers/types/socket";
+import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
     const { user, ioClient } = useAuth()
     const alert = useAlert()
+    const router = useNavigate()
 
     const opponentSearch = React.useCallback(() => {
         ioClient?.emit('duel__join_queue');
-        ioClient?.on('duel__join_queue', (data: ISocketEvent) => {
-            alert?.custom("Adversaire trouvé !", true);
+        ioClient?.on('duel__queue', (event: ISocketEvent) => {
+            if (event.type === ISocketEventType.ERROR) {
+                alert?.closeAll()
+                alert?.error(event.data.message)
+            }
         })
-        alert?.custom('recherche d\'un adversaire en cours...')
-    }, [alert])
+        ioClient?.on('duel__found', (event: ISocketEvent) => {
+            alert?.closeAll()
+            alert?.success("Adversaire trouvé !")
+            router(`/duel/${event.data.roomId}`)
+        })
+        alert?.custom('Recherche d\'un adversaire en cours...')
+    }, [ioClient, alert])
 
     const navs = React.useMemo(() => [
         { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: user.roles.includes(ROLES.USER), isBtn: false, action: () => { } },
