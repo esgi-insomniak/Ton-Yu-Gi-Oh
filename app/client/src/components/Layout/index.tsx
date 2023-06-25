@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth()
     const { data: me } = useMe(user.id)
     return (
-        <div className="h-screen">
+        <div className="h-screen flex flex-col">
             <div className="h-20 w-full flex bg-white/10 items-center justify-between px-10">
                 <div onClick={() => router('/')} className="flex items-center">
                     <div className="cursor-pointer hover:scale-110 duration-150">
@@ -23,7 +23,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                 </div>
             </div>
-            <main>{children}</main>
+            <main className="h-full">{children}</main>
         </div>
     );
 }

@@ -4,6 +4,7 @@ import { animated, useSpring, to } from '@react-spring/web';
 import { round, clamp, adjust } from '@/helpers/utils/AdvancedMath';
 import { CardDynamicStyles, CardInteractPointerEvent, CardInteractTouchEvent, CardStaticStyles } from '.';
 import GameCardContext from '@/helpers/context/cards/GameCardContext';
+import GameCardInfos from '@/components/GameCard/GameCardInfos';
 
 import '@/assets/css/cards/loader.css'
 import { IGameCard } from '@/helpers/types/cards';
@@ -182,8 +183,10 @@ const GameCard = (props: IGameCard) => {
         const rect = thisCardElement.current.getBoundingClientRect(); // get element's size/position
         const view = document.documentElement; // get window/viewport size
 
+        let deltaX = currentCardSet.displayCardInfoOnPop ? round(view.clientWidth / 2 - rect.x - (rect.width + rect.width * currentCardSet.popScale * 0.25 + rect.width * currentCardSet.popScale * 2) / 2) : round(view.clientWidth / 2 - rect.x - rect.width / 2);
+
         const delta = {
-            x: round(view.clientWidth / 2 - rect.x - rect.width / 2),
+            x: deltaX,
             y: round(view.clientHeight / 2 - rect.y - rect.height / 2),
         };
         setSpringTranslate({ x: delta.x, y: delta.y });
@@ -195,7 +198,7 @@ const GameCard = (props: IGameCard) => {
         let delay = 100;
         let scaleW = (window.innerWidth / rect.width) * 0.9;
         let scaleH = (window.innerHeight / rect.height) * 0.9;
-        let scaleF = 1.75;
+        let scaleF = currentCardSet.popScale;
         setCenter();
         if (firstPop) {
             delay = 1000;
@@ -339,8 +342,8 @@ const GameCard = (props: IGameCard) => {
             data-rarity={props.rarity.name.replace(/\W/g, '-').toLowerCase()}
             style={dynamicStyles}
             ref={thisCardElement as React.RefObject<HTMLDivElement>}>
-            <div className="yugi-card__translater">
-                {/* onBlur={deactivate} */}
+            <div className="yugi-card__translater"
+                onBlur={deactivate}>
                 <div className="yugi-card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
                     <img className="yugi-card__back" src={backImg} loading="lazy" width="660" height="921" />
                     <div className="yugi-card__front" style={staticStyles}>
@@ -349,6 +352,9 @@ const GameCard = (props: IGameCard) => {
                         <div className="yugi-card__glare"></div>
                     </div>
                 </div>
+                {currentCardSet.canPop && !currentCardSet.isHidden && currentCardSet.isActive && currentCardSet.displayCardInfoOnPop && (
+                    <GameCardInfos {...props} />
+                )}
             </div>
         </animated.div>
     )

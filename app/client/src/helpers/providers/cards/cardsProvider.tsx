@@ -62,13 +62,13 @@ export const GameCardProvider = ({ children }: { children: React.ReactNode }) =>
         });
     };
 
-    const setCanPop = (cardSet: IGameCard, canPop: boolean) => {
+    const setCanPop = (cardSet: IGameCard, canPop: boolean, displayCardInfoOnPop: boolean, popScale: number = 1.75) => {
         setCardSets((prevState) => {
             if (!prevState) return prevState;
 
             const updatedCardSets = prevState.map((updatedCardSet) => {
                 if (cardSet.id === updatedCardSet.id) {
-                    return { ...updatedCardSet, canPop };
+                    return { ...updatedCardSet, canPop, displayCardInfoOnPop, popScale };
                 }
                 return updatedCardSet;
             });

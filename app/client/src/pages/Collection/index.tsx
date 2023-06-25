@@ -40,6 +40,8 @@ const Collection = () => {
                 isLoaded: false,
                 isDraggable: false,
                 canPop: true,
+                displayCardInfoOnPop: true,
+                popScale: 1.75,
                 canFlip: false,
             }
         })
