@@ -1,18 +1,27 @@
 import { NavItem } from "@/components/NavItem";
 import { useAuth } from "@/helpers/api/hooks";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { ISocketEvent } from "@/helpers/types/socket";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-    const { user } = useAuth()
+    const { user, ioClient } = useAuth()
     const alert = useAlert()
+
+    const opponentSearch = React.useCallback(() => {
+        ioClient?.emit('duel__join_queue');
+        ioClient?.on('duel__join_queue', (data: ISocketEvent) => {
+            alert?.custom("Adversaire trouvé !", true);
+        })
+        alert?.custom('recherche d\'un adversaire en cours...')
+    }, [alert])
 
     const navs = React.useMemo(() => [
         { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: user.roles.includes(ROLES.USER), isBtn: false, action: () => { } },
         { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: user.roles.includes(ROLES.USER), isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: user.roles.includes(ROLES.USER), isBtn: true, action: () => alert?.custom({ loading: "Recherche d'adversaire ...", success: "Adversaire trouvé !", fail: "Aucun adversaire trouvé" }, new Promise((resolve, reject) => setTimeout((test: any) => resolve(test), 10000))) },
+        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: user.roles.includes(ROLES.USER), isBtn: true, action: () => opponentSearch() },
         { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: user.roles.includes(ROLES.USER), isBtn: false, action: () => { } },
         { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: user.roles.includes(ROLES.USER), isBtn: false, action: () => { } },
         { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: user.roles.includes(ROLES.ADMIN), isBtn: false, action: () => { } },
