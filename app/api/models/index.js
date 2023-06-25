@@ -60,6 +60,75 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
+
+const mouseEventTrackSchema = new mongoose.Schema({
+    event: {
+        type: String,
+        required: true,
+    },
+    tag: {
+        type: String,
+        required: true,
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+    },
+    clientId: {
+        type: String,
+        required: true,
+    },
+    appId: {
+        type: String,
+        required: true,
+    },
+    mousePosition: {
+        x: {
+            type: Number,
+            required: true,
+        },
+        y: {
+            type: Number,
+            required: true,
+        },
+        timestamp: {
+            type: Number,
+            required: true,
+        },
+        screenSize: {
+            type: String,
+            required: true,
+        },
+    }
+})
+
+const MouseEventTrack = mongoose.model('MouseEventTrack', mouseEventTrackSchema);
+
+const trackEventSchema = new mongoose.Schema({
+    event: {
+        type: String,
+        enum: ["click", "hover", "scroll", "time"],
+        required: true,
+    },
+    tag: {
+        type: String,
+        required: true,
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+    },
+    clientId: {
+        type: String,
+        required: true,
+    },
+    appId: {
+        type: String,
+        required: true,
+    },
+})
+
+const TrackEvent = mongoose.model('TrackEvent', trackEventSchema);
     
 
-module.exports = { Tunnel, Tag, Stat, AppId, User };
+module.exports = { Tunnel, Tag, Stat, AppId, User, MouseEventTrack, TrackEvent };

@@ -22,7 +22,7 @@ mongoose
     .catch((err) => console.log(err));
 
 // Models
-const { Tunnel, Tag, Stat, User } = require('./models');
+const { Tunnel, Tag, Stat, User, MouseEventTrack, TrackEvent } = require('./models');
 
 // Routes
 app.post('/register', (req, res) => {
@@ -131,6 +131,31 @@ app.put('/stats/:id', async (req, res) => {
 app.delete('/stats/:id', async (req, res) => {
     await Stat.findByIdAndDelete(req.params.id);
     res.json({ message: 'Stat deleted successfully' });
+});
+
+app.get('/mouse-track', async (req, res) => {
+    const mouseTrack = await MouseEventTrack.find();
+    res.json(mouseTrack);
+});
+
+app.post('/mouse-track', async (req, res) => {
+    console.log(req.body.data)
+    const { event, tag, timestamp, appId, clientId, mousePosition } = req.body.data;
+    const mouseTrack = new MouseEventTrack({ event, tag, timestamp, appId, clientId, mousePosition });
+    await mouseTrack.save();
+    res.json(mouseTrack);
+});
+
+app.get('/track', async (req, res) => {
+    const track = await TrackEvent.find();
+    res.json(track);
+});
+
+app.post('/track', async (req, res) => {
+    const { event, tag, timestamp, appId, clientId } = req.body.data;
+    const track = new TrackEvent({ event, tag, timestamp, appId, clientId });
+    await track.save();
+    res.json(track);
 });
 
 app.post('/createAppId', async (req, res) => {
