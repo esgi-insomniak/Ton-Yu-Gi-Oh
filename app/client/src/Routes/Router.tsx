@@ -41,6 +41,7 @@ const ShopPage = React.lazy(() => import('@/pages/Shop'));
 const DecksPage = React.lazy(() => import('@/pages/Decks'));
 const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
 const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
+const AdminPage = React.lazy(() => import('@/pages/Admin'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -48,6 +49,8 @@ const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
 const Router: React.FC = () => {
     const { user, isLoggedIn } = useAuth()
     const router = useLocation().pathname
+
+    const routesWithoutLayout = React.useMemo(() => ['/', '/admin'], [])
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
             <Routes>
@@ -57,7 +60,7 @@ const Router: React.FC = () => {
                         <ProtectedRoute
                             condition={isLoggedIn}
                             redirect="/login"
-                            withLayout={router !== '/'}
+                            withLayout={!routesWithoutLayout.includes(router)}
                         >
                             <Outlet />
                         </ProtectedRoute>
@@ -75,6 +78,7 @@ const Router: React.FC = () => {
                     <Route path="/decks" element={<DecksPage />} />
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     <Route path="/decks/edit/:id" element={<EditDecksPage />} />
+                    <Route path="/admin" element={<AdminPage />} />
                 </Route>
 
                 <Route
