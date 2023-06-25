@@ -342,8 +342,7 @@ const GameCard = (props: IGameCard) => {
             data-rarity={props.rarity.name.replace(/\W/g, '-').toLowerCase()}
             style={dynamicStyles}
             ref={thisCardElement as React.RefObject<HTMLDivElement>}>
-            <div className="yugi-card__translater"
-                onBlur={deactivate}>
+            <div className="yugi-card__translater">
                 <div className="yugi-card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
                     <img className="yugi-card__back" src={backImg} loading="lazy" width="660" height="921" />
                     <div className="yugi-card__front" style={staticStyles}>
