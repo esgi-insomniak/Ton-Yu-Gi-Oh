@@ -6,7 +6,6 @@ import jwt_decode from "jwt-decode"
 import { useLocalStorage } from "react-use";
 import { Socket, io } from "socket.io-client";
 import { SOCKET_URL } from "@/helpers/utils/constants";
-import { ISocketEvent } from "@/helpers/types/socket";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
     const [tokenLs, setToken, removeToken] = useLocalStorage("token", "", { raw: true });
@@ -48,13 +47,6 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
         if (!tokenLs) return;
         setIoClient(io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${tokenLs}` } }));
     }, [tokenLs])
-
-    React.useEffect(() => {
-        if (!ioClient) return;
-        ioClient.on('message', (event: ISocketEvent) => {
-            console.log(event);
-        })
-    }, [ioClient])
 
     const value = React.useMemo(() => ({
         token,
