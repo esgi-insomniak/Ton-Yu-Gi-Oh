@@ -38,6 +38,20 @@ export class UserController {
     return result;
   }
 
+  @MessagePattern('get_users_by_ids')
+  public async getUsersByIds(params: {
+    ids: string[];
+  }): Promise<GetResponseArray<User>> {
+    const users = await this.userService.getUsersByIds(params.ids);
+    const result: GetResponseArray<User> = {
+      status: users ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: users ? null : 'Users not found',
+      items: users,
+    };
+
+    return result;
+  }
+
   @MessagePattern('get_user_by_credentials')
   public async getUserByCredentials(params: {
     email?: string;

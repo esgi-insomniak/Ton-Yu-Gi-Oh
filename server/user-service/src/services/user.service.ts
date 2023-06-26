@@ -29,6 +29,21 @@ export class UserService {
     return user;
   }
 
+  async getUsersByIds(ids: string[]): Promise<User[]> {
+    const users: User[] = [];
+    for (const id of ids) {
+      const user = await this.userRepository.findOne({
+        where: [
+          {
+            id,
+          },
+        ],
+      });
+      if (user) users.push(user);
+    }
+    return users;
+  }
+
   async getUserByCredentials(data: {
     email?: string;
     username?: string;

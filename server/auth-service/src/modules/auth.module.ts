@@ -6,10 +6,18 @@ import { PostgresModule } from './postgres.module';
 import { JwtService } from '@nestjs/jwt';
 import { AuthController } from 'src/controllers/auth.controller';
 import { AuthService } from 'src/services/auth.service';
+import { LoginHistoryService } from 'src/services/login-history.service';
+import { LoginHistoryController } from 'src/controllers/login-history.controller';
 
 @Module({
   imports: [PostgresModule],
-  controllers: [TokenController, AuthController],
-  providers: [TokenService, AuthService, ConfigService, JwtService],
+  controllers: [TokenController, AuthController, LoginHistoryController],
+  providers: [
+    TokenService,
+    AuthService,
+    LoginHistoryService,
+    ConfigService,
+    JwtService,
+  ],
 })
 export class AuthModule {}
