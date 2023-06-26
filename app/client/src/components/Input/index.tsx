@@ -8,10 +8,11 @@ interface InputProps<T extends FieldValues> {
     name: Path<T>;
     register?: UseFormRegister<T>;
     error?: string;
-    type?: "text" | "password" | "email";
+    type?: "text" | "password" | "email" | "number";
     icons?: React.ReactNode;
     passwordIcon?: boolean;
     uppercase?: boolean;
+    defaultV?: string | number;
 }
 
 export const Input = <T extends FieldValues>({
@@ -24,6 +25,7 @@ export const Input = <T extends FieldValues>({
     icons,
     passwordIcon,
     uppercase,
+    defaultV
 }: InputProps<T>) => {
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
@@ -37,8 +39,8 @@ export const Input = <T extends FieldValues>({
                     className={`bg-transparent outline-none w-full text-gray-600 ${uppercase ? "uppercase" : ""}`}
                     type={showPassword ? "text" : type}
                     placeholder={placeholder}
-                    {...register && register(name)}
-                    defaultValue={""}
+                    {...register && register(name, { valueAsNumber: type === "number" })}
+                    defaultValue={defaultV}
                 />
                 {passwordIcon && (
                     <div
@@ -53,7 +55,7 @@ export const Input = <T extends FieldValues>({
                     </div>
                 )}
             </div>
-            {error && <span className="text-red-500">{error}</span>}
+            {error && <span className="text-red-500 text-xs">{error}</span>}
         </div>
     );
 };
@@ -69,7 +71,7 @@ export const Select = <T extends FieldValues>({
     placeholder?: string;
 }) => {
     return options ? (
-        <select className="select select-bordered w-full max-w-xs" name={name}>
+        <select className="select select-bordered w-full" name={name}>
             {placeholder && <option value="">{placeholder}</option>}
             {options.map((option, i) => (
                 <option key={i} value={option.id}>{option.name}</option>

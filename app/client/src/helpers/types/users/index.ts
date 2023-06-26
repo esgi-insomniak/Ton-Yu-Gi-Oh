@@ -7,8 +7,6 @@ export interface UserManagementContextProps {
 }
 export interface UserType {
     id: string;
-    firstName: string;
-    lastName: string;
     email: string;
     roles: ROLES[];
     createdAt: string;
@@ -17,7 +15,7 @@ export interface UserType {
     coins?: number;
 }
 
-export type UserContextType = Omit<UserType, 'createdAt' | 'updatedAt' | 'firstName' | 'lastName'>
+export type UserContextType = Omit<UserType, 'createdAt' | 'updatedAt'>
 
 export type DecodedTokenType = Omit<UserContextType, 'id'> & {
     userId: string

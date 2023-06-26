@@ -7,11 +7,15 @@ export const userSchema = zod.object({
     phone: zod.string().nullable(),
     roles: zod.array(zod.string()),
     coins: zod.number(),
-    isOnline: zod.boolean(),
+    isOnline: zod.boolean().nullable(),
 });
 
 export const getAllUsersSchema = zod.object({
     data: zod.array(userSchema),
+});
+
+export const responsePatchUserSchema = zod.object({
+    data: userSchema,
 });
 
 export type getAllUsersSchemaType = zod.infer<typeof getAllUsersSchema>;
