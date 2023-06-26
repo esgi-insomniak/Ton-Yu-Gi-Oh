@@ -37,7 +37,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8000
-  type: ClusterIp # Can be accessed from other pods in the cluster
+  type: ClusterIP # Can be accessed from other pods in the cluster
 
 ---
 

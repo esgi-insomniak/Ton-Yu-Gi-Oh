@@ -44,7 +44,7 @@ spec:
   ports:
     - name: http
       port: 8000
-  type: ClusterIp
+  type: ClusterIP
 
 ---
 apiVersion: v1
