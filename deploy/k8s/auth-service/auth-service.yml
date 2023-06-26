@@ -17,11 +17,19 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: maeljamin/ton-yugi-auth-service:{{VERSION}}
+          image: maeljamin/ton-yugi-auth-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8000
+            - containerPort: 3000
           env:
+            - name: AUTH_SERVICE_PORT
+              value: "3000"
+            - name: AUTH_SERVICE_JWT_SECRET
+              value: "secret"
+            - name: AUTH_SERVICE_JWT_EXPIRATION
+              value: "2592000"
+            - name: BASE_URI
+              value: "http://localhost:8000"
             - name: AUTH_SERVICE_POSTGRES_HOST
               value: "auth-service-db"
             - name: AUTH_SERVICE_POSTGRES_PORT
@@ -44,5 +52,5 @@ spec:
     app: auth-service # which pods will receive the traffic
   ports:
     - protocol: TCP
-      port: 8000
-  type: NodePort # Can be accessed from outside the cluster
+      port: 3000
+  type: LoadBalancer # Can be accessed from outside the cluster
