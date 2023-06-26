@@ -46,6 +46,7 @@ kind: ConfigMap
 metadata:
   name: user-service-config
 data:
+  USER_SERVICE_PORT: "8000"
   USER_SERVICE_POSTGRES_HOST: "user-service-db"
   USER_SERVICE_POSTGRES_PORT: "5432"
   USER_SERVICE_POSTGRES_USER: "postgres"
