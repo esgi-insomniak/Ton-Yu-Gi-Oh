@@ -1,12 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
+  ArrayUnique,
+  IsArray,
   IsEmail,
+  IsInt,
   IsMobilePhone,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsStrongPassword,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator';
 
@@ -41,6 +47,44 @@ export class CreateUserBodyDto {
   @MinLength(8)
   @MaxLength(20)
   password: string;
+}
+
+export class UpdateUserBodyDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(20)
+  username: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsMobilePhone()
+  phone: string;
+
+  @ApiProperty({
+    type: [String],
+    items: { type: 'string', format: 'uuid' },
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayUnique()
+  @ArrayMinSize(1)
+  roles: string[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  coins: number;
 }
 
 export class LoginUserBodyDto {
