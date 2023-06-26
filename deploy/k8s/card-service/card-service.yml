@@ -51,3 +51,5 @@ data:
   USER_DECK_SERVICE_POSTGRES_USER: "postgres"
   USER_DECK_SERVICE_POSTGRES_PASSWORD: "postgres"
   USER_DECK_SERVICE_POSTGRES_DB: "card_service"
+  CARD_SERVICE_YUGIOH_API: "https://db.ygoprodeck.com/api/v7"
+  CARD_SERVICE_YUGIOH_LANGUAGE: "fr"
