@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Promo service is a microservice that is responsible for managing promo codes. It is built using NestJS and TypeORM. It uses PostgreSQL as a database.
 
 ## Installation
 
