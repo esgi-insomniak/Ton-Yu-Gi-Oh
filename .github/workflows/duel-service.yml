@@ -1,11 +1,11 @@
-name: Deploy "user-service"
+name: Deploy "duel-service"
 
 on:
   push:
     paths:
-      - "server/user-service/**"
-      - ".github/workflows/user-service.yml"
-      - "deploy/k8s/user-service/**"
+      - "server/duel-service/**"
+      - ".github/workflows/duel-service.yml"
+      - "deploy/k8s/duel-service/**"
       - "deploy/scripts/**"
       - "deploy/docker/**"
 
@@ -35,19 +35,19 @@ jobs:
         # Tests the Service.
         #
       - name: Testing
-        run: deploy/scripts/test-service.sh user-service
+        run: deploy/scripts/test-service.sh duel-service
 
         #
         # Builds the Docker image.
         #
       - name: Build
-        run: deploy/scripts/build-image.sh user-service
+        run: deploy/scripts/build-image.sh duel-service
 
         #
         # Publishes the Docker image to the container registry.
         #
       - name: Publish
-        run: deploy/scripts/push-image.sh user-service
+        run: deploy/scripts/push-image.sh duel-service
 
         #
         # Authenticates with the Google Cloud Platform.
@@ -80,14 +80,14 @@ jobs:
         # Deploys the Docker image to the Kubernetes cluster.
         #
       - name: Deploy Image
-        run: deploy/scripts/deploy-image.sh user-service
+        run: deploy/scripts/deploy-image.sh duel-service
 
         #
         # Applies the Kubernetes files.
         #
       - name: Apply Kubernetes files
         run: |
-          kubectl apply -f deploy/k8s/user-service/user-service.yml
-          if [ -f deploy/k8s/user-service/user-service-db.yml ]; then
-            kubectl apply -f deploy/k8s/user-service/user-service-db.yml
+          kubectl apply -f deploy/k8s/duel-service/duel-service.yml
+          if [ -f deploy/k8s/duel-service/duel-service-db.yml ]; then
+            kubectl apply -f deploy/k8s/duel-service/duel-service-db.yml
           fi

@@ -88,4 +88,6 @@ jobs:
       - name: Apply Kubernetes files
         run: |
           kubectl apply -f deploy/k8s/user-deck-service/user-deck-service.yml
-          kubectl apply -f deploy/k8s/user-deck-service/user-deck-service-db.yml
+          if [ -f deploy/k8s/user-deck-service/user-deck-service-db.yml ]; then
+            kubectl apply -f deploy/k8s/user-deck-service/user-deck-service-db.yml
+          fi

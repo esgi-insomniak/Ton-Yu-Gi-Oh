@@ -88,4 +88,6 @@ jobs:
       - name: Apply Kubernetes files
         run: |
           kubectl apply -f deploy/k8s/mailer-service/mailer-service.yml
-          kubectl apply -f deploy/k8s/mailer-service/mailer-service-db.yml
+          if [ -f deploy/k8s/mailer-service/mailer-service-db.yml ]; then
+            kubectl apply -f deploy/k8s/mailer-service/mailer-service-db.yml
+          fi
