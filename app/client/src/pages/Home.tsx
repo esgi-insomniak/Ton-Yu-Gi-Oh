@@ -8,7 +8,7 @@ const Home = () => {
     const { user } = useAuth()
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/display-cards", title: "Mes decks", condition: user.roles.includes(ROLES.USER) },
+        { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: user.roles.includes(ROLES.USER) },
         { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: user.roles.includes(ROLES.USER) },
         { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: user.roles.includes(ROLES.USER) },
         { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: user.roles.includes(ROLES.USER) },

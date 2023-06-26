@@ -4,9 +4,12 @@ import { DecodedTokenType, UserContextType, UserManagementContextProps } from "@
 import { ROLES } from "@/helpers/utils/enum/roles";
 import jwt_decode from "jwt-decode"
 import { useLocalStorage } from "react-use";
+import { Socket, io } from "socket.io-client";
+import { SOCKET_URL } from "@/helpers/utils/constants";
+import { ISocketEvent } from "@/helpers/types/socket";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
-    const [tokenLs, setToken, removeToken] = useLocalStorage("token", "");
+    const [tokenLs, setToken, removeToken] = useLocalStorage("token", "", { raw: true });
     const token = tokenLs || "";
     const defaultUser = React.useMemo(() => {
         if (tokenLs) {
@@ -21,6 +24,7 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
         return { id: "", email: "", roles: [ROLES.USER], username: "" }
     }, [tokenLs])
     const [user, setUser] = React.useState<UserContextType>(defaultUser);
+    const [ioClient, setIoClient] = React.useState<Socket | null>(null);
 
     const handleUpdateUser = React.useCallback((token: string) => {
         setToken(token);
@@ -39,10 +43,24 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
         localStorage.clear();
     }, [setUser])
 
+    React.useEffect(() => {
+        ioClient?.disconnect();
+        if (!tokenLs) return;
+        setIoClient(io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${tokenLs}` } }));
+    }, [tokenLs])
+
+    React.useEffect(() => {
+        if (!ioClient) return;
+        ioClient.on('message', (event: ISocketEvent) => {
+            console.log(event);
+        })
+    }, [ioClient])
+
     const value = React.useMemo(() => ({
         token,
         isLoggedIn: user.id !== "",
         user,
+        ioClient,
         login: handleUpdateUser,
         logout
     }), [token, user, handleUpdateUser])

@@ -12,6 +12,8 @@ import { Price } from 'src/entities/price.entity';
 import { Race } from 'src/entities/race.entity';
 import { Rarity } from 'src/entities/rarity.entity';
 import { Set } from 'src/entities/set.entity';
+import { rarityDropTable, mappedRarities } from 'src/config/raritiesDropTable';
+import { RarityDropTable } from 'src/entities/rarityDropTable.entity';
 
 @Injectable()
 export class DBFeederService {
@@ -22,6 +24,7 @@ export class DBFeederService {
 
   async feedDatabase(chunk = 1000): Promise<string> {
     const rowData = (await this.getRowApiData()).data;
+
     return `
     Values inserted:
 
@@ -30,11 +33,11 @@ export class DBFeederService {
     - Types: ${await this.feedTypes({ rowData, chunk })}
     - FrameTypes: ${await this.feedFrameTypes({ rowData, chunk })}
     - Races: ${await this.feedRaces({ rowData, chunk })}
+    - RarityDropTable: ${await this.feedRarityDropTable({ chunk })}
     - Rarities: ${await this.feedRarities({ rowData, chunk })}
     - Sets: ${await this.feedSets({ rowData, chunk })}
     - LinkMarkers: ${await this.feedLinkMarkers({ rowData, chunk })}
     - Cards: ${await this.feedCards({ rowData, chunk })}
-    - Prices: ${await this.feedPrices({ rowData, chunk })}
     - CardSets: ${await this.feedCardSets({ rowData, chunk })}
     `;
   }
@@ -66,23 +69,11 @@ export class DBFeederService {
       },
       [],
     );
-    const currentAttributes = await this.dataSource
-      .getRepository(Attribute)
-      .find({
-        where: newAttributes.map((attribute) => ({
-          name: attribute.name,
-        })),
-      });
+
     return (
-      await this.dataSource.getRepository(Attribute).save(
-        newAttributes.filter(
-          (attribute) =>
-            !currentAttributes.find(
-              (currentAttribute) => currentAttribute.name === attribute.name,
-            ),
-        ),
-        { chunk },
-      )
+      await this.dataSource
+        .getRepository(Attribute)
+        .save(newAttributes, { chunk })
     ).length;
   }
 
@@ -103,23 +94,11 @@ export class DBFeederService {
       },
       [],
     );
-    const currentArchetypes = await this.dataSource
-      .getRepository(Archetype)
-      .find({
-        where: newArchetypes.map((archetype) => ({
-          name: archetype.name,
-        })),
-      });
+
     return (
-      await this.dataSource.getRepository(Archetype).save(
-        newArchetypes.filter(
-          (archetype) =>
-            !currentArchetypes.find(
-              (currentArchetype) => currentArchetype.name === archetype.name,
-            ),
-        ),
-        { chunk },
-      )
+      await this.dataSource
+        .getRepository(Archetype)
+        .save(newArchetypes, { chunk })
     ).length;
   }
 
@@ -137,20 +116,9 @@ export class DBFeederService {
       },
       [],
     );
-    const currentTypes = await this.dataSource.getRepository(Type).find({
-      where: newTypes.map((type) => ({
-        name: type.name,
-      })),
-    });
-    return (
-      await this.dataSource.getRepository(Type).save(
-        newTypes.filter(
-          (type) =>
-            !currentTypes.find((currentType) => currentType.name === type.name),
-        ),
-        { chunk },
-      )
-    ).length;
+
+    return (await this.dataSource.getRepository(Type).save(newTypes, { chunk }))
+      .length;
   }
 
   async feedFrameTypes({ rowData, chunk = 1000 }): Promise<number> {
@@ -170,23 +138,11 @@ export class DBFeederService {
       },
       [],
     );
-    const currentFrameTypes = await this.dataSource
-      .getRepository(FrameType)
-      .find({
-        where: newFrameTypes.map((frameType) => ({
-          name: frameType.name,
-        })),
-      });
+
     return (
-      await this.dataSource.getRepository(FrameType).save(
-        newFrameTypes.filter(
-          (frameType) =>
-            !currentFrameTypes.find(
-              (currentFrameType) => currentFrameType.name === frameType.name,
-            ),
-        ),
-        { chunk },
-      )
+      await this.dataSource
+        .getRepository(FrameType)
+        .save(newFrameTypes, { chunk })
     ).length;
   }
 
@@ -204,23 +160,22 @@ export class DBFeederService {
       },
       [],
     );
-    const currentRaces = await this.dataSource.getRepository(Race).find({
-      where: newRaces.map((race) => ({
-        name: race.name,
-      })),
-    });
+
+    return (await this.dataSource.getRepository(Race).save(newRaces, { chunk }))
+      .length;
+  }
+
+  async feedRarityDropTable({ chunk = 1000 }): Promise<number> {
     return (
-      await this.dataSource.getRepository(Race).save(
-        newRaces.filter(
-          (race) =>
-            !currentRaces.find((currentRace) => currentRace.name === race.name),
-        ),
-        { chunk },
-      )
+      await this.dataSource
+        .getRepository(RarityDropTable)
+        .save(rarityDropTable, { chunk })
     ).length;
   }
 
   async feedRarities({ rowData, chunk = 1000 }): Promise<number> {
+    const rtTable = await this.dataSource.getRepository(RarityDropTable).find();
+
     const newRarities: DeepPartial<Rarity>[] = rowData.reduce(
       (rarities: Rarity[], card: any) => {
         if (card.card_sets && card.card_sets.length > 0) {
@@ -239,6 +194,13 @@ export class DBFeederService {
                   this.dataSource.getRepository(Rarity).create({
                     name: set.set_rarity,
                     code: set.set_rarity,
+                    dropTable: rtTable.find(
+                      (table) =>
+                        table.rarityType ===
+                        Object.keys(mappedRarities).find((key) =>
+                          mappedRarities[key].includes(set.set_rarity),
+                        ),
+                    ),
                   }),
                 );
               } else if (set.set_rarity_code.match(/(\w*)/g)[1] !== undefined) {
@@ -246,6 +208,13 @@ export class DBFeederService {
                   this.dataSource.getRepository(Rarity).create({
                     name: set.set_rarity,
                     code: set.set_rarity_code.match(/(\w*)/g)[1],
+                    dropTable: rtTable.find(
+                      (table) =>
+                        table.rarityType ===
+                        Object.keys(mappedRarities).find((key) =>
+                          mappedRarities[key].includes(set.set_rarity),
+                        ),
+                    ),
                   }),
                 );
               }
@@ -257,21 +226,9 @@ export class DBFeederService {
       },
       [],
     );
-    const currentRarities = await this.dataSource.getRepository(Rarity).find({
-      where: newRarities.map((rarity) => ({
-        code: rarity.code,
-      })),
-    });
+
     return (
-      await this.dataSource.getRepository(Rarity).save(
-        newRarities.filter(
-          (rarity) =>
-            !currentRarities.find(
-              (currentRarity) => currentRarity.code === rarity.code,
-            ),
-        ),
-        { chunk },
-      )
+      await this.dataSource.getRepository(Rarity).save(newRarities, { chunk })
     ).length;
   }
 
@@ -288,6 +245,8 @@ export class DBFeederService {
                   image: `https://images.ygoprodeck.com/images/sets/${
                     cardSet.set_code.match(/(\w*)/)[0]
                   }.jpg`,
+                  cardSetsOnOpen:
+                    cardSet.set_code.match(/(\w*)/g)[0] === 'BLAR' ? 5 : 9,
                 }),
               );
             }
@@ -297,20 +256,9 @@ export class DBFeederService {
       },
       [],
     );
-    const currentSets = await this.dataSource.getRepository(Set).find({
-      where: newSets.map((set) => ({
-        code: set.code,
-      })),
-    });
-    return (
-      await this.dataSource.getRepository(Set).save(
-        newSets.filter(
-          (set) =>
-            !currentSets.find((currentSet) => currentSet.code === set.code),
-        ),
-        { chunk },
-      )
-    ).length;
+
+    return (await this.dataSource.getRepository(Set).save(newSets, { chunk }))
+      .length;
   }
 
   async feedLinkMarkers({ rowData, chunk = 1000 }): Promise<number> {
@@ -335,23 +283,11 @@ export class DBFeederService {
       },
       [],
     );
-    const currentLinkMarkers = await this.dataSource
-      .getRepository(LinkMarker)
-      .find({
-        where: newLinkMarkers.map((linkMarker) => ({
-          name: linkMarker.name,
-        })),
-      });
+
     return (
-      await this.dataSource.getRepository(LinkMarker).save(
-        newLinkMarkers.filter(
-          (linkMarker) =>
-            !currentLinkMarkers.find(
-              (currentLinkMarker) => currentLinkMarker.name === linkMarker.name,
-            ),
-        ),
-        { chunk },
-      )
+      await this.dataSource
+        .getRepository(LinkMarker)
+        .save(newLinkMarkers, { chunk })
     ).length;
   }
 
@@ -364,6 +300,14 @@ export class DBFeederService {
     const linkMarkers = await this.dataSource.getRepository(LinkMarker).find();
 
     const newCards: DeepPartial<Card>[] = await rowData.map((card: any) => {
+      const newPrice: DeepPartial<Price> = {
+        cardMarketPrice: card.card_prices[0].cardmarket_price,
+        tcgPlayerPrice: card.card_prices[0].tcgplayer_price,
+        ebayPrice: card.card_prices[0].ebay_price,
+        amazonPrice: card.card_prices[0].amazon_price,
+        coolStuffIncPrice: card.card_prices[0].coolstuffinc_price,
+      };
+
       return {
         identifiant: card.id,
         name: card.name,
@@ -392,54 +336,12 @@ export class DBFeederService {
               card.linkmarkers.includes(linkMarker.name),
             )
           : [],
+        price: newPrice,
       } as DeepPartial<Card>;
     });
-    const currentCards = await this.dataSource.getRepository(Card).find({
-      where: newCards.map((card) => ({
-        identifiant: card.identifiant,
-      })),
-    });
-    return (
-      await this.dataSource.getRepository(Card).save(
-        newCards.filter(
-          (card) =>
-            !currentCards.find(
-              (currentCard) => currentCard.identifiant === card.identifiant,
-            ),
-        ),
-        { chunk },
-      )
-    ).length;
-  }
 
-  async feedPrices({ rowData, chunk = 1000 }): Promise<number> {
-    const cards = await this.dataSource.getRepository(Card).find();
-    const newPrices: DeepPartial<Price>[] = await rowData.map((card: any) => {
-      return {
-        card: cards.find((c) => c.identifiant === card.id).id,
-        cardMarketPrice: card.card_prices[0].cardmarket_price,
-        tcgPlayerPrice: card.card_prices[0].tcgplayer_price,
-        ebayPrice: card.card_prices[0].ebay_price,
-        amazonPrice: card.card_prices[0].amazon_price,
-        coolStuffIncPrice: card.card_prices[0].coolstuffinc_price,
-      } as DeepPartial<Price>;
-    });
-    const currentPrices = await this.dataSource.getRepository(Price).find({
-      where: newPrices.map((price) => ({
-        card: price.card,
-      })),
-    });
-    return (
-      await this.dataSource.getRepository(Price).save(
-        newPrices.filter(
-          (price) =>
-            !currentPrices.find(
-              (currentPrice) => currentPrice.card === price.card,
-            ),
-        ),
-        { chunk },
-      )
-    ).length;
+    return (await this.dataSource.getRepository(Card).save(newCards, { chunk }))
+      .length;
   }
 
   async feedCardSets({ rowData, chunk = 1000 }): Promise<number> {
@@ -465,31 +367,15 @@ export class DBFeederService {
       },
       [],
     );
+
     newCardSets = newCardSets.filter(
       (cardSet, index, self) =>
         index ===
         self.findIndex((t) => t.card === cardSet.card && t.set === cardSet.set),
     );
 
-    const currentCardSets = await this.dataSource.getRepository(CardSet).find({
-      where: newCardSets.map((cardSet) => ({
-        card: cardSet.card,
-        set: cardSet.set,
-      })),
-    });
-
     return (
-      await this.dataSource.getRepository(CardSet).save(
-        newCardSets.filter(
-          (cardSet) =>
-            !currentCardSets.find(
-              (currentCardSet) =>
-                currentCardSet.card === cardSet.card &&
-                currentCardSet.set === cardSet.set,
-            ),
-        ),
-        { chunk },
-      )
+      await this.dataSource.getRepository(CardSet).save(newCardSets, { chunk })
     ).length;
   }
 }

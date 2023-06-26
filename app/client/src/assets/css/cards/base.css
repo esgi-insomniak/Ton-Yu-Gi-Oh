@@ -40,7 +40,7 @@
 
 }
 
-.card {
+.yugi-card {
 
   /* place the card on a new transform layer and
   make sure it has hardward acceleration... we gun'need that! */
@@ -59,16 +59,16 @@
 
 }
 
-.card,
-.card * {
+.yugi-card,
+.yugi-card * {
   /* outline is a little trick to anti-alias */
   outline: 1px solid transparent;
 }
 
-.card:not(.interactive) .card__translater,
-.card:not(.interactive) .card__rotator,
-.card:not(.interactive) .card__shine,
-.card:not(.interactive) .card__glare {
+.yugi-card:not(.yugi-interactive) .yugi-card__translater,
+.yugi-card:not(.yugi-interactive) .yugi-card__rotator,
+.yugi-card:not(.yugi-interactive) .yugi-card__shine,
+.yugi-card:not(.yugi-interactive) .yugi-card__glare {
 
   /* if this card is not in a framework, we can add simply
     hover effects when it's not "interactive" */
@@ -76,7 +76,7 @@
 
 }
 
-.card:not(.interactive):hover {
+.yugi-card:not(.yugi-interactive):hover {
 
   --pointer-x: 25% !important;
   --pointer-y: 10% !important;
@@ -94,52 +94,56 @@
 
 }
 
-.card.dark {
+.yugi-card.yugi-dark {
   --card-glow: hsl(0, 0%, 0%);
 }
 
-.card.divine {
+.yugi-card.yugi-divine {
   --card-glow: hsl(51, 87%, 79%);
 }
 
-.card.earth {
+.yugi-card.yugi-earth {
   --card-glow: rgb(145, 90, 39);
 }
 
-.card.fire {
+.yugi-card.yugi-fire {
   --card-glow: hsl(9, 81%, 59%);
 }
 
-.card.light {
+.yugi-card.yugi-light {
   --card-glow: hsl(0, 0%, 100%);
 }
 
-.card.water {
+.yugi-card.yugi-water {
   --card-glow: hsl(192, 97%, 60%);
 }
 
-.card.wind {
+.yugi-card.yugi-wind {
   --card-glow: hsl(96, 81%, 65%);
 }
 
-.card,
-.card__rotator {
+.yugi-card,
+.yugi-card__rotator {
   aspect-ratio: var(--card-aspect);
   border-radius: var(--card-radius);
 }
 
-.card.interacting {
+.yugi-card.yugi-active {
+  z-index: calc(var(--card-scale) * 200);
+}
+
+.yugi-card.yugi-interacting:not(.yugi-active) {
   z-index: calc(var(--card-scale) * 120);
 }
 
-.card.active .card__translater,
-.card.active .card__rotator {
+.yugi-card.yugi-active .yugi-card__translater,
+.yugi-card.yugi-active .yugi-card__rotator {
   /* prevent pinch/double-tap zooms on card */
   touch-action: none;
 }
 
-.card__translater,
-.card__rotator {
+.yugi-card__translater,
+.yugi-card__rotator {
   display: grid;
   perspective: 600px;
   will-change: transform, box-shadow;
@@ -148,7 +152,7 @@
   -webkit-transform-origin: center;
 }
 
-.card__translater {
+.yugi-card__translater {
   width: auto;
   position: relative;
 
@@ -156,7 +160,7 @@
   transform: translate3d(var(--translate-x), var(--translate-y), 0.1px) scale(var(--card-scale));
 }
 
-.card__rotator {
+.yugi-card__rotator {
   -webkit-transform: rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
   -webkit-transform-style: preserve-3d;
   transform: rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
@@ -169,9 +173,9 @@
 }
 
 
-.card__rotator,
-.card:not(.hidden).interacting .card__rotator,
-.card:not(.hidden).active .card__rotator {
+.yugi-card__rotator,
+.yugi-card:not(.yugi-hidden).yugi-interacting .yugi-card__rotator,
+.yugi-card:not(.yugi-hidden).yugi-active .yugi-card__rotator {
   transition: box-shadow 0.4s ease, opacity .33s ease-out;
   box-shadow:
     0 0 3px -1px transparent,
@@ -182,8 +186,8 @@
     0 0 20px 0px transparent;
 }
 
-.card:not(.hidden).interacting .card__rotator,
-.card:not(.hidden).active .card__rotator {
+.yugi-card:not(.yugi-hidden).yugi-interacting .yugi-card__rotator,
+.yugi-card:not(.yugi-hidden).yugi-active .yugi-card__rotator {
   box-shadow:
     0 0 3px -1px white,
     0 0 3px 1px var(--card-edge),
@@ -193,12 +197,12 @@
     0 0 50px -20px var(--card-glow)
 }
 
-.card.hidden .card__rotator {
+.yugi-card.hidden .yugi-card__rotator {
   -webkit-transform: rotateY(0deg);
   transform: rotateY(180deg);
 }
 
-.card__rotator * {
+.yugi-card__rotator * {
   width: 100%;
   display: grid;
   grid-area: 1/1;
@@ -211,36 +215,36 @@
   overflow: hidden;
 }
 
-.card__rotator img {
+.yugi-card__rotator img {
   height: auto;
   -webkit-transform: translate3d(0px, 0px, 0.01px);
   transform: translate3d(0px, 0px, 0.01px);
 }
 
-.card__back {
+.yugi-card__back {
   background-color: var(--card-back);
   -webkit-transform: rotateY(180deg) translateZ(1px);
   transform: rotateY(180deg) translateZ(1px);
   backface-visibility: visible;
 }
 
-.card__front,
-.card__front * {
+.yugi-card__front,
+.yugi-card__front * {
   backface-visibility: hidden;
 }
 
-.card__front {
+.yugi-card__front {
   opacity: 1;
   transition: opacity 0.33s ease-out;
   -webkit-transform: translate3d(0px, 0px, 0.01px);
   transform: translate3d(0px, 0px, 0.01px);
 }
 
-.loading .card__front {
+.yugi-loading .yugi-card__front {
   opacity: 0;
 }
 
-.loading .card__back {
+.yugi-loading .yugi-card__back {
   -webkit-transform: rotateY(0deg);
   transform: rotateY(0deg);
 }
@@ -252,7 +256,7 @@ Shine & Glare Effects
 
 **/
 
-.card__shine {
+.yugi-card__shine {
 
   display: grid;
   transform: translateZ(1px);
@@ -270,8 +274,8 @@ Shine & Glare Effects
 
 }
 
-.card__shine:before,
-.card__shine:after {
+.yugi-card__shine:before,
+.yugi-card__shine:after {
 
   --sunpillar-clr-1: var(--sunpillar-5);
   --sunpillar-clr-2: var(--sunpillar-6);
@@ -286,7 +290,7 @@ Shine & Glare Effects
 
 }
 
-.card__shine:after {
+.yugi-card__shine:after {
 
   --sunpillar-clr-1: var(--sunpillar-6);
   --sunpillar-clr-2: var(--sunpillar-1);
@@ -299,7 +303,7 @@ Shine & Glare Effects
 
 }
 
-.card__glare {
+.yugi-card__glare {
 
   /* make sure the glare doesn't clip */
   transform: translateZ(1.41px);

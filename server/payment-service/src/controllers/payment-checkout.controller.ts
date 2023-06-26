@@ -16,8 +16,8 @@ export class PaymentCheckoutController {
   }): Promise<ICheckoutCreateResponse> {
     let result: ICheckoutCreateResponse = {
       status: HttpStatus.NOT_FOUND,
-      message: 'Product not found',
-      session: null,
+      message: 'Product not found or stripe private key not add in .env',
+      item: null,
     };
 
     try {
@@ -29,10 +29,44 @@ export class PaymentCheckoutController {
       result = {
         status: HttpStatus.CREATED,
         message: null,
-        session: {
+        item: {
           sessionId: session.id,
           paymentStatus: session.paymentStatus,
           url: session.url,
+        },
+      };
+    } catch (e) {}
+
+    return result;
+  }
+
+  @MessagePattern('get_checkout')
+  public async getCheckout(params: {
+    sessionId: string;
+    userId: string;
+  }): Promise<ICheckoutCreateResponse> {
+    let result: ICheckoutCreateResponse = {
+      status: HttpStatus.NOT_FOUND,
+      message: 'Checkout not found',
+      item: null,
+    };
+
+    try {
+      const session = await this.paymentCheckoutService.getCheckout(
+        params.sessionId,
+        params.userId,
+      );
+
+      if (!session) return result;
+
+      result = {
+        status: HttpStatus.OK,
+        message: null,
+        item: {
+          sessionId: session.id,
+          paymentStatus: session.paymentStatus,
+          url: session.url,
+          coins: session.coins,
         },
       };
     } catch (e) {}
@@ -48,7 +82,7 @@ export class PaymentCheckoutController {
     let result: ICheckoutCreateResponse = {
       status: HttpStatus.NOT_FOUND,
       message: 'Session or Id not found',
-      session: null,
+      item: null,
     };
 
     try {
@@ -60,7 +94,7 @@ export class PaymentCheckoutController {
       result = {
         status: HttpStatus.ACCEPTED,
         message: 'Session updated',
-        session: {
+        item: {
           sessionId: session.id,
           paymentStatus: session.paymentStatus,
           url: session.url,

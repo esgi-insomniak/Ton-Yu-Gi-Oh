@@ -4,7 +4,10 @@ import {
   ArrayMinSize,
   ArrayUnique,
   IsArray,
+  IsString,
   IsUUID,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class CreateUserDeckBodyDto {
@@ -15,6 +18,12 @@ export class CreateUserDeckBodyDto {
   @ArrayMinSize(40)
   @ArrayMaxSize(60)
   userCardSetIds: string[];
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(30)
+  name: string;
 }
 
 export class UpdateUserDeckBodyDto {
@@ -25,4 +34,10 @@ export class UpdateUserDeckBodyDto {
   @ArrayMinSize(40)
   @ArrayMaxSize(60)
   userCardSetIds: string[];
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @MinLength(3)
+  @MaxLength(30)
+  name: string;
 }

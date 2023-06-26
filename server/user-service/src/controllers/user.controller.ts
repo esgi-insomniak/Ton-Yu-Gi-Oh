@@ -133,4 +133,12 @@ export class UserController {
 
     return result;
   }
+
+  @MessagePattern('set_user_is_online')
+  public async setUserIsOnline(params: {
+    userId: string;
+    isOnline: boolean;
+  }): Promise<void> {
+    await this.userService.setUserIsOnline(params.userId, params.isOnline);
+  }
 }

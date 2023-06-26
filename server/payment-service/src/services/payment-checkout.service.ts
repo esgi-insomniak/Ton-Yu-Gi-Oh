@@ -50,6 +50,16 @@ export class PaymentCheckoutService {
     return session;
   }
 
+  async getCheckout(
+    sessionId: string,
+    userId: string,
+  ): Promise<PaymentCheckout> {
+    return this.dataSource.getRepository(PaymentCheckout).findOneBy({
+      sessionId: sessionId,
+      userId: userId,
+    });
+  }
+
   async updateCheckout(
     sessionId: string,
     userId: string,

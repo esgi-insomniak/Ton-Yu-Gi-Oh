@@ -16,6 +16,7 @@ export class UserDeckController {
   @MessagePattern('post_userdeck')
   public async postUserDeck(query: {
     userId: string;
+    name: string;
     userCardSetsIds: string[];
   }): Promise<GetResponseOne<UserDeck>> {
     const userDeck = await this.userDeckService.createUserDeck(query);
@@ -71,6 +72,22 @@ export class UserDeckController {
     const userDecks = await this.userDeckService.getUserDecksByUserId(
       request.params.id,
       request.query,
+    );
+    const result: GetResponseArray<UserDeck> = {
+      status: HttpStatus.OK,
+      message: null,
+      items: userDecks,
+    };
+
+    return result;
+  }
+
+  @MessagePattern('get_userdecks_by_usercardset_id')
+  public async getUserDecksByUserCardSetId(
+    params: ParamGetItemById,
+  ): Promise<GetResponseArray<UserDeck>> {
+    const userDecks = await this.userDeckService.getUserDecksByUserCardSetId(
+      params.id,
     );
     const result: GetResponseArray<UserDeck> = {
       status: HttpStatus.OK,

@@ -34,3 +34,6 @@ package-lock.json
 .env.local
 
 pnpm-lock.yaml
+/test-results/
+/playwright-report/
+/playwright/.cache/

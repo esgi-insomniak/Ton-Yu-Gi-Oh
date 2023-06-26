@@ -11,8 +11,7 @@ import {
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetItemsPaginationDto } from '../../interfaces/common/common.query.dto';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   GetResponseArray,
   GetResponseOne,
@@ -25,11 +24,14 @@ import {
 import {
   GetUserCardSetByIdResponseDto,
   GetUserCardSetsResponseDto,
+  ScrapUserCardSetByIdResponseDto,
 } from '../../interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { Permission } from 'src/decorators/permission.decorator';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
+import { GetUserCardSetsQuery } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.query.dto';
+import { IUserDeckPartial } from 'src/interfaces/user-deck-service/userDeck/user-deck.interface';
 
 @Controller('user_card_sets')
 @ApiTags('UserCardSet')
@@ -38,16 +40,17 @@ export class UserCardSetController {
     @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
     @Inject('USER_DECK_SERVICE')
     private readonly userDeckServiceClient: ClientProxy,
+    @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
   ) {}
 
   @Get(':id')
   @Authorization(true)
-  @Permission(['admin'])
   @ApiOkResponse({
     type: GetUserCardSetByIdResponseDto,
   })
   public async getUserCardSetById(
     @Param() params: GetItemByIdDto,
+    @Request() request: IAuthorizedRequest,
   ): Promise<GetUserCardSetByIdResponseDto> {
     // get userCardSet by id
     const userCardSetResponse: GetResponseOne<IUserCardSetPartial> =
@@ -61,6 +64,17 @@ export class UserCardSetController {
       throw new HttpException(
         userCardSetResponse.message,
         userCardSetResponse.status,
+      );
+    }
+
+    // check if user owns the cardSet
+    if (
+      userCardSetResponse.item.userId !== request.user.id &&
+      !request.user.roles.includes('admin')
+    ) {
+      throw new HttpException(
+        'User does not own this cardSet',
+        HttpStatus.FORBIDDEN,
       );
     }
 
@@ -91,18 +105,90 @@ export class UserCardSetController {
     return result;
   }
 
-  // TODO: Add type of response
   @Delete(':id/scrap')
   @Authorization(true)
-  @ApiOkResponse()
-  @ApiOperation({
-    summary: 'NOT IMPLEMENTED YET',
+  @ApiOkResponse({
+    type: ScrapUserCardSetByIdResponseDto,
   })
   public async scrapCardSetById(
     @Param() params: GetItemByIdDto,
     @Request() request: IAuthorizedRequest,
-  ): Promise<any> {
-    return;
+  ): Promise<ScrapUserCardSetByIdResponseDto> {
+    // get userCardSet by id
+    const userCardSetResponse: GetResponseOne<IUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardset_by_id', params),
+      );
+
+    if (userCardSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetResponse.message,
+        userCardSetResponse.status,
+      );
+    }
+
+    // check if user owns the cardSet
+    if (userCardSetResponse.item.userId !== request.user.id) {
+      throw new HttpException(
+        'User does not own this cardSet',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    // check if cardSet is in a deck
+    const userDecksResponse: GetResponseArray<IUserDeckPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send(
+          'get_userdecks_by_usercardset_id',
+          params,
+        ),
+      );
+
+    if (userDecksResponse.items.length !== 0) {
+      throw new HttpException(
+        'Cannot scrap cardSet that is in a deck',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    // get cardSet by id
+    const cardSetResponse: GetResponseOne<ICardCardSet> = await firstValueFrom(
+      this.cardServiceClient.send('get_cardset_by_id', {
+        id: userCardSetResponse.item.cardSetId,
+      }),
+    );
+
+    // delete userCardSet
+    const deletedUserCardSetResponse: GetResponseOne<IUserCardSet> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('delete_usercardset', params),
+      );
+
+    if (deletedUserCardSetResponse.status !== HttpStatus.NO_CONTENT) {
+      throw new HttpException(
+        'Failed to scrap cardSet',
+        deletedUserCardSetResponse.status,
+      );
+    }
+
+    const cardPrice = cardSetResponse.item.card.price;
+    delete cardPrice.id;
+    const coinsEarned = Math.round(Math.max(...Object.values(cardPrice)));
+
+    await firstValueFrom(
+      this.userServiceClient.send('add_coins_user', {
+        userId: request.user.id,
+        coins: coinsEarned !== 0 ? coinsEarned : 1,
+      }),
+    );
+
+    const result: ScrapUserCardSetByIdResponseDto = {
+      data: {
+        coinsEarned,
+      },
+    };
+
+    return result;
   }
 }
 
@@ -124,7 +210,7 @@ export class UserController {
   })
   public async getUserCardSetsByUserId(
     @Param() params: GetItemByIdDto,
-    @Query() query: GetItemsPaginationDto,
+    @Query() query: GetUserCardSetsQuery,
   ): Promise<GetUserCardSetsResponseDto> {
     const userResponse = await firstValueFrom(
       this.userServiceClient.send('get_user_by_id', {
@@ -143,10 +229,6 @@ export class UserController {
           params: {
             id: params.id,
           },
-          query: {
-            limit: query.limit,
-            offset: query.offset,
-          },
         }),
       );
 
@@ -157,11 +239,17 @@ export class UserController {
       );
     }
 
+    // get all unique cardSetIds
+    const cardSetIds = userCardSetResponse.items
+      .map((item) => item.cardSetId)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
     // get cardSets
     const cardSetsResponse: GetResponseArray<ICardCardSet> =
       await firstValueFrom(
         this.cardServiceClient.send('get_cardsets_by_ids', {
-          ids: userCardSetResponse.items.map((item) => item.cardSetId),
+          ids: cardSetIds,
+          query,
         }),
       );
 
@@ -174,15 +262,17 @@ export class UserController {
 
     // create response with combined data of cardSets and userCardSets
     const result: GetUserCardSetsResponseDto = {
-      data: userCardSetResponse.items.map((partialUserCardSet) => {
-        const cardSet: IUserCardSet = {
-          id: partialUserCardSet.id,
-          userId: partialUserCardSet.userId,
-          cardSet: cardSetsResponse.items.find(
-            (item) => item.id === partialUserCardSet.cardSetId,
-          ),
+      data: cardSetsResponse.items.map((cardSet) => {
+        const userCardSet: IUserCardSet = {
+          id: userCardSetResponse.items.find(
+            (item) => item.cardSetId === cardSet.id,
+          ).id,
+          userId: userCardSetResponse.items.find(
+            (item) => item.cardSetId === cardSet.id,
+          ).userId,
+          cardSet,
         };
-        return cardSet;
+        return userCardSet;
       }),
     };
 

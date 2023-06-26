@@ -41,6 +41,20 @@ export class ConfigService {
       },
       transport: Transport.TCP,
     };
+    this.envConfig.promoService = {
+      options: {
+        port: process.env.PROMO_SERVICE_PORT,
+        host: process.env.PROMO_SERVICE_HOST,
+      },
+      transport: Transport.TCP,
+    };
+    this.envConfig.duelService = {
+      options: {
+        port: process.env.DUEL_SERVICE_PORT,
+        host: process.env.DUEL_SERVICE_HOST,
+      },
+      transport: Transport.TCP,
+    };
     this.envConfig.mailerService = {
       options: {
         port: process.env.MAILER_SERVICE_PORT,

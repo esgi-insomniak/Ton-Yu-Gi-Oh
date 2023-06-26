@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { RarityDropTable } from './rarityDropTable.entity';
 
 @Entity()
 export class Rarity {
@@ -10,4 +11,7 @@ export class Rarity {
 
   @Column({ unique: true })
   code: string;
+
+  @ManyToOne(() => RarityDropTable)
+  dropTable: RarityDropTable;
 }

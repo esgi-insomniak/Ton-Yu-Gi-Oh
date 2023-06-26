@@ -1,7 +1,10 @@
-import {Injectable} from '@nestjs/common';
-import {User} from '../entities/user.entity';
-import {ParamGetItemById, QueryGetItems,} from '../interfaces/common/common.response.interface';
-import {DataSource, Repository} from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { User } from 'src/entities/user.entity';
+import {
+  ParamGetItemById,
+  QueryGetItems,
+} from 'src/interfaces/common/common.response.interface';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -12,16 +15,18 @@ export class UserService {
   }
 
   async getUsers(query: QueryGetItems): Promise<User[]> {
-    return await this.userRepository.find({
+    const users = await this.userRepository.find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
     });
+    return users;
   }
 
   async getUserById(param: ParamGetItemById): Promise<User> {
-    return await this.userRepository.findOne({
-      where: {id: param.id},
+    const user = await this.userRepository.findOne({
+      where: { id: param.id },
     });
+    return user;
   }
 
   async getUserByCredentials(data: {
@@ -71,7 +76,9 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async deleteAllUsers() {
-    return await this.userRepository.clear();
+  async setUserIsOnline(userId: string, isOnline: boolean): Promise<User> {
+    const user = await this.getUserById({ id: userId });
+    user.isOnline = isOnline;
+    return this.userRepository.save(user);
   }
 }

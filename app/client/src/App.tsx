@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="App">
       <QueryClientProvider client={queryClient}>
-        <TrackingProvider>
+        <TrackingProvider appId=''>
           <UserContextProvider>
             <BrowserRouter>
               <Router />

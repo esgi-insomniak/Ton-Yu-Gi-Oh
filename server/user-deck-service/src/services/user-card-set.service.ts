@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserCardSet } from 'src/entities/user-card-set.entity';
 import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
-import { DataSource } from 'typeorm';
+import { DataSource, DeepPartial } from 'typeorm';
 
 @Injectable()
 export class UserCardSetService {
@@ -24,14 +24,9 @@ export class UserCardSetService {
     return userCardSet;
   }
 
-  async getUserCardSetsByUserId(
-    userId: string,
-    query: QueryGetItems,
-  ): Promise<UserCardSet[]> {
+  async getUserCardSetsByUserId(userId: string): Promise<UserCardSet[]> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
       where: { userId },
-      take: query.limit || 10,
-      skip: query.offset * query.limit || 0,
     });
     return userCardSets;
   }
@@ -60,6 +55,20 @@ export class UserCardSetService {
       cardSetId: query.cardSetId,
     });
     return this.dataSource.getRepository(UserCardSet).save(userCardSet);
+  }
+
+  async createUserCardSetsByCardSetIds(query: {
+    userId: string;
+    cardSetIds: string[];
+  }): Promise<UserCardSet[]> {
+    const userCardSets: DeepPartial<UserCardSet>[] = query.cardSetIds.map(
+      (cardSetId) => ({
+        userId: query.userId,
+        cardSetId,
+      }),
+    );
+
+    return this.dataSource.getRepository(UserCardSet).save(userCardSets);
   }
 
   async deleteUserCardSetById(id: string): Promise<boolean> {

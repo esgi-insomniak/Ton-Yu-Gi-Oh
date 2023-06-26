@@ -30,6 +30,14 @@ export class UserDeckService {
     return userDecks;
   }
 
+  async getUserDecksByUserCardSetId(id: string): Promise<UserDeck[]> {
+    const userDecks = await this.dataSource.getRepository(UserDeck).find({
+      where: { cardSets: { id } },
+      relations: ['cardSets'],
+    });
+    return userDecks;
+  }
+
   async getUserDeckById(id: string): Promise<UserDeck> {
     const userDeck = await this.dataSource.getRepository(UserDeck).findOne({
       where: { id },
@@ -85,6 +93,7 @@ export class UserDeckService {
 
   async createUserDeck(query: {
     userId: string;
+    name: string;
     userCardSetsIds: string[];
   }): Promise<UserDeck> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
@@ -92,6 +101,7 @@ export class UserDeckService {
     });
     const userDeck = this.dataSource.getRepository(UserDeck).create({
       userId: query.userId,
+      name: query.name,
       cardSets: userCardSets,
     });
     return this.dataSource.getRepository(UserDeck).save(userDeck);
