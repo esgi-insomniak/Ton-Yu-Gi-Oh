@@ -88,3 +88,4 @@ jobs:
       - name: Apply Kubernetes files
         run: |
           kubectl apply -f deploy/k8s/card-service/card-service.yml
+          kubectl apply -f deploy/k8s/card-service/card-service-db.yml

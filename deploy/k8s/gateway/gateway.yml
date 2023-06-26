@@ -45,3 +45,23 @@ spec:
     - name: http
       port: 8000
   type: LoadBalancer
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-config
+data:
+  API_GATEWAY_PORT: "8000"
+  CARD_SERVICE_PORT: "8000"
+  CARD_SERVICE_HOST: "card-service-node"
+  USER_SERVICE_PORT: "8000"
+  USER_SERVICE_HOST: "user-service-node"
+  AUTH_SERVICE_PORT: "8000"
+  AUTH_SERVICE_HOST: "auth-service-node"
+  USER_DECK_SERVICE_PORT: "8000"
+  USER_DECK_SERVICE_HOST: "user-deck-service-node"
+  PAYMENT_SERVICE_PORT: "8000"
+  PAYMENT_SERVICE_HOST: "payment-service-node"
+  MAILER_SERVICE_PORT: "8000"
+  MAILER_SERVICE_HOST: "mailer-service-node"

@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deck-service
+  labels:
+    app: user-deck-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-deck-service
+  template:
+    metadata:
+      labels:
+        app: user-deck-service
+    spec:
+      containers:
+        - name: user-deck-service
+          image: maeljamin/ton-yugi-user-deck-service:{{VERSION}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: user-deck-service-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-deck-service
+spec:
+  selector:
+    app: user-deck-service # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8000
+  type: LoadBalancer # Can be accessed from other pods in the cluster
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-deck-service-config
+data:
+  USER_DECK_SERVICE_POSTGRES_HOST: "user-deck-service-db"
+  USER_DECK_SERVICE_POSTGRES_PORT: "5432"
+  USER_DECK_SERVICE_POSTGRES_USER: "postgres"
+  USER_DECK_SERVICE_POSTGRES_PASSWORD: "postgres"
+  USER_DECK_SERVICE_POSTGRES_DB: "user_deck_service"

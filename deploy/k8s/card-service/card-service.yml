@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: card-service
+  labels:
+    app: card-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: card-service
+  template:
+    metadata:
+      labels:
+        app: card-service
+    spec:
+      containers:
+        - name: card-service
+          image: maeljamin/ton-yugi-card-service:{{VERSION}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: card-service-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: card-service
+spec:
+  selector:
+    app: card-service # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8000
+  type: LoadBalancer # Can be accessed from other pods in the cluster
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: card-service-config
+data:
+  USER_DECK_SERVICE_POSTGRES_HOST: "card-service-db"
+  USER_DECK_SERVICE_POSTGRES_PORT: "5432"
+  USER_DECK_SERVICE_POSTGRES_USER: "postgres"
+  USER_DECK_SERVICE_POSTGRES_PASSWORD: "postgres"
+  USER_DECK_SERVICE_POSTGRES_DB: "card_service"

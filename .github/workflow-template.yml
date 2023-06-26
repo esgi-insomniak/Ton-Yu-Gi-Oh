@@ -88,3 +88,4 @@ jobs:
       - name: Apply Kubernetes files
         run: |
           kubectl apply -f deploy/k8s/{{ROUTE}}/{{ROUTE}}.yml
+          kubectl apply -f deploy/k8s/{{ROUTE}}/{{ROUTE}}-db.yml

@@ -17,29 +17,13 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: maeljamin/ton-yugi-auth-service:latest
+          image: maeljamin/ton-yugi-auth-service:{{VERSION}}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
-          env:
-            - name: AUTH_SERVICE_PORT
-              value: "3000"
-            - name: AUTH_SERVICE_JWT_SECRET
-              value: "secret"
-            - name: AUTH_SERVICE_JWT_EXPIRATION
-              value: "2592000"
-            - name: BASE_URI
-              value: "http://localhost:8000"
-            - name: AUTH_SERVICE_POSTGRES_HOST
-              value: "auth-service-db"
-            - name: AUTH_SERVICE_POSTGRES_PORT
-              value: "5432"
-            - name: AUTH_SERVICE_POSTGRES_USER
-              value: "postgres"
-            - name: AUTH_SERVICE_POSTGRES_PASSWORD
-              value: "postgres"
-            - name: AUTH_SERVICE_POSTGRES_DB
-              value: "auth_service"
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: auth-service-config
 
 ---
 
@@ -52,5 +36,22 @@ spec:
     app: auth-service # which pods will receive the traffic
   ports:
     - protocol: TCP
-      port: 3000
+      port: 8000
   type: LoadBalancer # Can be accessed from outside the cluster
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+data:
+  AUTH_SERVICE_PORT: "8000"
+  AUTH_SERVICE_JWT_SECRET: "secret"
+  AUTH_SERVICE_JWT_EXPIRATION: "2592000"
+  BASE_URI: "http://localhost:8000"
+  AUTH_SERVICE_POSTGRES_HOST: "auth-service-db"
+  AUTH_SERVICE_POSTGRES_PORT: "5432"
+  AUTH_SERVICE_POSTGRES_DB: "auth_service"
+  AUTH_SERVICE_POSTGRES_USER: "postgres"
+  AUTH_SERVICE_POSTGRES_PASSWORD: "postgres"
