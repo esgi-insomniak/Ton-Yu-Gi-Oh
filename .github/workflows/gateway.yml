@@ -83,7 +83,7 @@ jobs:
         run: deploy/scripts/deploy-image.sh gateway
 
         #
-        # Applies the Kubernetes files.
+        # Applies the Kubernetes files (test if a db.yml exists).
         #
       - name: Apply Kubernetes files
         run: |

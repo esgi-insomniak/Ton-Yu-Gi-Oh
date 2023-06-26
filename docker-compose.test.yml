@@ -7,7 +7,7 @@ services:
       build:
         context: ./server/gateway
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=gateway
       hostname: gateway
@@ -28,7 +28,7 @@ services:
       build:
         context: ./server/card-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=card-service
       hostname: card-service-node
@@ -100,7 +100,7 @@ services:
       build:
         context: ./server/payment-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=payment-service
       hostname: payment-service-node
@@ -135,7 +135,7 @@ services:
       build:
         context: ./server/auth-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=auth-service
       hostname: auth-service-node
@@ -169,7 +169,7 @@ services:
       build:
         context: ./server/user-deck-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=user-deck-service
       hostname: user-deck-service-node
@@ -204,14 +204,14 @@ services:
       build:
         context: ./server/promo-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=promo-service
       hostname: promo-service-node
       command: >
         sh -c "yarn install &&
         yarn typeorm:migrate &&
-        yarn start:dev"
+        yarn test"
       networks:
         - backend-dev
       env_file:
@@ -241,14 +241,14 @@ services:
       build:
         context: ./server/duel-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
         args:
           - SERVICE_NAME=duel-service
       hostname: duel-service-node
       command: >
         sh -c "yarn install &&
         yarn typeorm:migrate &&
-        yarn start:dev"
+        yarn test"
       networks:
         - backend-dev
       env_file:
@@ -278,7 +278,7 @@ services:
       build:
         context: ./server/mailer-service
         dockerfile: ../../deploy/docker/Dockerfile
-        target: dev
+        target: test
       hostname: mailer-service-node
       command: sh -c "yarn install && yarn typeorm:migrate && yarn test"
       networks:
