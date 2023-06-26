@@ -44,7 +44,7 @@ spec:
   ports:
     - name: http
       port: 8000
-  type: ClusterIP
+  type: LoadBalancer # Can be accessed from outside the cluster
 
 ---
 apiVersion: v1
@@ -54,14 +54,16 @@ metadata:
 data:
   API_GATEWAY_PORT: "8000"
   CARD_SERVICE_PORT: "8000"
-  CARD_SERVICE_HOST: "card-service-node"
-  USER_SERVICE_PORT: "8000"
-  USER_SERVICE_HOST: "user-service-node"
-  AUTH_SERVICE_PORT: "8000"
-  AUTH_SERVICE_HOST: "auth-service-node"
   USER_DECK_SERVICE_PORT: "8000"
-  USER_DECK_SERVICE_HOST: "user-deck-service-node"
+  USER_SERVICE_PORT: "8000"
+  AUTH_SERVICE_PORT: "8000"
   PAYMENT_SERVICE_PORT: "8000"
-  PAYMENT_SERVICE_HOST: "payment-service-node"
   MAILER_SERVICE_PORT: "8000"
+  AUTH_SERVICE_HOST: "auth-service-node"
+  CARD_SERVICE_HOST: "card-service-node"
+  DUEL_SERVICE_HOST: "duel-service-node"
   MAILER_SERVICE_HOST: "mailer-service-node"
+  PAYMENT_SERVICE_HOST: "payment-service-node"
+  PROMO_SERVICE_HOST: "promo-service-node"
+  USER_DECK_SERVICE_HOST: "user-deck-service-node"
+  USER_SERVICE_HOST: "user-service-node"
