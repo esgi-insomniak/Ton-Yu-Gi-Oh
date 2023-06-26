@@ -44,7 +44,7 @@ spec:
   ports:
     - name: http
       port: 8000
-  type: LoadBalancer
+  type: ClusterIp
 
 ---
 apiVersion: v1
