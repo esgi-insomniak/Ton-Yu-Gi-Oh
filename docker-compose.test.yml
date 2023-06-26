@@ -199,6 +199,80 @@ services:
         - user-deck-service-postgres-dev:/var/lib/postgresql/data
 
 
+    ### PROMO SERVICE ###
+    promo-service-node:
+      build:
+        context: ./server/promo-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=promo-service
+      hostname: promo-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - promo-service-postgres
+      volumes:
+        - ./server/promo-service:/usr/src/promo-service
+      links:
+        - promo-service-postgres
+    promo-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: promo-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${PROMO_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${PROMO_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${PROMO_SERVICE_POSTGRES_DB}
+      volumes:
+        - promo-service-postgres-dev:/var/lib/postgresql/data
+
+   ### DUEL SERVICE ###
+    duel-service-node:
+      build:
+        context: ./server/duel-service
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=duel-service
+      hostname: duel-service-node
+      command: >
+        sh -c "yarn install &&
+        yarn typeorm:migrate &&
+        yarn start:dev"
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      depends_on:
+        - duel-service-postgres
+      volumes:
+        - ./server/duel-service:/usr/src/duel-service
+      links:
+        - duel-service-postgres
+    duel-service-postgres:
+      image: postgres:13.2-alpine
+      hostname: duel-service-postgres
+      networks:
+        - backend-dev
+      env_file:
+        - .env.dev
+      environment:
+        - POSTGRES_USER=${DUEL_SERVICE_POSTGRES_USER}
+        - POSTGRES_PASSWORD=${DUEL_SERVICE_POSTGRES_PASSWORD}
+        - POSTGRES_DB=${DUEL_SERVICE_POSTGRES_DB}
+      volumes:
+        - duel-service-postgres-dev:/var/lib/postgresql/data
+
     ### MAILER SERVICE ###
     mailer-service-node:
       build:
