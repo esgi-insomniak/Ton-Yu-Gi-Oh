@@ -26,7 +26,7 @@ spec:
                 name: user-deck-service-db-config
           volumeMounts:
             - name: user-deck-service-db-data
-              mountPath: /var/lib/postgresql/data/user_deck_service
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: user-deck-service-db-data
           persistentVolumeClaim:

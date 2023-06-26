@@ -46,7 +46,6 @@ kind: ConfigMap
 metadata:
   name: card-service-config
 data:
-  BASE_URI: "http://localhost:8000"
   CARD_DECK_SERVICE_POSTGRES_HOST: "card-service-db"
   CARD_DECK_SERVICE_POSTGRES_PORT: "5432"
   CARD_DECK_SERVICE_POSTGRES_USER: "postgres"
