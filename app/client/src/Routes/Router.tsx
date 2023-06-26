@@ -3,6 +3,8 @@ import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/helpers/api/hooks";
 import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
 import Layout from "@/components/Layout";
+import { ROLES } from "@/helpers/utils/enum/roles";
+import { LayoutAdmin } from "@/pages/Admin/Layout";
 
 interface ProtectedRouteProps {
     redirect: string;
@@ -41,7 +43,10 @@ const ShopPage = React.lazy(() => import('@/pages/Shop'));
 const DecksPage = React.lazy(() => import('@/pages/Decks'));
 const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
 const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
-const AdminPage = React.lazy(() => import('@/pages/Admin'));
+const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
+const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
+const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
+const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -55,6 +60,7 @@ const Router: React.FC = () => {
         <React.Suspense fallback={<div>Loading...</div>}>
             <Routes>
 
+                {/* Protected routes */}
                 <Route
                     element={
                         <ProtectedRoute
@@ -78,9 +84,26 @@ const Router: React.FC = () => {
                     <Route path="/decks" element={<DecksPage />} />
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     <Route path="/decks/edit/:id" element={<EditDecksPage />} />
-                    <Route path="/admin" element={<AdminPage />} />
                 </Route>
 
+                {/* Admin routes */}
+                <Route element={
+                    <ProtectedRoute
+                        condition={user.roles.includes(ROLES.ADMIN)}
+                        redirect="/"
+                    >
+                        <LayoutAdmin>
+                            <Outlet />
+                        </LayoutAdmin>
+                    </ProtectedRoute>
+                }>
+                    <Route path="/admin" element={<AdminUserPage />} />
+                    <Route path="/admin/exchange" element={<AdminExchangePage />} />
+                    <Route path="/admin/payement" element={<AdminPayementPage />} />
+                    <Route path="/admin/auth" element={<AdminAuthPage />} />
+                </Route>
+
+                {/* Public routes */}
                 <Route
                     element={
                         <ProtectedRoute
