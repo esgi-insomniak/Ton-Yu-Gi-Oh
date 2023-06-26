@@ -43,6 +43,6 @@ spec:
   selector:
     app: auth-service # which pods will receive the traffic
   ports:
-    - name: http
+    - protocol: TCP
       port: 8000
-  type: LoadBalancer # Can be accessed from other pods in the cluster
+  type: NodePort # Can be accessed from outside the cluster
