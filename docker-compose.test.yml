@@ -325,3 +325,5 @@ volumes:
     payment-service-postgres-dev:
     auth-service-postgres-dev:
     user-deck-service-postgres-dev:
+    promo-service-postgres-dev:
+    duel-service-postgres-dev:
