@@ -21,17 +21,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-          env:
-            - name: USER_SERVICE_POSTGRES_HOST
-              value: "user-service-db"
-            - name: USER_SERVICE_POSTGRES_PORT
-              value: "5432"
-            - name: USER_SERVICE_POSTGRES_USER
-              value: "postgres"
-            - name: USER_SERVICE_POSTGRES_PASSWORD
-              value: "postgres"
-            - name: USER_SERVICE_POSTGRES_DB
-              value: "user_service"
+          envFrom:
+            - configMapRef:
+                name: user-service-config
 
 ---
 
@@ -46,3 +38,16 @@ spec:
     - protocol: TCP
       port: 8000
   type: LoadBalancer # Can be accessed from other pods in the cluster
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+data:
+  USER_SERVICE_POSTGRES_HOST: "user-service-db"
+  USER_SERVICE_POSTGRES_PORT: "5432"
+  USER_SERVICE_POSTGRES_USER: "postgres"
+  USER_SERVICE_POSTGRES_PASSWORD: "postgres"
+  USER_SERVICE_POSTGRES_DB: "user_service"

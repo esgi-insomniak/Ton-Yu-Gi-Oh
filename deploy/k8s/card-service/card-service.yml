@@ -46,10 +46,11 @@ kind: ConfigMap
 metadata:
   name: card-service-config
 data:
-  USER_DECK_SERVICE_POSTGRES_HOST: "card-service-db"
-  USER_DECK_SERVICE_POSTGRES_PORT: "5432"
-  USER_DECK_SERVICE_POSTGRES_USER: "postgres"
-  USER_DECK_SERVICE_POSTGRES_PASSWORD: "postgres"
-  USER_DECK_SERVICE_POSTGRES_DB: "card_service"
+  BASE_URI: "http://localhost:8000"
+  CARD_DECK_SERVICE_POSTGRES_HOST: "card-service-db"
+  CARD_DECK_SERVICE_POSTGRES_PORT: "5432"
+  CARD_DECK_SERVICE_POSTGRES_USER: "postgres"
+  CARD_DECK_SERVICE_POSTGRES_PASSWORD: "postgres"
+  CARD_DECK_SERVICE_POSTGRES_DB: "card_service"
   CARD_SERVICE_YUGIOH_API: "https://db.ygoprodeck.com/api/v7"
   CARD_SERVICE_YUGIOH_LANGUAGE: "fr"

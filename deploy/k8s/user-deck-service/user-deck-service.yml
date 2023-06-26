@@ -46,6 +46,7 @@ kind: ConfigMap
 metadata:
   name: user-deck-service-config
 data:
+  BASE_URI: "http://localhost:8000"
   USER_DECK_SERVICE_POSTGRES_HOST: "user-deck-service-db"
   USER_DECK_SERVICE_POSTGRES_PORT: "5432"
   USER_DECK_SERVICE_POSTGRES_USER: "postgres"

@@ -46,10 +46,10 @@ kind: ConfigMap
 metadata:
   name: auth-service-config
 data:
+  BASE_URI: "http://localhost:8000"
   AUTH_SERVICE_PORT: "8000"
   AUTH_SERVICE_JWT_SECRET: "secret"
   AUTH_SERVICE_JWT_EXPIRATION: "2592000"
-  BASE_URI: "http://localhost:8000"
   AUTH_SERVICE_POSTGRES_HOST: "auth-service-db"
   AUTH_SERVICE_POSTGRES_PORT: "5432"
   AUTH_SERVICE_POSTGRES_DB: "auth_service"
