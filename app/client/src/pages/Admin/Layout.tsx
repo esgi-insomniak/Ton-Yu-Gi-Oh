@@ -1,5 +1,5 @@
 import { RxHamburgerMenu } from "react-icons/rx";
-import { MdAdminPanelSettings } from "react-icons/md";
+import { MdAdminPanelSettings, MdOutlineDiscount } from "react-icons/md";
 import { FaCoins } from "react-icons/fa";
 import { BiLogOutCircle, BiTransferAlt } from "react-icons/bi";
 import { GiLockedFortress } from "react-icons/gi";
@@ -35,6 +35,9 @@ export const LayoutAdmin = ({ children }: { children: React.ReactNode }) => {
                                 <Link to='/admin/auth' className="tooltip tooltip-right btn flex justify-center items-center" data-tip="Authentification">
                                     <GiLockedFortress className="text-white w-5 h-5" />
                                 </Link>
+                                <Link to='/admin/promo' className="tooltip tooltip-right btn flex justify-center items-center" data-tip="Codes promo">
+                                    <MdOutlineDiscount className="text-white w-5 h-5" />
+                                </Link>
                             </div>
                             <Link to='' className="btn tooltip tooltip-right flex justify-center items-center group" data-tip="Quitter le panneau admin">
                                 <BiLogOutCircle className="text-white w-5 h-5 group-hover:text-red-500" />
@@ -52,6 +55,8 @@ export const LayoutAdmin = ({ children }: { children: React.ReactNode }) => {
                         <li><Link to={'/admin/payement'} onClick={handleCloseDrawer}>Payement</Link></li>
                         <li><Link to={'/admin/exchange'} onClick={handleCloseDrawer}>Echange</Link></li>
                         <li><Link to={'/admin/auth'} onClick={handleCloseDrawer}>Authentification</Link></li>
+                        <li><Link to={'/admin/promo'} onClick={handleCloseDrawer}>Codes promo</Link></li>
+                        <li><Link to={'/'} onClick={handleCloseDrawer}>Quitter le panneau admin</Link></li>
                     </ul>
                 </div>
             </div >

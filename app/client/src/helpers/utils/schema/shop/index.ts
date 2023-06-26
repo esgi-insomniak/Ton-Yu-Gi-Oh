@@ -38,21 +38,24 @@ const responseBuyBoosterSchema = zod.object({
     })),
 });
 
+const PromoCodeSchema = zod.object({
+    id: zod.string(),
+    code: zod.string().nonempty({ message: "Le code ne peut pas être vide" }),
+    rewardCoinsAmount: zod.number().positive({ message: "C'est de l'arnaque si on donne moins que 0 Coins" }).nullable(),
+    rewardSet: setPartialSchema.nullable(),
+    rewardSetAmount: zod.number().nullable(),
+    expirationDate: zod.string().nullable(),
+})
+
 const responsePromoCodeSchema = zod.object({
-    data: zod.object({
-        id: zod.string(),
-        code: zod.string(),
-        rewardCoinsAmount: zod.number().nullable(),
-        rewardSet: setPartialSchema.nullable(),
-        rewardSetAmount: zod.number().nullable(),
-        expirationDate: zod.string().nullable(),
-    }),
+    data: zod.array(PromoCodeSchema),
 });
 
 type responseSendPayementIcToStripeSchemaType = zod.infer<typeof responseSendPayementIcToStripeSchema>;
 type responseConfirmPayementIcToStripeSchemaType = zod.infer<typeof responseConfirmPayementIcToStripeSchema>;
 type responseBuyBoosterSchemaType = zod.infer<typeof responseBuyBoosterSchema>;
 type responsePromoCodeSchemaType = zod.infer<typeof responsePromoCodeSchema>;
+type PromoCodeSchemaType = zod.infer<typeof PromoCodeSchema>;
 
-export { sendPayementIcToStripeSchema, responseSendPayementIcToStripeSchema, responseConfirmPayementIcToStripeSchema, sendBuyAmountSchema, responseBuyBoosterSchema, responsePromoCodeSchema }
-export type { responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseBuyBoosterSchemaType, responsePromoCodeSchemaType }
+export { sendPayementIcToStripeSchema, responseSendPayementIcToStripeSchema, responseConfirmPayementIcToStripeSchema, sendBuyAmountSchema, responseBuyBoosterSchema, responsePromoCodeSchema, PromoCodeSchema }
+export type { responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseBuyBoosterSchemaType, responsePromoCodeSchemaType, PromoCodeSchemaType }

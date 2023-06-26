@@ -6,6 +6,7 @@ import React from "react";
 const QUERY_URLS = {
     getAllUsers: (limit: number, offset: number) => `/users?limit=${limit}&offset=${offset}`,
     patchUser: (id: string) => `/users/${id}`,
+    deleteUser: (id: string) => `/users/${id}`,
 } as const;
 
 const token = localStorage.getItem('token')
@@ -22,6 +23,13 @@ const requestPatchUser = (id: string, data: userSchemaType) => apiRequest({
     token: !!token ? token : undefined,
     body: data
 }, responsePatchUserSchema)
+
+
+const requestDeleteUser = (id: string) => apiRequest({
+    url: QUERY_URLS.deleteUser(id),
+    method: 'DELETE',
+    token: !!token ? token : undefined
+})
 
 export const useGetAllUsers = (limit: number, offset: number) => {
     const { data, isLoading, error, refetch } = useQuery<getAllUsersSchemaType>(['getAllUsers', limit, offset], () => requestAllUsers(limit, offset))

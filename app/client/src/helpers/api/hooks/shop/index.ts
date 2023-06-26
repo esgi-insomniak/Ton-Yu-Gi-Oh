@@ -1,6 +1,7 @@
 import { apiRequest } from '@/helpers/api'
 import { ApiGetItemResponse } from '@/helpers/types/common'
 import { BoosterApiResponse } from '@/helpers/types/shop'
+import { BOOSTER_CODE } from '@/helpers/utils/constants'
 import {
     responseSendPayementIcToStripeSchema, responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchema, responseBuyBoosterSchemaType, responseBuyBoosterSchema, sendBuyAmountSchema, responsePromoCodeSchema, responsePromoCodeSchemaType
 } from '@/helpers/utils/schema/shop'
@@ -38,7 +39,7 @@ const buyBooster = (amount: number, boosterId: string) => apiRequest({
 }, responseBuyBoosterSchema)
 
 const getFirstGenerationBooster = () => apiRequest({
-    url: QUERY_URLS.getBooster(["LOB", "MRD", "BLAR", "PSV", "LON", "LOD", "PGD", "MFC", "DCR", "IOC"]),
+    url: QUERY_URLS.getBooster(BOOSTER_CODE),
     method: 'GET',
     token: !!token ? token : undefined
 })

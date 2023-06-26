@@ -8,7 +8,7 @@ interface InputProps<T extends FieldValues> {
     name: Path<T>;
     register?: UseFormRegister<T>;
     error?: string;
-    type?: "text" | "password" | "email" | "number";
+    type?: "text" | "password" | "email" | "number" | "date";
     icons?: React.ReactNode;
     passwordIcon?: boolean;
     uppercase?: boolean;
@@ -64,14 +64,20 @@ export const Select = <T extends FieldValues>({
     options,
     name,
     placeholder,
+    register,
+    wfull,
+    theme = "light"
 }: {
     // generic options type
     options: Array<{ id: string; name: string }> | undefined;
     name: Path<T>;
     placeholder?: string;
+    register?: UseFormRegister<T>;
+    wfull?: boolean;
+    theme?: "dark" | "light";
 }) => {
     return options ? (
-        <select className="select select-bordered w-full" name={name}>
+        <select className={`select select-bordered ${wfull === true && 'w-full'} ${theme === 'light' ? 'bg-white text-gray-400 border border-gray-400' : ''}`} name={name} {...register && register(name)}>
             {placeholder && <option value="">{placeholder}</option>}
             {options.map((option, i) => (
                 <option key={i} value={option.id}>{option.name}</option>

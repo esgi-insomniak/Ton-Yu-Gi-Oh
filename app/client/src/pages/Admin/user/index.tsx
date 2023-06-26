@@ -31,6 +31,7 @@ const UserAdmin = () => {
     const patchUser = usePatchUser()
     const alert = useAlert()
     const { isShowing, toggle } = useModal()
+    const { isShowing: deleteShowing, toggle: deleteToggle } = useModal()
 
     const { register, reset, handleSubmit, formState: { errors } } = useForm<userSchemaType>({
         resolver: zodResolver(userSchema)
@@ -39,6 +40,10 @@ const UserAdmin = () => {
     const nbUser = data?.data && data?.data?.length - data?.data.filter((user) => user.roles.includes(ROLES.ADMIN)).length
 
     const [editUser, setEditUser] = React.useState<userSchemaType>()
+    const [deleteUser, setDeleteUser] = React.useState<{ userId: string, username: string }>({
+        userId: '',
+        username: ''
+    })
 
     const formatedData = data?.data.map((user) => ({
         ...user,
@@ -46,7 +51,7 @@ const UserAdmin = () => {
         crud: (
             <div className="flex space-x-2">
                 <AiFillEdit className="w-6 h-6 text-gray-500 cursor-pointer" onClick={() => handleEditModal(user)} />
-                <AiTwotoneDelete className="w-6 h-6 text-red-500 cursor-pointer" />
+                <AiTwotoneDelete className="w-6 h-6 text-red-500 cursor-pointer" onClick={() => handleDelete(user.id, user.username)} />
             </div>
         ),
     }));
@@ -69,6 +74,12 @@ const UserAdmin = () => {
         toggle()
         reset(user)
         setEditUser(user)
+    }
+
+    const handleDelete = (userId: string, username: string) => {
+        deleteToggle()
+        reset()
+        setDeleteUser({ userId, username })
     }
 
     return (
@@ -103,6 +114,17 @@ const UserAdmin = () => {
                         </div>
                     </form>
                 }
+            />
+            <Modal
+                isShowing={deleteShowing}
+                toggle={deleteToggle}
+                title={`Supprimer l'utilisateur ${deleteUser?.username}`}
+                yesNo
+                text="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Toutes les cartes ainsi que les decks de cet utilisateur seront supprimés."
+                yesNoAction={[
+                    { text: 'Annuler', action: deleteToggle, type: 'no' },
+                    { text: 'Supprimer', action: () => console.log('oui'), type: 'yes' },
+                ]}
             />
         </div>
     );
