@@ -2,11 +2,13 @@ import { useMutation, useQuery } from "react-query";
 import { apiRequest } from "@/helpers/api";
 import React from "react";
 import { PromoCodeSchema, PromoCodeSchemaType, responsePromoCodeSchema, responsePromoCodeSchemaType } from "@/helpers/utils/schema/shop";
+import { sendPatchPromoCodeSchemaType } from "@/helpers/utils/schema/Admin";
 
 const QUERY_URLS = {
     getAllPromos: (limit: number, offset: number) => `/promo_codes?limit=${limit}&offset=${offset}`,
     postPromoCode: () => `/promo_codes`,
     deletePromoCode: (id: string) => `/promo_codes/${id}`,
+    patchPromoCode: (id: string) => `/promo_codes/${id}`,
 } as const;
 
 const token = localStorage.getItem('token')
@@ -30,6 +32,13 @@ const requestDeletePromoCode = (id: string) => apiRequest({
     token: !!token ? token : undefined
 })
 
+const requestPatchPromoCode = (id: string, body: sendPatchPromoCodeSchemaType) => apiRequest({
+    url: QUERY_URLS.patchPromoCode(id),
+    method: 'PATCH',
+    body,
+    token: !!token ? token : undefined
+})
+
 export const useGetAllPromos = (limit: number, offset: number) => {
     const { data, isLoading, error, refetch } = useQuery<responsePromoCodeSchemaType>(['getAllPromos', limit, offset], () => requestAllPromos(limit, offset))
 
@@ -39,3 +48,5 @@ export const useGetAllPromos = (limit: number, offset: number) => {
 export const usePostPromoCode = () => useMutation((data: PromoCodeSchemaType) => requestPostPromoCode(data))
 
 export const useDeletePromoCode = () => useMutation((id: string) => requestDeletePromoCode(id))
+
+export const usePatchPromoCode = () => useMutation((data: { id: string, body: sendPatchPromoCodeSchemaType }) => requestPatchPromoCode(data.id, data.body))

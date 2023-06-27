@@ -78,7 +78,9 @@ export const Select = <T extends FieldValues>({
 }) => {
     return options ? (
         <select className={`select select-bordered ${wfull === true && 'w-full'} ${theme === 'light' ? 'bg-white text-gray-400 border border-gray-400' : ''}`} name={name} {...register && register(name)}>
-            {placeholder && <option value="">{placeholder}</option>}
+            {placeholder && <option value={
+                options.find((option) => option.name === placeholder)?.id
+            }>{placeholder}</option>}
             {options.map((option, i) => (
                 <option key={i} value={option.id}>{option.name}</option>
             ))}

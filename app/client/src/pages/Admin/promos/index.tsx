@@ -1,18 +1,17 @@
 import React from "react";
 import { ReportCard } from "../Layout";
 import { Table, TableColumn } from "@/components/Table";
-import { useGetAllPromos, usePostPromoCode, useDeletePromoCode } from "@/helpers/api/hooks/admin/promo";
+import { useGetAllPromos, usePostPromoCode, useDeletePromoCode, usePatchPromoCode } from "@/helpers/api/hooks/admin/promo";
 import { PromoCodeSchemaType } from "@/helpers/utils/schema/shop";
 import { AiFillEdit, AiTwotoneDelete } from "react-icons/ai";
 import useModal from "@/helpers/api/hooks/modal";
 import { Modal } from "@/components/Modal";
 import { Input, Select } from "@/components/Input";
 import { set, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { BOOSTER_CODE } from "@/helpers/utils/constants";
 import { createPromoCodeWithCoinsSchemaType, createPromoCodeWithSetSchemaType } from "@/helpers/utils/schema/Admin";
 import { PromoFormWithcoins, PromoFormWithBooster } from "./form";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { useGetFirstGenerationBooster } from "@/helpers/api/hooks/shop";
 
 interface TablePromoProps extends Omit<PromoCodeSchemaType, 'rewardSet'> {
     rewardSet: string;
@@ -36,7 +35,9 @@ const PromoAdmin = () => {
     const { isShowing: deleteIsShowing, toggle: deleteToggle } = useModal()
     const postPromoCode = usePostPromoCode()
     const deletePromoCode = useDeletePromoCode()
+    const patchPromo = usePatchPromoCode()
     const alert = useAlert()
+    const { data: boosters } = useGetFirstGenerationBooster()
 
     const [editPromo, setEditPromo] = React.useState<PromoCodeSchemaType>()
     const [toggleReward, setToggleReward] = React.useState<boolean>(false)
@@ -47,7 +48,7 @@ const PromoAdmin = () => {
     const onSubmit = (data: createPromoCodeWithCoinsSchemaType) => {
         postPromoCode.mutate({
             ...data,
-            code: data.code.toUpperCase()
+            code: data.code.toUpperCase().trim()
         } as any, {
             onSuccess: () => {
                 refetch()
@@ -61,7 +62,7 @@ const PromoAdmin = () => {
     const onSubmitSet = (data: createPromoCodeWithSetSchemaType) => {
         postPromoCode.mutate({
             ...data,
-            code: data.code.toUpperCase()
+            code: data.code.toUpperCase().trim()
         } as any, {
             onSuccess: () => {
                 refetch()
@@ -73,7 +74,24 @@ const PromoAdmin = () => {
     }
 
     const onSubmitPatch = (data: PromoCodeSchemaType) => {
-        console.log(data)
+        console.log(data, editPromo)
+        patchPromo.mutate({
+            body: {
+                code: data.code.toUpperCase().trim(),
+                rewardSetId: data.rewardSet as unknown as string || editPromo?.rewardSet?.id as string,
+                rewardSetAmount: data.rewardSetAmount || editPromo?.rewardSetAmount as number,
+                rewardCoinsAmount: data.rewardCoinsAmount || editPromo?.rewardCoinsAmount as number,
+                expirationDate: data.expirationDate || editPromo?.expirationDate as string,
+            },
+            id: editPromo?.id || ""
+        }, {
+            onSuccess: () => {
+                refetch()
+                alert?.success('Code promo modifié avec succès')
+                patchToggle()
+            },
+            onError: (err) => alert?.error('Une erreur est survenue')
+        })
     }
 
     const handlePatchPromoModal = (data: PromoCodeSchemaType) => {
@@ -156,16 +174,17 @@ const PromoAdmin = () => {
                         <Input name="code" label="Code promo" register={patch} uppercase error={errors.code?.message} defaultV={editPromo?.code} />
                         <Input name="rewardCoinsAmount" label="Nombre de coins" type="number" register={patch} error={errors.rewardCoinsAmount?.message}
                             defaultV={editPromo?.rewardCoinsAmount as number} />
-                        <Select name="rewardSet" register={patch} options={
-                            BOOSTER_CODE.map((booster) => ({ id: booster, name: booster }))
-                        } placeholder="Selectionner un booster" wfull />
+                        <Select name="rewardSet" register={patch} options={boosters?.data?.map((booster) => ({
+                            id: booster.id,
+                            name: booster.name,
+                        })) || []} placeholder={boosters?.data?.find((booster) => booster.id === editPromo?.rewardSet?.id)?.name} wfull />
                         <Input name="rewardSetAmount" label="Nombre de booster" type="number" register={patch} error={errors.rewardSetAmount?.message}
                             defaultV={editPromo?.rewardSetAmount as number} />
                         <Input name="expirationDate" label="Date d'expiration" type="date" register={patch} error={errors.expirationDate?.message}
                             defaultV={editPromo?.expirationDate as string} />
 
                         <div className="w-full flex justify-end">
-                            <button className="btn" type="submit">Ajouter</button>
+                            <button className="btn" type="submit">Modifier</button>
                         </div>
                     </form>
                 }
