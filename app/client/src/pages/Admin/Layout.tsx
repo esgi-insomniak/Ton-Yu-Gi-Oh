@@ -70,7 +70,7 @@ export const ReportCard = ({ title, value, icon }: { title: string, value?: stri
         <div className="w-72 h-32 bg-white rounded-lg p-4 flex justify-between flex-col">
             <div className="flex items-center space-x-2">
                 {icon}
-                <h2>{title}:</h2>
+                <h2>{title} :</h2>
             </div>
             <span className="flex justify-end text-7xl">{value}</span>
         </div>

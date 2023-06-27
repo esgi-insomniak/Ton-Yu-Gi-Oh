@@ -50,6 +50,18 @@ export const responseGetAllPromoCodesSchema = zod.object({
     data: zod.array(responsePaymentHistorySchema),
 });
 
+export const AuthLogSchema = zod.object({
+    id: zod.string(),
+    ipAddress: zod.string(),
+    isSuccess: zod.boolean(),
+    createdAt: zod.string(),
+    user: userSchema.nullable(),
+});
+
+export const responseAuthSchema = zod.object({
+    data: zod.array(AuthLogSchema),
+});
+
 export type getAllUsersSchemaType = zod.infer<typeof getAllUsersSchema>;
 export type userSchemaType = zod.infer<typeof userSchema>;
 export type createPromoCodeWithCoinsSchemaType = zod.infer<typeof createPromoCodeWithCoinsSchema>;
@@ -57,3 +69,6 @@ export type createPromoCodeWithSetSchemaType = zod.infer<typeof createPromoCodeW
 export type sendPatchPromoCodeSchemaType = zod.infer<typeof sendPatchPromoCodeSchema>;
 export type responsePaymentHistorySchemaType = zod.infer<typeof responsePaymentHistorySchema>;
 export type responseGetAllPromoCodesSchemaType = zod.infer<typeof responseGetAllPromoCodesSchema>;
+export type responseAuthSchemaType = zod.infer<typeof responseAuthSchema>;
+export type responsePatchUserSchemaType = zod.infer<typeof responsePatchUserSchema>;
+export type AuthLogSchemaType = zod.infer<typeof AuthLogSchema>;
