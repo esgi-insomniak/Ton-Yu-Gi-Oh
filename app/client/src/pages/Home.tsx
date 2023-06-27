@@ -28,12 +28,12 @@ const Home = () => {
     }, [ioClient, alert])
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: true },
-        { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: true },
-        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: true },
-        { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: true },
-        { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: true },
-        { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: user.roles.includes(ROLES.ADMIN) },
+        { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
+        { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: user.roles.includes(ROLES.ADMIN), isBtn: false, action: () => { } },
     ], [user.roles])
 
     return (
