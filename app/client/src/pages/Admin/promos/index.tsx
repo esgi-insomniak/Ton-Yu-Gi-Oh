@@ -8,7 +8,7 @@ import useModal from "@/helpers/api/hooks/modal";
 import { Modal } from "@/components/Modal";
 import { Input, Select } from "@/components/Input";
 import { set, useForm } from "react-hook-form";
-import { createPromoCodeWithCoinsSchemaType, createPromoCodeWithSetSchemaType } from "@/helpers/utils/schema/Admin";
+import { createPromoCodeWithCoinsSchemaType, createPromoCodeWithSetSchemaType, sendPatchPromoCodeSchemaType } from "@/helpers/utils/schema/Admin";
 import { PromoFormWithcoins, PromoFormWithBooster } from "./form";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { useGetFirstGenerationBooster } from "@/helpers/api/hooks/shop";
@@ -43,7 +43,7 @@ const PromoAdmin = () => {
     const [toggleReward, setToggleReward] = React.useState<boolean>(false)
     const [deleteCodeId, setDeleteCodeId] = React.useState<string>("")
 
-    const { register: patch, handleSubmit: patchSubmit, reset: patchReset, formState: { errors } } = useForm<PromoCodeSchemaType>()
+    const { register: patch, handleSubmit: patchSubmit, reset: patchReset, formState: { errors } } = useForm<sendPatchPromoCodeSchemaType>()
 
     const onSubmit = (data: createPromoCodeWithCoinsSchemaType) => {
         postPromoCode.mutate({
@@ -73,12 +73,12 @@ const PromoAdmin = () => {
         })
     }
 
-    const onSubmitPatch = (data: PromoCodeSchemaType) => {
+    const onSubmitPatch = (data: sendPatchPromoCodeSchemaType) => {
         console.log(data, editPromo)
         patchPromo.mutate({
             body: {
                 code: data.code.toUpperCase().trim(),
-                rewardSetId: data.rewardSet as unknown as string || editPromo?.rewardSet?.id as string,
+                rewardSetId: data.rewardSetId || null,
                 rewardSetAmount: data.rewardSetAmount || editPromo?.rewardSetAmount as number,
                 rewardCoinsAmount: data.rewardCoinsAmount || editPromo?.rewardCoinsAmount as number,
                 expirationDate: data.expirationDate || editPromo?.expirationDate as string,
@@ -174,10 +174,7 @@ const PromoAdmin = () => {
                         <Input name="code" label="Code promo" register={patch} uppercase error={errors.code?.message} defaultV={editPromo?.code} />
                         <Input name="rewardCoinsAmount" label="Nombre de coins" type="number" register={patch} error={errors.rewardCoinsAmount?.message}
                             defaultV={editPromo?.rewardCoinsAmount as number} />
-                        <Select name="rewardSet" register={patch} options={boosters?.data?.map((booster) => ({
-                            id: booster.id,
-                            name: booster.name,
-                        })) || []} placeholder={boosters?.data?.find((booster) => booster.id === editPromo?.rewardSet?.id)?.name} wfull />
+                        <Select name="rewardSetId" register={patch} options={boosters?.data} defaultV={editPromo?.rewardSet?.id} placeholder="Aucun" wfull />
                         <Input name="rewardSetAmount" label="Nombre de booster" type="number" register={patch} error={errors.rewardSetAmount?.message}
                             defaultV={editPromo?.rewardSetAmount as number} />
                         <Input name="expirationDate" label="Date d'expiration" type="date" register={patch} error={errors.expirationDate?.message}
