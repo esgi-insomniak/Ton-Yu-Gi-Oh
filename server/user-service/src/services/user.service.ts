@@ -60,6 +60,15 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  async updateUserById(id: string, user: User): Promise<User> {
+    try {
+      await this.userRepository.update(id, user);
+      return await this.getUserById({ id });
+    } catch {
+      return null;
+    }
+  }
+
   async addCoinsUser(userId: string, coins: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
