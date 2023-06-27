@@ -61,6 +61,7 @@ export const Input = <T extends FieldValues>({
 };
 
 export const Select = <T extends FieldValues>({
+    defaultV,
     options,
     name,
     placeholder,
@@ -69,6 +70,7 @@ export const Select = <T extends FieldValues>({
     theme = "light"
 }: {
     // generic options type
+    defaultV?: string | number | undefined;
     options: Array<{ id: string; name: string }> | undefined;
     name: Path<T>;
     placeholder?: string;
@@ -77,8 +79,8 @@ export const Select = <T extends FieldValues>({
     theme?: "dark" | "light";
 }) => {
     return options ? (
-        <select className={`select select-bordered ${wfull === true && 'w-full'} ${theme === 'light' ? 'bg-white text-gray-400 border border-gray-400' : ''}`} name={name} {...register && register(name)}>
-            {placeholder && <option value="">{placeholder}</option>}
+        <select className={`select select-bordered ${wfull === true && 'w-full'} ${theme === 'light' ? 'bg-white text-gray-400 border border-gray-400' : ''}`} defaultValue={defaultV || ''} name={name} {...register && register(name)}>
+            {placeholder && <option value={''}>{placeholder}</option>}
             {options.map((option, i) => (
                 <option key={i} value={option.id}>{option.name}</option>
             ))}

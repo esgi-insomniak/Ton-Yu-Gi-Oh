@@ -32,7 +32,16 @@ export const createPromoCodeWithSetSchema = zod.object({
     expirationDate: zod.string(),
 });
 
+export const sendPatchPromoCodeSchema = zod.object({
+    code: zod.string().nonempty({ message: "Le code ne peut pas être vide" }),
+    rewardCoinsAmount: zod.number().positive({ message: "C'est de l'arnaque si on donne moins que 0 Coins" }).nullable(),
+    rewardSetId: zod.string().nonempty({ message: "Selectionner un code booster " }).nullable(),
+    rewardSetAmount: zod.number().positive({ message: "C'est de l'arnaque si on donne moins que 0 boosters" }).nullable(),
+    expirationDate: zod.string().nullable(),
+});
+
 export type getAllUsersSchemaType = zod.infer<typeof getAllUsersSchema>;
 export type userSchemaType = zod.infer<typeof userSchema>;
 export type createPromoCodeWithCoinsSchemaType = zod.infer<typeof createPromoCodeWithCoinsSchema>;
 export type createPromoCodeWithSetSchemaType = zod.infer<typeof createPromoCodeWithSetSchema>;
+export type sendPatchPromoCodeSchemaType = zod.infer<typeof sendPatchPromoCodeSchema>;

@@ -47,15 +47,20 @@ const PromoCodeSchema = zod.object({
     expirationDate: zod.string().nullable(),
 })
 
-const responsePromoCodeSchema = zod.object({
+const responseArrayPromoCodeSchema = zod.object({
     data: zod.array(PromoCodeSchema),
+});
+
+const responseOnePromoCodeSchema = zod.object({
+    data: PromoCodeSchema,
 });
 
 type responseSendPayementIcToStripeSchemaType = zod.infer<typeof responseSendPayementIcToStripeSchema>;
 type responseConfirmPayementIcToStripeSchemaType = zod.infer<typeof responseConfirmPayementIcToStripeSchema>;
 type responseBuyBoosterSchemaType = zod.infer<typeof responseBuyBoosterSchema>;
-type responsePromoCodeSchemaType = zod.infer<typeof responsePromoCodeSchema>;
+type responseArrayPromoCodeSchemaType = zod.infer<typeof responseArrayPromoCodeSchema>;
+type responseOnePromoCodeSchemaType = zod.infer<typeof responseOnePromoCodeSchema>;
 type PromoCodeSchemaType = zod.infer<typeof PromoCodeSchema>;
 
-export { sendPayementIcToStripeSchema, responseSendPayementIcToStripeSchema, responseConfirmPayementIcToStripeSchema, sendBuyAmountSchema, responseBuyBoosterSchema, responsePromoCodeSchema, PromoCodeSchema }
-export type { responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseBuyBoosterSchemaType, responsePromoCodeSchemaType, PromoCodeSchemaType }
+export { sendPayementIcToStripeSchema, responseSendPayementIcToStripeSchema, responseConfirmPayementIcToStripeSchema, sendBuyAmountSchema, responseBuyBoosterSchema, responseArrayPromoCodeSchema, responseOnePromoCodeSchema, PromoCodeSchema }
+export type { responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseBuyBoosterSchemaType, responseOnePromoCodeSchemaType, responseArrayPromoCodeSchemaType, PromoCodeSchemaType }
