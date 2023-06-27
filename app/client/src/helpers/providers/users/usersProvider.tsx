@@ -6,7 +6,6 @@ import jwt_decode from "jwt-decode"
 import { useLocalStorage } from "react-use";
 import { Socket, io } from "socket.io-client";
 import { SOCKET_URL } from "@/helpers/utils/constants";
-import { ISocketEvent } from "@/helpers/types/socket";
 
 export const UserContextProvider = ({ children }: UserManagementContextProps) => {
     const [tokenLs, setToken, removeToken] = useLocalStorage("token", "", { raw: true });
@@ -28,6 +27,7 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
 
     const handleUpdateUser = React.useCallback((token: string) => {
         setToken(token);
+        ioClient?.disconnect();
         const decodedToken = jwt_decode<DecodedTokenType>(token);
         setUser({
             id: decodedToken.userId,
@@ -35,6 +35,7 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
             roles: decodedToken.roles,
             username: decodedToken.username,
         })
+        setIoClient(io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${token}` } }));
     }, [setUser])
 
     const logout = React.useCallback(() => {
@@ -43,27 +44,22 @@ export const UserContextProvider = ({ children }: UserManagementContextProps) =>
         localStorage.clear();
     }, [setUser])
 
-    React.useEffect(() => {
-        ioClient?.disconnect();
-        if (!tokenLs) return;
-        setIoClient(io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${tokenLs}` } }));
-    }, [tokenLs])
+    const memoizedIoClient = React.useMemo(() => {
+        if (token) {
+            if (ioClient === null) setIoClient(io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${token}` } }));
+        }
 
-    React.useEffect(() => {
-        if (!ioClient) return;
-        ioClient.on('message', (event: ISocketEvent) => {
-            console.log(event);
-        })
-    }, [ioClient])
+        return ioClient;
+    }, [token, ioClient])
 
     const value = React.useMemo(() => ({
         token,
         isLoggedIn: user.id !== "",
         user,
-        ioClient,
+        ioClient: memoizedIoClient,
         login: handleUpdateUser,
         logout
-    }), [token, user, handleUpdateUser])
+    }), [token, user, handleUpdateUser, ioClient])
 
     return (
         <UserContext.Provider value={value}>

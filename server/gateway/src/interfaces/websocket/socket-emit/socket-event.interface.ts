@@ -1,12 +1,13 @@
-export enum ISocketEventMethod {
-  GET = 'GET',
+export enum ISocketEventType {
+  INFO = 'INFO',
   CREATE = 'CREATE',
   UPDATE = 'UPDATE',
   DELETE = 'DELETE',
+  ERROR = 'ERROR',
 }
 
 export interface ISocketEvent {
   event: string;
-  method: keyof typeof ISocketEventMethod;
+  type: keyof typeof ISocketEventType;
   data: any;
 }
