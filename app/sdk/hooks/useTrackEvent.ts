@@ -27,7 +27,7 @@ export const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type }: 
         const track = () => {
             apiRequest({
                 beacon: true,
-                url: "/api/track",
+                url: "/track",
                 method: "POST",
                 payload: {
                     event: type,

@@ -137,6 +137,7 @@ const Dashboard = () => {
       setGraphData(countArray);
     } else if (dataName === "rebond") {
     } else if (dataName === "time") {
+      
     }
 
     setOptionsGraph({

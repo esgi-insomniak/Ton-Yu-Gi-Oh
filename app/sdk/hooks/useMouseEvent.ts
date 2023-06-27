@@ -44,14 +44,15 @@ const useTrackMouseMovement = ({ ref }: TrackMouseMouvementType): TrackMouseMove
         const track = () => {
             apiRequest({
                 beacon: true,
-                url: "/api/track",
+                url: "/mouse-track",
                 method: "POST",
                 payload: {
                     event: "mouse",
                     timestamp: Date.now(),
                     visitorId,
                     appId,
-                    mousePosition
+                    mousePosition,
+                    pageUrl: window.location.href
                 }
             })
         };

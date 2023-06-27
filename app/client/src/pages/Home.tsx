@@ -5,6 +5,7 @@ import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTrackEvent, useTrackMouseMovement } from "insomniak-sdk-analytics";
 
 const Home = () => {
     const { user, ioClient } = useAuth()
@@ -36,6 +37,8 @@ const Home = () => {
         { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: user.roles.includes(ROLES.ADMIN), isBtn: false, action: () => { } },
     ], [user.roles])
 
+    const { ref } = useTrackEvent<HTMLElement>({ tag: 'card-homePage', type: 'click' })
+
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
@@ -44,7 +47,7 @@ const Home = () => {
             <div className="hero-overlay bg-gray-900 opacity-60" />
             <div className="hero-content text-center flex flex-col">
                 <div className="max-w-md">
-                    <h1 className="mb-5 text-5xl font-bold">
+                    <h1 className="mb-5 text-5xl font-bold" ref={ref}>
                         Welcome <span className="text-yellow-500">{user.username}</span>
                     </h1>
                 </div>

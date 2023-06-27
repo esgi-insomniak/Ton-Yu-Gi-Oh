@@ -1,3 +1,5 @@
+const API_URL = 'http://localhost:3000';
+
 const generateId = (type: 'client' | 'app'): string => {
     return `${type}-${crypto.randomUUID()}`
 }
@@ -34,9 +36,8 @@ interface apiRequestProps {
 }
 
 const apiRequest = ({ beacon, url, payload, headers, method }: apiRequestProps) => {
-    if (beacon) {
-        navigator.sendBeacon(url, JSON.stringify(payload));
-    } else {
+    if (beacon) navigator.sendBeacon(`${API_URL}${url}`, JSON.stringify(payload));
+    else {
         fetch(url, {
             method: method,
             headers: {
