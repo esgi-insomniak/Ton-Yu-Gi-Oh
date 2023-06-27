@@ -5,6 +5,17 @@ const tunnelSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    tags: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Tag',
+        },
+    ],
+    appData: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AppData',
+        required: true,
+    },
 });
 
 const Tunnel = mongoose.model('Tunnel', tunnelSchema);
@@ -12,6 +23,11 @@ const Tunnel = mongoose.model('Tunnel', tunnelSchema);
 const tagSchema = new mongoose.Schema({
     name: {
         type: String,
+        required: true,
+    },
+    appData: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AppData',
         required: true,
     },
 });
@@ -57,6 +73,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    appData: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'AppData',
+        },
+    ]
 });
 
 const User = mongoose.model('User', userSchema);
@@ -99,7 +121,11 @@ const mouseEventTrackSchema = new mongoose.Schema({
             type: String,
             required: true,
         },
-    }
+    },
+    pageUrl: {
+        type: String,
+        required: true,
+    },
 })
 
 const MouseEventTrack = mongoose.model('MouseEventTrack', mouseEventTrackSchema);
@@ -129,6 +155,22 @@ const trackEventSchema = new mongoose.Schema({
 })
 
 const TrackEvent = mongoose.model('TrackEvent', trackEventSchema);
+
+const appDataSchema = new mongoose.Schema({
+    clientId: {
+        type: String,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+    },
+});
+
+const AppData = mongoose.model('AppData', appDataSchema);
     
 
-module.exports = { Tunnel, Tag, Stat, AppId, User, MouseEventTrack, TrackEvent };
+module.exports = { Tunnel, Tag, Stat, AppId, User, MouseEventTrack, TrackEvent, AppData };

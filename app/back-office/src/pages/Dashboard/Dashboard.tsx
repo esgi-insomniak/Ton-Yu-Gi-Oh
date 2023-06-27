@@ -1,42 +1,156 @@
-import React from 'react';
-import OurLogoWithoutRect from '@/assets/logo';
-import Charts from '@/components/Charts';
+import React from "react";
+import Charts from "@/components/Charts";
+import Header from "@/components/Navbar";
+import { EChartsOption } from "echarts-for-react";
+import axios from "axios";
 
 const Dashboard = () => {
-  const [showSubmenu, setShowSubmenu] = React.useState(false);
-  const [showNotification, setShowNotification] = React.useState(false);
-  const [optionsGraph, setOptionsGraph] = React.useState<any>({
+  const [dataHeatmap, setDataHeatmap] = React.useState([]);
+  const [userData, setUserData] = React.useState([]);
+  const [clickData, setClickData] = React.useState([]);
+  const [nbClickTotal, setNbClickTotal] = React.useState(0);
+  const [sessionData, setSessionData] = React.useState([]);
+  const [nbSessionTotal, setNbSessionTotal] = React.useState(0);
+  const [rebondData, setRebondData] = React.useState([]);
+  const [sessionTimeData, setSessionTimeData] = React.useState([]);
+  const [graphData, setGraphData] = React.useState([]);
+  const currentDate = new Date();
+
+  const last7Days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(currentDate);
+    date.setDate(date.getDate() - index);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+
+    const formattedDate = `${day}/${month}`;
+
+    return formattedDate;
+  }).reverse();
+
+  const [optionsGraph, setOptionsGraph] = React.useState<EChartsOption>({
     xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      type: "category",
+      data: last7Days,
     },
     yAxis: {
-      type: 'value',
+      type: "value",
     },
     series: [
       {
-        data: [820, 932, 901, 934, 1290, 1330, 1320],
-        type: 'line',
+        data: [0, 0, 0, 0, 0, 0, 10],
+        type: "line",
         smooth: true,
       },
     ],
   });
 
+  const userId = localStorage.getItem("id");
+
+  React.useEffect(() => {
+    axios
+      .get(`http://localhost:3000/users/${userId}`)
+      .then((res) => {
+        setUserData(res.data.appData[0]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [userId]);
+
+  React.useEffect(() => {
+    if (userData.length > 0) {
+      axios
+        .get(`http://localhost:3000/mouse-track/distinct/${userData}`)
+        .then((response) => {
+          const { data } = response;
+          setDataHeatmap(data);
+        })
+        .catch((error) => {
+          console.error("Error retrieving data:", error);
+        });
+    }
+  }, [userData]);
+
+  React.useEffect(() => {
+    axios.get(`http://localhost:3000/track/${userData}`).then((response) => {
+      setClickData(response.data);
+      let totalClicks = 0;
+      if (clickData.length > 0) {
+        clickData.forEach((data: any) => {
+          totalClicks += data.count; // Accumulate the count values
+        });
+      }
+  
+      setNbClickTotal(totalClicks); // Update the state with the total clicks
+    });
+  }, [userData]);
+  
+  
+
+  React.useEffect(() => {
+    axios.get(`http://localhost:3000/track/distinct/${userData}`).then((response) => {
+      setSessionData(response.data);
+      let totalSession = 0;
+      if (sessionData.length > 0) {
+        sessionData.forEach((data: any) => {
+          // count nb user
+          let nbUser = data.users.length;
+          totalSession += nbUser; // Accumulate the count values
+        });
+      }
+
+      setNbSessionTotal(totalSession); // Update the state with the total clicks
+    });
+  }, [userData]);
+
+  // React.useEffect(() => {
+  //   axios.get(`http://localhost:3000/mouse-track/distinct/${userData}`).then((response) => {
+  //     setClickData(response.data);
+  //   });
+  // }, [userData]);
+
   const handleClick = (dataName: string) => {
-    console.log(dataName);
+    if (dataName === "click") {
+      const countArray: any = last7Days.map((day) => {
+        const matchingData = clickData.find((data: any) => {
+          const formattedDate = day.split("/").reverse().join("-");
+          const year = new Date().getFullYear(); // Get the current year
+          const fullDate = `${year}-${formattedDate}`;
+          return fullDate === data.date;
+        });
+        return matchingData ? matchingData.count : 0;
+      });
+
+      setGraphData(countArray);
+    } else if (dataName === "session") {
+      const countArray: any = last7Days.map((day) => {
+        const matchingData = sessionData.find((data: any) => {
+          const formattedDate = day.split("/").reverse().join("-");
+          const year = new Date().getFullYear(); // Get the current year
+          const fullDate = `${year}-${formattedDate}`;
+          return fullDate === data.date;
+        });
+        return matchingData ? matchingData.users.length : 0;
+      });
+
+      setGraphData(countArray);
+    } else if (dataName === "rebond") {
+    } else if (dataName === "time") {
+    }
 
     setOptionsGraph({
       xAxis: {
-        type: 'category',
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        type: "category",
+        data: last7Days,
       },
       yAxis: {
-        type: 'value',
+        type: "value",
       },
       series: [
         {
-          data: [820, 932, 901, 934, 1290, 1330, 1320],
-          type: 'line',
+          data: graphData || [0, 0, 0, 0, 0, 0, 10],
+          type: "line",
           smooth: true,
         },
       ],
@@ -46,161 +160,7 @@ const Dashboard = () => {
   return (
     <React.Fragment>
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
-        <header className="z-40 py-4  bg-gray-800 flex justify-between items-center">
-          <div className="flex justify-center">
-            <div className="flex items-center mx-5">
-              <OurLogoWithoutRect width="80" height="80" />
-              <div className="flex items-center mx-5">
-                <p className="text-2xl text-green-500 font-semibold">WEB</p>
-                <p className="ml-2 font-semibold italic text-white">
-                  ANALYTICS
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between h-8 px-6">
-            <ul className="flex items-center flex-shrink-0 space-x-6">
-              <li className="relative">
-                <button
-                  className="p-2 bg-white text-green-400 align-middle rounded-full hover:text-white hover:bg-green-400 focus:outline-none "
-                  aria-label="Notifications"
-                  aria-haspopup="true"
-                  onClick={() => {
-                    setShowNotification(!showNotification),
-                      setShowSubmenu(false);
-                  }}
-                >
-                  <div className="flex items-cemter">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                      />
-                    </svg>
-                  </div>
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 right-0 inline-block w-3 h-3 transform translate-x-1 -translate-y-1 bg-red-600 border-2 border-white rounded-full dark:border-gray-800"
-                  ></span>
-                </button>
-                <div>
-                  {showNotification && (
-                    <ul
-                      className="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-green-400 border border-green-500 rounded-md shadow-md"
-                    >
-                      <li className="flex">
-                        <a
-                          className="text-white inline-flex items-center justify-between w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
-                          href="#"
-                        >
-                          <span>Messages</span>
-                          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-600 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-600">
-                            13
-                          </span>
-                        </a>
-                      </li>
-                    </ul>
-                  )}
-                </div>
-              </li>
-
-              <li className="relative">
-                <button
-                  className="p-2 bg-white text-green-400 align-middle rounded-full hover:text-white hover:bg-green-400 focus:outline-none "
-                  aria-label="Account"
-                  aria-haspopup="true"
-                  onClick={() => {
-                    setShowSubmenu(!showSubmenu), setShowNotification(false);
-                  }}
-                >
-                  <div className="flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </div>
-                </button>
-                <div>
-                  {showSubmenu && (
-                    <ul
-                      className="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-green-400 border border-green-500 rounded-md shadow-md block"
-                      aria-label="submenu"
-                    >
-                      <li className="flex">
-                        <a
-                          className=" text-white inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
-                          href="#"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-5 h-5 mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span>Profil</span>
-                        </a>
-                      </li>
-                      <li className="flex">
-                        <a
-                          className="text-white inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800"
-                          href="/logout"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-5 h-5 mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                            />
-                          </svg>
-                          <span>Se déconnecter</span>
-                        </a>
-                      </li>
-                    </ul>
-                  )}
-                </div>
-              </li>
-            </ul>
-          </div>
-        </header>
+        <Header />
         <main className="">
           <div className="grid mb-4 pb-10 px-8 rounded-3xl bg-gray-100">
             <div className="grid grid-cols-12 gap-6">
@@ -214,7 +174,7 @@ const Dashboard = () => {
                   <div className="grid grid-cols-12 gap-6 mt-5">
                     <a
                       className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
-                      onClick={() => handleClick('users')}
+                      onClick={() => handleClick("click")}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -232,18 +192,15 @@ const Dashboard = () => {
                               d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                             />
                           </svg>
-                          <div className="bg-green-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
-                            <span className="flex items-center">30%</span>
-                          </div>
                         </div>
                         <div className="ml-2 w-full flex-1">
                           <div>
                             <div className="mt-3 text-3xl font-bold leading-8">
-                              4.510
+                              {nbClickTotal || "Pas de données"}
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
-                              Utilisateurs
+                              Nombres de clicks
                             </div>
                           </div>
                         </div>
@@ -251,7 +208,7 @@ const Dashboard = () => {
                     </a>
                     <a
                       className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
-                      onClick={() => handleClick('session')}
+                      onClick={() => handleClick("session")}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -269,14 +226,11 @@ const Dashboard = () => {
                               d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                             />
                           </svg>
-                          <div className="bg-red-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
-                            <span className="flex items-center">30%</span>
-                          </div>
                         </div>
                         <div className="ml-2 w-full flex-1">
                           <div>
                             <div className="mt-3 text-3xl font-bold leading-8">
-                              4.510
+                              {nbSessionTotal || "Pas de données"}
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
@@ -288,7 +242,7 @@ const Dashboard = () => {
                     </a>
                     <a
                       className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
-                      onClick={() => handleClick('rebond')}
+                      onClick={() => handleClick("rebond")}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -312,9 +266,6 @@ const Dashboard = () => {
                               d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
                             />
                           </svg>
-                          <div className="bg-yellow-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
-                            <span className="flex items-center">30%</span>
-                          </div>
                         </div>
                         <div className="ml-2 w-full flex-1">
                           <div>
@@ -331,7 +282,7 @@ const Dashboard = () => {
                     </a>
                     <a
                       className="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white cursor-pointer"
-                      onClick={() => handleClick('time')}
+                      onClick={() => handleClick("time")}
                     >
                       <div className="p-5">
                         <div className="flex justify-between">
@@ -349,9 +300,6 @@ const Dashboard = () => {
                               d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
                             />
                           </svg>
-                          <div className="bg-blue-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
-                            <span className="flex items-center">30%</span>
-                          </div>
                         </div>
                         <div className="ml-2 w-full flex-1">
                           <div>
@@ -399,21 +347,7 @@ const Dashboard = () => {
                                       <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                         <div className="flex cursor-pointer">
                                           <span className="mr-2">
-                                            Nombre de visiteurs
-                                          </span>
-                                        </div>
-                                      </th>
-                                      <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                        <div className="flex cursor-pointer">
-                                          <span className="mr-2">
-                                            Nombres de clique
-                                          </span>
-                                        </div>
-                                      </th>
-                                      <th className="px-6 py-3 bg-gray-50 text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                        <div className="flex cursor-pointer">
-                                          <span className="mr-2">
-                                            Temps passé sur la page
+                                            Nombre de click
                                           </span>
                                         </div>
                                       </th>
@@ -425,28 +359,57 @@ const Dashboard = () => {
                                     </tr>
                                   </thead>
                                   <tbody className="bg-white divide-y divide-gray-200">
-                                    <tr>
-                                      <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <p>tonyugigi.fr</p>
-                                      </td>
-                                      <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <p>9999999</p>
-                                      </td>
-                                      <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <p>9999999</p>
-                                      </td>
-                                      <td className="px-6 py-4 whitespace-no-wrap text-sm leading-5">
-                                        <p>15min52</p>
-                                      </td>
-                                      <td>
-                                        <a
-                                          href="/heatmap/{pageId}"
-                                          className="text-blue-500"
-                                        >
-                                          Heatmap de la page
-                                        </a>
-                                      </td>
-                                    </tr>
+                                    {dataHeatmap.length ? (
+                                      dataHeatmap.map((item: any, index) => (
+                                        <tr key={index}>
+                                          <td className="px-6 py-4 whitespace-no-wrap">
+                                            <div className="flex items-center">
+                                              <div className="ml-4">
+                                                <div className="text-sm leading-5 font-medium text-gray-900">
+                                                  {item.pageUrl ||
+                                                    "Pas de nom de page"}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-no-wrap">
+                                            <div className="flex items-center">
+                                              <div className="ml-4">
+                                                <div className="text-sm leading-5 font-medium text-gray-900">
+                                                  {item.clientIdCount || "0"}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-no-wrap">
+                                            <div className="text-sm leading-5 text-gray-900">
+                                              <a href={`/heatmap/${item._id}`}>
+                                                <svg
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  className="h-6 w-6 text-blue-500"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M12 4v16m8-8H4"
+                                                  />
+                                                </svg>
+                                              </a>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      ))
+                                    ) : (
+                                      <tr>
+                                        <td colSpan={3} className="text-center">
+                                          Aucune donnée disponible
+                                        </td>
+                                      </tr>
+                                    )}
                                   </tbody>
                                 </table>
                               </div>
