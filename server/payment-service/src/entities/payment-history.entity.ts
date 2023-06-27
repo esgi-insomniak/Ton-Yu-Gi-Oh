@@ -5,6 +5,9 @@ export class PaymentHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ unique: true })
+  sessionId: string;
+
   @Column('uuid')
   userId: string;
 

@@ -82,9 +82,9 @@ const Collection = () => {
         <div className="flex gap-5 w-full overflow-scroll p-5 flex-col h-full">
             <form className="flex w-full space-x-2 items-center justify-center" onSubmit={handleSearch}>
                 <input type="text" className="input input-bordered" name="searchBar" placeholder="Rechercher" />
-                <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" />
-                <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" />
-                <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" />
+                <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" theme="dark" />
+                <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" theme="dark" />
+                <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" theme="dark" />
                 <button className="btn" type="submit">Rechercher</button>
                 <button className="btn" onClick={handleClear}>Vider</button>
             </form>

@@ -3,6 +3,8 @@ import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/helpers/api/hooks";
 import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
 import Layout from "@/components/Layout";
+import { ROLES } from "@/helpers/utils/enum/roles";
+import { LayoutAdmin } from "@/pages/Admin/Layout";
 
 interface ProtectedRouteProps {
     redirect: string;
@@ -41,6 +43,11 @@ const ShopPage = React.lazy(() => import('@/pages/Shop'));
 const DecksPage = React.lazy(() => import('@/pages/Decks'));
 const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
 const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
+const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
+const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
+const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
+const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
+const AdminPromoPage = React.lazy(() => import('@/pages/Admin/promos'));
 const DuelPage = React.lazy(() => import('@/pages/Duels'));
 
 /**
@@ -49,16 +56,19 @@ const DuelPage = React.lazy(() => import('@/pages/Duels'));
 const Router: React.FC = () => {
     const { user, isLoggedIn } = useAuth()
     const router = useLocation().pathname
+
+    const routesWithoutLayout = React.useMemo(() => ['/', '/admin'], [])
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
             <Routes>
 
+                {/* Protected routes */}
                 <Route
                     element={
                         <ProtectedRoute
                             condition={isLoggedIn}
                             redirect="/login"
-                            withLayout={router !== '/'}
+                            withLayout={!routesWithoutLayout.includes(router)}
                         >
                             <Outlet />
                         </ProtectedRoute>
@@ -79,6 +89,25 @@ const Router: React.FC = () => {
                     <Route path="/duel/:roomId" element={<DuelPage />} />
                 </Route>
 
+                {/* Admin routes */}
+                <Route element={
+                    <ProtectedRoute
+                        condition={user.roles.includes(ROLES.ADMIN)}
+                        redirect="/"
+                    >
+                        <LayoutAdmin>
+                            <Outlet />
+                        </LayoutAdmin>
+                    </ProtectedRoute>
+                }>
+                    <Route path="/admin" element={<AdminUserPage />} />
+                    <Route path="/admin/exchange" element={<AdminExchangePage />} />
+                    <Route path="/admin/payement" element={<AdminPayementPage />} />
+                    <Route path="/admin/auth" element={<AdminAuthPage />} />
+                    <Route path="/admin/promo" element={<AdminPromoPage />} />
+                </Route>
+
+                {/* Public routes */}
                 <Route
                     element={
                         <ProtectedRoute

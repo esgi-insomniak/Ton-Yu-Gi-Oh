@@ -5,6 +5,7 @@ export interface IUser {
   phone: string;
   coins: number;
   roles: string[];
+  isOnline: boolean;
 }
 
 export enum IUserRoles {

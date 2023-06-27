@@ -58,6 +58,24 @@ export class UserController {
     return result;
   }
 
+  @MessagePattern('update_user_by_id')
+  public async updateUserById(request: {
+    params: ParamGetItemById;
+    body: User;
+  }): Promise<GetResponseOne<User>> {
+    const user = await this.userService.updateUserById(
+      request.params.id,
+      request.body,
+    );
+    const result: GetResponseOne<User> = {
+      status: user ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
+      message: user ? null : 'User not updated',
+      item: user,
+    };
+
+    return result;
+  }
+
   @MessagePattern('user_create')
   public async createUser(params: {
     username: string;

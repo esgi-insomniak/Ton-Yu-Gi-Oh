@@ -7,6 +7,8 @@ import {
   Query,
   Body,
   Req,
+  Patch,
+  SerializeOptions,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
@@ -19,7 +21,10 @@ import {
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
-import { CreateUserBodyDto } from 'src/interfaces/user-service/user/user.body.dto';
+import {
+  CreateUserBodyDto,
+  UpdateUserBodyDto,
+} from 'src/interfaces/user-service/user/user.body.dto';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 import {
@@ -137,6 +142,48 @@ export class UserController {
 
     const result: CreateUserResponseDto = {
       data: userResponse.item,
+    };
+
+    return result;
+  }
+
+  @Authorization(true)
+  @Patch(':id')
+  @SerializeOptions({
+    groups: ['admin'],
+  })
+  @ApiOkResponse({
+    type: GetUserByIdResponseDto,
+  })
+  public async updateUser(
+    @Req() request: IAuthorizedRequest,
+    @Param() params: GetItemByIdDto,
+    @Body() body: UpdateUserBodyDto,
+  ): Promise<GetUserByIdResponseDto> {
+    if (!request.user.roles.includes(IUserRoles.admin)) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    const userPartial: Partial<IUser> = body;
+
+    const updatedUserResponse: GetResponseOne<IUser> = await firstValueFrom(
+      this.userServiceClient.send('update_user_by_id', {
+        params: {
+          id: params.id,
+        },
+        body: userPartial,
+      }),
+    );
+
+    if (updatedUserResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        updatedUserResponse.message,
+        updatedUserResponse.status,
+      );
+    }
+
+    const result: GetUserByIdResponseDto = {
+      data: updatedUserResponse.item,
     };
 
     return result;
