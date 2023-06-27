@@ -45,6 +45,7 @@ const Shop = () => {
         buyBooster.mutate({ amount: 1, boosterId: booster.id }, {
             onSuccess: (res) => {
                 alert?.success(`Vous avez bien acheté le booster ${booster.name} !`)
+                confirmBuyBoosterToggle()
                 refetch()
             },
             onError: (err) => {

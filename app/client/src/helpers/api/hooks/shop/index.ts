@@ -3,7 +3,7 @@ import { ApiGetItemResponse } from '@/helpers/types/common'
 import { BoosterApiResponse } from '@/helpers/types/shop'
 import { BOOSTER_CODE } from '@/helpers/utils/constants'
 import {
-    responseSendPayementIcToStripeSchema, responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchema, responseBuyBoosterSchemaType, responseBuyBoosterSchema, sendBuyAmountSchema, responsePromoCodeSchema, responsePromoCodeSchemaType
+    responseSendPayementIcToStripeSchema, responseSendPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchemaType, responseConfirmPayementIcToStripeSchema, responseBuyBoosterSchemaType, responseBuyBoosterSchema, sendBuyAmountSchema, responseOnePromoCodeSchema, responseOnePromoCodeSchemaType
 } from '@/helpers/utils/schema/shop'
 import React from 'react'
 import { useMutation, useQuery } from 'react-query'
@@ -48,7 +48,7 @@ const redeemPromoCode = (promoCode: string) => apiRequest({
     url: QUERY_URLS.promoCode(promoCode),
     method: 'POST',
     token: !!token ? token : undefined
-}, responsePromoCodeSchema)
+}, responseOnePromoCodeSchema)
 
 export const usePayment = () =>
     useMutation<responseSendPayementIcToStripeSchemaType, Error, string>((productId) => requestPayment(productId))
@@ -66,4 +66,4 @@ export const useGetFirstGenerationBooster = () => {
 }
 
 export const useRedeemPromoCode = () =>
-    useMutation<responsePromoCodeSchemaType, Error, string>((promoCode) => redeemPromoCode(promoCode))
+    useMutation<responseOnePromoCodeSchemaType, Error, string>((promoCode) => redeemPromoCode(promoCode))

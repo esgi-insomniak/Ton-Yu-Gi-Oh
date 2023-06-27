@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "react-query";
 import { apiRequest } from "@/helpers/api";
 import React from "react";
-import { PromoCodeSchema, PromoCodeSchemaType, responsePromoCodeSchema, responsePromoCodeSchemaType } from "@/helpers/utils/schema/shop";
+import { PromoCodeSchema, PromoCodeSchemaType, responseArrayPromoCodeSchema, responseArrayPromoCodeSchemaType } from "@/helpers/utils/schema/shop";
 import { sendPatchPromoCodeSchemaType } from "@/helpers/utils/schema/Admin";
 
 const QUERY_URLS = {
@@ -17,7 +17,7 @@ const requestAllPromos = (limit: number, offset: number) => apiRequest({
     url: QUERY_URLS.getAllPromos(limit, offset),
     method: 'GET',
     token: !!token ? token : undefined
-}, responsePromoCodeSchema)
+}, responseArrayPromoCodeSchema)
 
 const requestPostPromoCode = (body: PromoCodeSchemaType) => apiRequest({
     url: QUERY_URLS.postPromoCode(),
@@ -40,7 +40,7 @@ const requestPatchPromoCode = (id: string, body: sendPatchPromoCodeSchemaType) =
 })
 
 export const useGetAllPromos = (limit: number, offset: number) => {
-    const { data, isLoading, error, refetch } = useQuery<responsePromoCodeSchemaType>(['getAllPromos', limit, offset], () => requestAllPromos(limit, offset))
+    const { data, isLoading, error, refetch } = useQuery<responseArrayPromoCodeSchemaType>(['getAllPromos', limit, offset], () => requestAllPromos(limit, offset))
 
     return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
 }
