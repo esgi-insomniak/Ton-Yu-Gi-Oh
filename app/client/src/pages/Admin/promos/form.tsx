@@ -80,7 +80,7 @@ export const PromoFormWithBooster: React.FC<PromoFormWithBoosterProps> = ({ onSu
                 options={
                     boosters?.data?.map((booster) => ({
                         id: booster.id,
-                        name: booster.code,
+                        name: `${booster.name} (${booster.code})`,
                     })) || []
                 }
                 placeholder="Sélectionner un booster"
