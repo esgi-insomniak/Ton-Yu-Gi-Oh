@@ -39,9 +39,21 @@ export const sendPatchPromoCodeSchema = zod.object({
     rewardSetAmount: zod.number().positive({ message: "C'est de l'arnaque si on donne moins que 0 boosters" }).nullable(),
     expirationDate: zod.string().nullable(),
 });
+export const responsePaymentHistorySchema = zod.object({
+    id: zod.string(),
+    userId: zod.string(),
+    coinsAmount: zod.number(),
+    stripeInfo: zod.string(),
+});
+
+export const responseGetAllPromoCodesSchema = zod.object({
+    data: zod.array(responsePaymentHistorySchema),
+});
 
 export type getAllUsersSchemaType = zod.infer<typeof getAllUsersSchema>;
 export type userSchemaType = zod.infer<typeof userSchema>;
 export type createPromoCodeWithCoinsSchemaType = zod.infer<typeof createPromoCodeWithCoinsSchema>;
 export type createPromoCodeWithSetSchemaType = zod.infer<typeof createPromoCodeWithSetSchema>;
 export type sendPatchPromoCodeSchemaType = zod.infer<typeof sendPatchPromoCodeSchema>;
+export type responsePaymentHistorySchemaType = zod.infer<typeof responsePaymentHistorySchema>;
+export type responseGetAllPromoCodesSchemaType = zod.infer<typeof responseGetAllPromoCodesSchema>;
