@@ -1081,6 +1081,13 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
 
+"@types/request-ip@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/request-ip/-/request-ip-0.0.38.tgz#05e5c2098c6e0c83dbfc4453177d0e0374a744d0"
+  integrity sha512-1yeq8UuK/tUBqLXRY24gjeFvrSNaGNcOcZLQjHlnuw8iu+qE/vTQ64TUcLWorr607NKLfFakdoYEXXHXrLLKCw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/semver@^7.3.12":
   version "7.3.13"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.3.13.tgz#da4bfd73f49bd541d28920ab0e2bf0ee80f71c91"
@@ -4266,6 +4273,11 @@ reflect-metadata@^0.1.13:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
   integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
+
+request-ip@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/request-ip/-/request-ip-3.3.0.tgz#863451e8fec03847d44f223e30a5d63e369fa611"
+  integrity sha512-cA6Xh6e0fDBBBwH77SLJaJPBmD3nWVAcF9/XAcsrIHdjhFzFiB5aNQFytdjCGPezU3ROwrR11IddKAM08vohxA==
 
 require-directory@^2.1.1:
   version "2.1.1"

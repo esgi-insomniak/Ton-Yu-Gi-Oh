@@ -1,4 +1,12 @@
-import { Controller, Post, Inject, Body, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Inject,
+  Body,
+  Req,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -15,11 +23,23 @@ import {
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import {
   DefaultResponse,
+  GetResponseArray,
   GetResponseOne,
 } from 'src/interfaces/common/common.response';
-import { IUser } from 'src/interfaces/user-service/user/user.interface';
+import {
+  IUser,
+  IUserRoles,
+} from 'src/interfaces/user-service/user/user.interface';
 import { IToken } from 'src/interfaces/auth-service/token/token.interface';
 import { IBasicAuth } from 'src/interfaces/auth-service/auth/basic-auth.interface';
+import {
+  ILoginHistory,
+  ILoginHistoryPartial,
+} from 'src/interfaces/auth-service/loginHistory/login-history.interface';
+import { IpAddress } from 'src/decorators/ipaddress.decorator';
+import { GetLoginHistoriesResponseDto } from 'src/interfaces/auth-service/loginHistory/login-history.response.dto';
+import { Permission } from 'src/decorators/permission.decorator';
+import { GetItemsPaginationDto } from 'src/interfaces/common/common.query.dto';
 
 @Controller()
 @ApiTags('Auth')
@@ -36,7 +56,13 @@ export class AuthController {
   })
   public async loginUser(
     @Body() body: LoginUserBodyDto,
+    @IpAddress() ipAddress: string,
   ): Promise<LoginUserResponseDto> {
+    const loginHistory: Partial<ILoginHistoryPartial> = {
+      ipAddress,
+      isSuccess: false,
+    };
+
     // get user by credentials
     const userResponse: GetResponseOne<IUser> = await firstValueFrom(
       this.userServiceClient.send('get_user_by_credentials', {
@@ -47,8 +73,11 @@ export class AuthController {
     );
 
     if (userResponse.status !== HttpStatus.OK) {
+      this.authServiceClient.emit('create_login_history', loginHistory);
       throw new HttpException(userResponse.message, userResponse.status);
     }
+
+    loginHistory.userId = userResponse.item.id;
 
     // check if password is correct
     const tokenResponse: GetResponseOne<IToken> = await firstValueFrom(
@@ -62,6 +91,7 @@ export class AuthController {
     );
 
     if (tokenResponse.status !== HttpStatus.CREATED) {
+      this.authServiceClient.emit('create_login_history', loginHistory);
       throw new HttpException(tokenResponse.message, tokenResponse.status);
     }
 
@@ -75,6 +105,7 @@ export class AuthController {
     );
 
     if (getBasicAuthTokensResponse.status !== HttpStatus.OK) {
+      this.authServiceClient.emit('create_login_history', loginHistory);
       throw new HttpException(
         getBasicAuthTokensResponse.message,
         getBasicAuthTokensResponse.status,
@@ -82,11 +113,16 @@ export class AuthController {
     }
 
     if (getBasicAuthTokensResponse.item.confirmationToken !== null) {
+      this.authServiceClient.emit('create_login_history', loginHistory);
       throw new HttpException(
         'Confirm your account first',
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    loginHistory.isSuccess = true;
+
+    this.authServiceClient.emit('create_login_history', loginHistory);
 
     const result: LoginUserResponseDto = {
       token: tokenResponse.item.token,
@@ -117,6 +153,53 @@ export class AuthController {
     }
 
     return;
+  }
+
+  @Get('/login_histories')
+  @Authorization(true)
+  @Permission([IUserRoles.admin], true)
+  @ApiOkResponse({
+    type: GetLoginHistoriesResponseDto,
+  })
+  public async getLoginHistories(
+    @Query() query: GetItemsPaginationDto,
+  ): Promise<GetLoginHistoriesResponseDto> {
+    const loginHistoriesResponse: GetResponseArray<ILoginHistoryPartial> =
+      await firstValueFrom(
+        this.authServiceClient.send('get_login_histories', query),
+      );
+
+    const userIds: string[] = loginHistoriesResponse.items
+      .reduce((acc, curr) => {
+        if (acc.indexOf(curr.userId) === -1) {
+          acc.push(curr.userId);
+        }
+        return acc;
+      }, [])
+      .filter((userId) => userId !== null);
+
+    const usersResponse: GetResponseArray<IUser> = await firstValueFrom(
+      this.userServiceClient.send('get_users_by_ids', {
+        ids: userIds,
+      }),
+    );
+
+    const loginHistories: ILoginHistory[] = loginHistoriesResponse.items.map(
+      (loginHistory) => {
+        const userId = loginHistory.userId;
+        delete loginHistory.userId;
+        return {
+          ...loginHistory,
+          user: usersResponse.items.find((user) => user.id === userId) || null,
+        } as ILoginHistory;
+      },
+    );
+
+    const result: GetLoginHistoriesResponseDto = {
+      data: loginHistories,
+    };
+
+    return result;
   }
 
   @Post('send_confirmation_email')
