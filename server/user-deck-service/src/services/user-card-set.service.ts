@@ -96,4 +96,11 @@ export class UserCardSetService {
       .delete({ id });
     return deleteResult.affected > 0;
   }
+
+  async deleteUserCardSetsByIds(ids: string[]): Promise<boolean> {
+    const deleteResult = await this.dataSource
+      .getRepository(UserCardSet)
+      .delete(ids);
+    return deleteResult.affected > 0;
+  }
 }
