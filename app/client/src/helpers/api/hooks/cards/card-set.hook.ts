@@ -52,7 +52,7 @@ const requestScrapCards = (arrayOfIds: string[]) =>
   apiRequest({
     url: QUERY_URLS.scrapCards(),
     method: "DELETE",
-    body: arrayOfIds,
+    body: { userCardSetIds: arrayOfIds },
     token: !!token ? token : undefined
   });
 

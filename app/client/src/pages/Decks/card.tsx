@@ -12,26 +12,34 @@ const CardCollection = () => {
     const { user } = useAuth()
     const { data: cardSetsResponse, refetch } = useGetUserCardSets(user.id, 0, 24, "", "", "", "")
     const { cardSets, setCardSets } = useGameCard()
-    const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<{ id: string, selected: boolean }[]>([])
-    const [arrayOfDuplicateCard, setArrayOfDuplicateCard] = React.useState<string[]>([])
+    const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<string[]>([])
     const [coinsEarned, setCoinsEarned] = React.useState<number>(0)
     const alert = useAlert()
     const { isShowing, toggle } = useModal()
     const scrapCards = useScrapCards()
 
-    const filterDuplicatedIdSets = () => {
-        const arrayOfDuplicateCardId: string[] = []
-        cardSets.map((cardSet, i) => {
-            if (cardSets.find((cardSetDuplicate) => cardSetDuplicate.id === cardSet.id && cardSetDuplicate !== cardSet)) {
-                arrayOfDuplicateCardId.push(cardSet.id)
-            }
+    const handleRequestScrapCardsModal = (ids: string[]) => {
+        scrapCards.mutate(ids, {
+            onSuccess: (res) => {
+                setArrayOfCardDismantle([])
+                alert?.success(`Cartes démantelez avec succès !, ${res.data?.coinsEarned} coins ont été ajouté à votre compte !`)
+                refetch()
+                toggle()
+            },
+            onError: (error) => alert?.error('Vous ne pouvez pas démantelez certaines cartes car elles appartiennent à un deck !')
         })
-        setArrayOfDuplicateCard(arrayOfDuplicateCardId)
     }
+
+    const handleSelectCard = (cardId: string) => {
+        if (arrayOfCardDismantle.includes(cardId)) {
+            setArrayOfCardDismantle(arrayOfCardDismantle.filter((id) => id !== cardId))
+            return;
+        } else setArrayOfCardDismantle([...arrayOfCardDismantle, cardId])
+    };
 
     React.useEffect(() => {
         if (arrayOfCardDismantle.length <= 0) return;
-        const cardsPrice = cardSets.filter((findCardSet) => arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate.id === findCardSet.id)
+        const cardsPrice = cardSets.filter((findCardSet) => arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate === findCardSet.id)
         ).map((cardSet) => {
             const prices: Partial<CardIPrice> = cardSet.card.price;
             delete prices.id;
@@ -51,6 +59,7 @@ const CardCollection = () => {
         const apiCardSets = cardSetsResponse.data.map<IGameCard>((userCardSet: CardIUserCardSet) => {
             return {
                 ...userCardSet.cardSet,
+                userCardSetId: userCardSet.id,
                 isActive: false,
                 isHidden: false,
                 isFocused: false,
@@ -67,37 +76,21 @@ const CardCollection = () => {
         setCardSets(apiCardSets)
     }, [cardSetsResponse])
 
-    const handleSelectCard = (cardId: string) => {
-        if (arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate.id === cardId)?.selected) {
-            setArrayOfCardDismantle(arrayOfCardDismantle.filter((cardDuplicate) => cardDuplicate.id !== cardId))
-        } else setArrayOfCardDismantle([...arrayOfCardDismantle, { id: cardId, selected: true }])
-    }
-
-    const handleRequestScrapCardsModal = (ids: string[]) => {
-        scrapCards.mutate(ids, {
-            onSuccess: (res) => {
-                setArrayOfCardDismantle([])
-                alert?.success(`Cartes démantelez avec succès !, ${res.data?.coinsEarned} coins ont été ajouté à votre compte !`)
-                refetch()
-            },
-            onError: (error) => alert?.error('Une erreur est survenue lors du démantelement des cartes !')
-        })
-    }
-
     return (
         <div className={`w-full h-full px-20 py-10 flex flex-col space-y-10`}>
-            <div className="flex w-full justify-between space-x-5">
-                <button className="btn" onClick={filterDuplicatedIdSets}>Trouver les cartes en doubles</button>
+            <div className="flex w-full justify-end space-x-5">
                 <button className="btn" onClick={toggle} disabled={arrayOfCardDismantle.length <= 0}>Démanteler les cartes contres des coins</button>
             </div>
             <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
-                {cardSets
-                    .filter((cardSet) => !arrayOfDuplicateCard.includes(cardSet.id))
-                    .map((cardSet, i) => (
-                        <div className={`${arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate.id === cardSet.id)?.selected && "border-[3px] border-yellow-500 h-fit p-0.5 rounded-md"}`} onClick={() => handleSelectCard(cardSet.id)} key={i}>
-                            <GameCard {...cardSet} />
-                        </div>
-                    ))}
+                {cardSets.map((cardSet) => (
+                    <div
+                        className={`${arrayOfCardDismantle.includes(cardSet.userCardSetId as string) && "border-[3px] border-yellow-500 h-fit p-0.5 rounded-md"}`}
+                        onClick={() => handleSelectCard(cardSet.userCardSetId as string)}
+                        key={`${cardSet.userCardSetId}`}
+                    >
+                        <GameCard {...cardSet} />
+                    </div>
+                ))}
             </div>
             <Modal
                 isShowing={isShowing}
@@ -107,7 +100,7 @@ const CardCollection = () => {
                 yesNo
                 yesNoAction={[
                     { text: 'Non', action: () => toggle(), type: 'no' },
-                    { text: 'Oui', action: () => handleRequestScrapCardsModal(arrayOfDuplicateCard), type: 'yes' }
+                    { text: 'Oui', action: () => handleRequestScrapCardsModal(arrayOfCardDismantle), type: 'yes' }
                 ]}
             />
         </div>

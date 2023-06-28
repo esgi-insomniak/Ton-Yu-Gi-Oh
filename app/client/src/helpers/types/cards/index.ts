@@ -101,6 +101,7 @@ export interface IGameCard extends CardICardSet {
   canFlip: boolean;
   canActivate: boolean;
   canInteract: boolean;
+  userCardSetId?: string;
 }
 
 export interface IGameCardContextProps {
