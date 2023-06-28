@@ -39,7 +39,7 @@ const CardCollection = () => {
 
     React.useEffect(() => {
         if (arrayOfCardDismantle.length <= 0) return;
-        const cardsPrice = cardSets.filter((findCardSet) => arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate === findCardSet.id)
+        const cardsPrice = cardSets.filter((findCardSet) => arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate === findCardSet.userCardSetId)
         ).map((cardSet) => {
             const prices: Partial<CardIPrice> = cardSet.card.price;
             delete prices.id;
