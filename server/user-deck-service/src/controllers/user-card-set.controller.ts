@@ -137,4 +137,18 @@ export class UserCardSetController {
 
     return result;
   }
+
+  @MessagePattern('delete_usercardsets_by_ids')
+  public async deleteUserCardSetsByIds(params: { ids: string[] }) {
+    const userCardSetsIsDeleted =
+      await this.userCardSetService.deleteUserCardSetsByIds(params.ids);
+    const result: DefaultResponse = {
+      status: userCardSetsIsDeleted
+        ? HttpStatus.NO_CONTENT
+        : HttpStatus.NOT_FOUND,
+      message: userCardSetsIsDeleted ? null : 'UserCardSets not found',
+    };
+
+    return result;
+  }
 }
