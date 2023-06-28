@@ -90,6 +90,34 @@ export const GameCardProvider = ({ children }: { children: React.ReactNode }) =>
         });
     };
 
+    const setCanActivate = (cardSet: IGameCard, canActivate: boolean) => {
+        setCardSets((prevState) => {
+            if (!prevState) return prevState;
+
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, canActivate };
+                }
+                return updatedCardSet;
+            });
+            return updatedCardSets;
+        });
+    };
+
+    const setCanInteract = (cardSet: IGameCard, canInteract: boolean) => {
+        setCardSets((prevState) => {
+            if (!prevState) return prevState;
+
+            const updatedCardSets = prevState.map((updatedCardSet) => {
+                if (cardSet.id === updatedCardSet.id) {
+                    return { ...updatedCardSet, canInteract };
+                }
+                return updatedCardSet;
+            });
+            return updatedCardSets;
+        });
+    };
+
     const setIsLoaded = (cardSet: IGameCard, isLoaded: boolean) => {
         setCardSets((prevState) => {
             if (!prevState) return prevState;
@@ -135,6 +163,8 @@ export const GameCardProvider = ({ children }: { children: React.ReactNode }) =>
         setIsFocused,
         setCanPop,
         setCanFlip,
+        setCanActivate,
+        setCanInteract,
         setIsLoaded,
         deactivateAllCardSets,
         sortCardSets
@@ -146,6 +176,8 @@ export const GameCardProvider = ({ children }: { children: React.ReactNode }) =>
         setIsFocused,
         setCanPop,
         setCanFlip,
+        setCanActivate,
+        setCanInteract,
         setIsLoaded,
         deactivateAllCardSets,
         sortCardSets]);

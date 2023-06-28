@@ -60,6 +60,8 @@ const CardCollection = () => {
                 displayCardInfoOnPop: false,
                 popScale: 1.75,
                 canFlip: false,
+                canActivate: false,
+                canInteract: false,
             }
         })
         setCardSets(apiCardSets)

@@ -99,6 +99,8 @@ export interface IGameCard extends CardICardSet {
   displayCardInfoOnPop: boolean;
   popScale: number;
   canFlip: boolean;
+  canActivate: boolean;
+  canInteract: boolean;
 }
 
 export interface IGameCardContextProps {
@@ -110,6 +112,8 @@ export interface IGameCardContextProps {
   setIsFocused: (card: IGameCard, isFocused: boolean) => void;
   setCanPop: (card: IGameCard, canPop: boolean, displayCardInfoOnPop: boolean, popScale: number) => void;
   setCanFlip: (card: IGameCard, canFlip: boolean) => void;
+  setCanActivate: (card: IGameCard, canActivate: boolean) => void;
+  setCanInteract: (card: IGameCard, canInteract: boolean) => void;
   setIsLoaded: (card: IGameCard, isLoaded: boolean) => void;
   sortCardSets: (result: DropResult) => void;
   deactivateAllCardSets: () => void;
