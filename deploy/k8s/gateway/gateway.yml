@@ -4,16 +4,16 @@ kind: Deployment
 metadata:
   name: gateway-deployment
   labels:
-    app: gateway
+    app: gateway-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gateway
+      app: gateway-pod
   template:
     metadata:
       labels:
-        app: gateway
+        app: gateway-pod
     spec:
       containers:
         - name: gateway
@@ -38,9 +38,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gateway-svc
+  labels:
+    app: gateway-svc
 spec:
   selector:
-    app: gateway # which pods will receive the traffic
+    app: gateway-pod # which pods will receive the traffic
   ports:
     - name: http
       port: 8000
@@ -60,11 +62,11 @@ data:
   AUTH_SERVICE_PORT: "8000"
   PAYMENT_SERVICE_PORT: "8000"
   MAILER_SERVICE_PORT: "8000"
-  AUTH_SERVICE_HOST: "auth-service"
+  AUTH_SERVICE_HOST: "auth-service-svc"
   CARD_SERVICE_HOST: "card-service"
   DUEL_SERVICE_HOST: "duel-service"
   MAILER_SERVICE_HOST: "mailer-service"
   PAYMENT_SERVICE_HOST: "payment-service"
   PROMO_SERVICE_HOST: "promo-service"
   USER_DECK_SERVICE_HOST: "user-deck-service"
-  USER_SERVICE_HOST: "user-service"
+  USER_SERVICE_HOST: "user-service-svc"

@@ -4,16 +4,16 @@ kind: Deployment
 metadata:
   name: auth-service-deployment
   labels:
-    app: auth-service
+    app: auth-service-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth-service
+      app: auth-service-pod
   template:
     metadata:
       labels:
-        app: auth-service
+        app: auth-service-pod
     spec:
       containers:
         - name: auth-service
@@ -31,9 +31,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: auth-service-svc
+  labels:
+      app: auth-service-svc
 spec:
   selector:
-    app: auth-service # which pods will receive the traffic
+    app: auth-service-pod # which pods will receive the traffic
   ports:
     - protocol: TCP
       port: 8000
