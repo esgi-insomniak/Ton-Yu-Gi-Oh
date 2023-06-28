@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: user-service-deployment
   labels:
     app: user-service
 spec:
@@ -30,13 +30,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-service
+  name: user-service-svc
 spec:
   selector:
     app: user-service # which pods will receive the traffic
   ports:
     - protocol: TCP
       port: 8000
+      targetPort: 8000
   type: ClusterIP # Can be accessed from other pods in the cluster
 
 

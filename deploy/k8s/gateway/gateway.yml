@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway
+  name: gateway-deployment
   labels:
     app: gateway
 spec:
@@ -37,13 +37,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway
+  name: gateway-svc
 spec:
   selector:
     app: gateway # which pods will receive the traffic
   ports:
     - name: http
       port: 8000
+      targetPort: 8000
   type: LoadBalancer # Can be accessed from outside the cluster
 
 ---
