@@ -75,6 +75,24 @@ export class UserCardSetController {
     return result;
   }
 
+  @MessagePattern('get_users_ids_by_cardset_id')
+  public async getUsersIdsByCardSetId(request: {
+    params: { cardSetId: string };
+    query: QueryGetItems;
+  }): Promise<GetResponseArray<string>> {
+    const usersIds = await this.userCardSetService.getUsersIdsByCardSetId(
+      request.params.cardSetId,
+      request.query,
+    );
+
+    const result: GetResponseArray<string> = {
+      status: HttpStatus.OK,
+      items: usersIds,
+    };
+
+    return result;
+  }
+
   @MessagePattern('post_usercardset')
   public async postUserCardSet(query: {
     userId: string;
