@@ -5,7 +5,7 @@ import { UseModalType } from '@/helpers/types/modal'
 export const Modal = ({ isShowing, toggle, yesNo, yesNoAction, title, text, content }: UseModalType) => isShowing ? ReactDOM.createPortal(
     <Fragment>
         {isShowing && (
-            <div className="fixed inset-0 z-10 overflow-y-auto">
+            <div className="fixed inset-0 z-[999] overflow-y-auto">
                 <div className="flex items-end justify-center min-h-screen mx-auto pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                         <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={toggle}></div>

@@ -42,13 +42,15 @@ const CollectionPage = React.lazy(() => import('@/pages/Collection'));
 const ShopPage = React.lazy(() => import('@/pages/Shop'));
 const DecksPage = React.lazy(() => import('@/pages/Decks'));
 const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
-const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
+//const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
 const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
 const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
 const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
 const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
 const AdminPromoPage = React.lazy(() => import('@/pages/Admin/promos'));
 const DuelPage = React.lazy(() => import('@/pages/Duels'));
+const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
+const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -84,8 +86,14 @@ const Router: React.FC = () => {
                     <Route path="/shop" element={<ShopPage />} />
                     <Route path="/shop/:sessionId" element={<ShopPage />} />
                     <Route path="/decks" element={<DecksPage />} />
+                    <Route path="/decks/create" element={<CreateDeckPage />} />
+                    <Route path="/decks/my-cards" element={
+                        <GameCardProvider>
+                            <MyCardCollectionPage />
+                        </GameCardProvider>
+                    } />
                     <Route path="/decks/new" element={<NewDecksPage />} />
-                    <Route path="/decks/edit/:id" element={<EditDecksPage />} />
+                    {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
                     <Route path="/duel/:roomId" element={<DuelPage />} />
                 </Route>
 

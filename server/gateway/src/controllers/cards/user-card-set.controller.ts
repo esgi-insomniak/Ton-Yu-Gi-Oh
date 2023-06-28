@@ -371,15 +371,13 @@ export class UserController {
 
     // create response with combined data of cardSets and userCardSets
     const result: GetUserCardSetsResponseDto = {
-      data: cardSetsResponse.items.map((cardSet) => {
+      data: userCardSetResponse.items.map((userCardSetPartial) => {
         const userCardSet: IUserCardSet = {
-          id: userCardSetResponse.items.find(
-            (item) => item.cardSetId === cardSet.id,
-          ).id,
-          userId: userCardSetResponse.items.find(
-            (item) => item.cardSetId === cardSet.id,
-          ).userId,
-          cardSet,
+          id: userCardSetPartial.id,
+          userId: userCardSetPartial.userId,
+          cardSet: cardSetsResponse.items.find(
+            (item) => item.id === userCardSetPartial.cardSetId,
+          ),
         };
         return userCardSet;
       }),

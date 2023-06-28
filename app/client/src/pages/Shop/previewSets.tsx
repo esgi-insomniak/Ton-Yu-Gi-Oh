@@ -20,6 +20,8 @@ const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | u
                 displayCardInfoOnPop: true,
                 popScale: 1.75,
                 canFlip: false,
+                canActivate: true,
+                canInteract: true,
             }
         })
         setCardSets(gameCardSets)

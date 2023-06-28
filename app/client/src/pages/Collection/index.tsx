@@ -43,6 +43,8 @@ const Collection = () => {
                 displayCardInfoOnPop: true,
                 popScale: 1.75,
                 canFlip: false,
+                canActivate: true,
+                canInteract: true,
             }
         })
         setCardSets(apiCardSets)

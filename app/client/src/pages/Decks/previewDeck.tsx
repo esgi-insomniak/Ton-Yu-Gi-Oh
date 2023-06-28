@@ -7,7 +7,7 @@ const PreviewDecks = ({
 }: {
   cardSets: CardICardSet[] | undefined;
 }) => {
-    
+
   const { cardSets, setCardSets } = useGameCard();
   if (cardSetsProps?.status === "loading") return <div>Loading...</div>;
   React.useEffect(() => {
@@ -22,6 +22,8 @@ const PreviewDecks = ({
       isDraggable: false,
       canPop: true,
       canFlip: false,
+      canActivate: true,
+      canInteract: true,
     }));
 
     setCardSets(gameCardSets);

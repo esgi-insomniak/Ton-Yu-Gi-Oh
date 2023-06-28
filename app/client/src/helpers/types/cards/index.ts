@@ -26,6 +26,12 @@ export interface CardICardSet {
   price: number;
 }
 
+export interface CardIUserCardSet {
+  id: string,
+  userId: string,
+  cardSet: CardICardSet
+}
+
 export interface ICard extends ICommonNameId {
   identifiant: number;
   enName: string;
@@ -93,6 +99,9 @@ export interface IGameCard extends CardICardSet {
   displayCardInfoOnPop: boolean;
   popScale: number;
   canFlip: boolean;
+  canActivate: boolean;
+  canInteract: boolean;
+  userCardSetId?: string;
 }
 
 export interface IGameCardContextProps {
@@ -102,8 +111,10 @@ export interface IGameCardContextProps {
   setIsActive: (card: IGameCard, isActive: boolean) => void;
   setIsHidden: (card: IGameCard, isHidden: boolean) => void;
   setIsFocused: (card: IGameCard, isFocused: boolean) => void;
-  setCanPop: (card: IGameCard, canPop: boolean, displayCardInfoOnPop:boolean, popScale: number) => void;
+  setCanPop: (card: IGameCard, canPop: boolean, displayCardInfoOnPop: boolean, popScale: number) => void;
   setCanFlip: (card: IGameCard, canFlip: boolean) => void;
+  setCanActivate: (card: IGameCard, canActivate: boolean) => void;
+  setCanInteract: (card: IGameCard, canInteract: boolean) => void;
   setIsLoaded: (card: IGameCard, isLoaded: boolean) => void;
   sortCardSets: (result: DropResult) => void;
   deactivateAllCardSets: () => void;
