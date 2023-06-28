@@ -5,7 +5,7 @@ import { useGetUserCardSets, useScrapCards } from "@/helpers/api/hooks/cards/car
 import useModal from "@/helpers/api/hooks/modal";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
-import { CardIUserCardSet, IGameCard } from "@/helpers/types/cards";
+import { CardIPrice, CardIUserCardSet, IGameCard } from "@/helpers/types/cards";
 import React from "react";
 
 const CardCollection = () => {
@@ -14,6 +14,7 @@ const CardCollection = () => {
     const { cardSets, setCardSets } = useGameCard()
     const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<{ id: string, selected: boolean }[]>([])
     const [arrayOfDuplicateCard, setArrayOfDuplicateCard] = React.useState<string[]>([])
+    const [coinsEarned, setCoinsEarned] = React.useState<number>(0)
     const alert = useAlert()
     const { isShowing, toggle } = useModal()
     const scrapCards = useScrapCards()
@@ -28,6 +29,22 @@ const CardCollection = () => {
         setArrayOfDuplicateCard(arrayOfDuplicateCardId)
     }
 
+    React.useEffect(() => {
+        if (arrayOfCardDismantle.length <= 0) return;
+        const cardsPrice = cardSets.filter((findCardSet) => arrayOfCardDismantle.find((cardDuplicate) => cardDuplicate.id === findCardSet.id)
+        ).map((cardSet) => {
+            const prices: Partial<CardIPrice> = cardSet.card.price;
+            delete prices.id;
+            return prices;
+        });
+        const coinsEarned = Math.round(
+            cardsPrice.reduce((acc, curr) => {
+                const maxPrice = Math.max(...Object.values(curr as CardIPrice));
+                return maxPrice !== 0 ? acc + maxPrice : acc + 1;
+            }, 0),
+        );
+        setCoinsEarned(coinsEarned)
+    }, [arrayOfCardDismantle])
 
     React.useEffect(() => {
         if (cardSetsResponse?.data === undefined) return;
@@ -84,7 +101,7 @@ const CardCollection = () => {
                 isShowing={isShowing}
                 toggle={toggle}
                 title="Démanteler les cartes"
-                text={`Êtes-vous sûr de vouloir démantelez les cartes sélectionnées ?`}
+                text={`Êtes-vous sûr de vouloir démantelez les cartes sélectionnées en échange de ${coinsEarned} coins ?`}
                 yesNo
                 yesNoAction={[
                     { text: 'Non', action: () => toggle(), type: 'no' },
