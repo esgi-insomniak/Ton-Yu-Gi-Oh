@@ -38,6 +38,8 @@ import {
 import { GetItemByIdDto } from 'src/interfaces/common/common.params.dto';
 import { Permission } from 'src/decorators/permission.decorator';
 import { IBasicAuth } from 'src/interfaces/auth-service/auth/basic-auth.interface';
+import { GetUsersQuery } from 'src/interfaces/user-service/user/user.query.dto';
+import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
 
 @Controller('users')
 @ApiTags('User')
@@ -46,6 +48,9 @@ export class UserController {
     @Inject('AUTH_SERVICE') private readonly authServiceClient: ClientProxy,
     @Inject('USER_SERVICE') private readonly userServiceClient: ClientProxy,
     @Inject('MAILER_SERVICE') private readonly mailerServiceClient: ClientProxy,
+    @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
+    @Inject('USER_DECK_SERVICE')
+    private readonly userDeckServiceClient: ClientProxy,
   ) {}
 
   @Get()
@@ -56,8 +61,50 @@ export class UserController {
   })
   public async getUsers(
     @Req() request: IAuthorizedRequest,
-    @Query() query: GetItemsPaginationDto,
+    @Query() query: GetUsersQuery,
   ): Promise<GetUsersResponseDto> {
+    // get differents users by cardSetId
+    if (query.cardSetId) {
+      const cardSetResponse: GetResponseOne<ICardCardSet> =
+        await firstValueFrom(
+          this.cardServiceClient.send('get_cardset_by_id', {
+            id: query.cardSetId,
+          }),
+        );
+
+      if (cardSetResponse.status !== HttpStatus.OK) {
+        throw new HttpException(
+          cardSetResponse.message,
+          cardSetResponse.status,
+        );
+      }
+
+      const userIdsResponse: GetResponseArray<string> = await firstValueFrom(
+        this.userDeckServiceClient.send('get_users_ids_by_cardset_id', {
+          params: {
+            cardSetId: query.cardSetId,
+          },
+          query,
+        }),
+      );
+
+      const usersResponse: GetResponseArray<IUser> = await firstValueFrom(
+        this.userServiceClient.send('get_users_by_ids', {
+          ids: userIdsResponse.items,
+        }),
+      );
+
+      if (usersResponse.status !== HttpStatus.OK) {
+        throw new HttpException(usersResponse.message, usersResponse.status);
+      }
+
+      const result: GetUsersResponseDto = {
+        data: usersResponse.items,
+      };
+
+      return result;
+    }
+
     const userResponse: GetResponseArray<IUser> = await firstValueFrom(
       this.userServiceClient.send('get_users', {
         limit: query.limit,
