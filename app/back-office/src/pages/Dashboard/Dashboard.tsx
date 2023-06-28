@@ -12,7 +12,9 @@ const Dashboard = () => {
   const [sessionData, setSessionData] = React.useState([]);
   const [nbSessionTotal, setNbSessionTotal] = React.useState(0);
   const [rebondData, setRebondData] = React.useState([]);
+  const [percentagesData, setPercentagesData] = React.useState(0);
   const [sessionTimeData, setSessionTimeData] = React.useState([]);
+  const [sessionTimeTotal, setSessionTimeTotal] = React.useState("");
   const [graphData, setGraphData] = React.useState([]);
   const currentDate = new Date();
 
@@ -28,22 +30,7 @@ const Dashboard = () => {
     return formattedDate;
   }).reverse();
 
-  const [optionsGraph, setOptionsGraph] = React.useState<EChartsOption>({
-    xAxis: {
-      type: "category",
-      data: last7Days,
-    },
-    yAxis: {
-      type: "value",
-    },
-    series: [
-      {
-        data: [0, 0, 0, 0, 0, 0, 10],
-        type: "line",
-        smooth: true,
-      },
-    ],
-  });
+  const [optionsGraph, setOptionsGraph] = React.useState<EChartsOption>({});
 
   const userId = localStorage.getItem("id");
 
@@ -74,71 +61,31 @@ const Dashboard = () => {
 
   React.useEffect(() => {
     axios.get(`http://localhost:3000/track/${userData}`).then((response) => {
-      setClickData(response.data);
-      let totalClicks = 0;
-      if (clickData.length > 0) {
-        clickData.forEach((data: any) => {
-          totalClicks += data.count; // Accumulate the count values
-        });
-      }
-  
-      setNbClickTotal(totalClicks); // Update the state with the total clicks
+      const { data } = response;
+      setClickData(data);
     });
   }, [userData]);
-  
-  
 
   React.useEffect(() => {
-    axios.get(`http://localhost:3000/track/distinct/${userData}`).then((response) => {
-      setSessionData(response.data);
-      let totalSession = 0;
-      if (sessionData.length > 0) {
-        sessionData.forEach((data: any) => {
-          // count nb user
-          let nbUser = data.users.length;
-          totalSession += nbUser; // Accumulate the count values
-        });
-      }
+    let totalClicks = 0;
 
-      setNbSessionTotal(totalSession); // Update the state with the total clicks
-    });
-  }, [userData]);
-
-  // React.useEffect(() => {
-  //   axios.get(`http://localhost:3000/mouse-track/distinct/${userData}`).then((response) => {
-  //     setClickData(response.data);
-  //   });
-  // }, [userData]);
-
-  const handleClick = (dataName: string) => {
-    if (dataName === "click") {
-      const countArray: any = last7Days.map((day) => {
-        const matchingData = clickData.find((data: any) => {
-          const formattedDate = day.split("/").reverse().join("-");
-          const year = new Date().getFullYear(); // Get the current year
-          const fullDate = `${year}-${formattedDate}`;
-          return fullDate === data.date;
-        });
-        return matchingData ? matchingData.count : 0;
+    if (clickData.length > 0) {
+      clickData.forEach((data: any) => {
+        totalClicks += data.count;
       });
-
-      setGraphData(countArray);
-    } else if (dataName === "session") {
-      const countArray: any = last7Days.map((day) => {
-        const matchingData = sessionData.find((data: any) => {
-          const formattedDate = day.split("/").reverse().join("-");
-          const year = new Date().getFullYear(); // Get the current year
-          const fullDate = `${year}-${formattedDate}`;
-          return fullDate === data.date;
-        });
-        return matchingData ? matchingData.users.length : 0;
-      });
-
-      setGraphData(countArray);
-    } else if (dataName === "rebond") {
-    } else if (dataName === "time") {
-      
     }
+
+    const countArray: any = last7Days.map((day) => {
+      const matchingData = clickData.find((data: any) => {
+        const formattedDate = day.split("/").reverse().join("-");
+        const year = new Date().getFullYear();
+        const fullDate = `${year}-${formattedDate}`;
+        return fullDate === data.date;
+      });
+      return matchingData ? matchingData.count : 0;
+    });
+
+    setGraphData(countArray);
 
     setOptionsGraph({
       xAxis: {
@@ -150,7 +97,186 @@ const Dashboard = () => {
       },
       series: [
         {
-          data: graphData || [0, 0, 0, 0, 0, 0, 10],
+          data: countArray || [],
+          type: "line",
+          smooth: true,
+        },
+      ],
+    });
+
+    setNbClickTotal(totalClicks);
+  }, [clickData]);
+
+  React.useEffect(() => {
+    if (userData.length > 0) {
+      axios
+        .get(`http://localhost:3000/session/${userData}`)
+        .then((response) => {
+          const { data } = response;
+          setSessionData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching session data:", error);
+        });
+    }
+  }, [userData]);
+
+  React.useEffect(() => {
+    let totalSession = 0;
+    if (sessionData.length > 0) {
+      sessionData.forEach((data: any) => {
+        let nbUser = data.count;
+        totalSession += nbUser;
+      });
+    }
+
+    setNbSessionTotal(totalSession);
+  }, [sessionData]);
+
+  React.useEffect(() => {
+    if (userData.length > 0) {
+      axios
+        .get(`http://localhost:3000/user-page-urls/${userData}`)
+        .then((response) => {
+          setRebondData(response.data);
+        });
+    }
+  }, [userData]);
+
+  React.useEffect(() => {
+    if (rebondData.length > 0) {
+      const totalSessions = rebondData.length;
+      const sessionsWithSinglePageView = rebondData.filter(
+        (session) => session.uniquePageUrls === 1
+      );
+      const totalSessionsWithSinglePageView = sessionsWithSinglePageView.length;
+      const bounceRate = Math.round(
+        (totalSessionsWithSinglePageView / totalSessions) * 100
+      );
+      setPercentagesData(bounceRate);
+    }
+  }, [rebondData]);
+
+  React.useEffect(() => {
+    axios
+      .get(`http://localhost:3000/analytics/average-session-time`)
+      .then((response) => {
+        const { data } = response;
+        setSessionTimeData(data);
+      });
+  }, [userData]);
+
+  React.useEffect(() => {
+    if (sessionTimeData.length > 0) {
+      const totalSessions = sessionTimeData.length;
+      let totalSessionTime = 0;
+      sessionTimeData.forEach((data: any) => {
+        totalSessionTime += data.averageSessionTime;
+      });
+      const averageSessionTime = Math.round(totalSessionTime / totalSessions);
+
+      const convertToHHMMSS = (milliseconds: any) => {
+        const seconds = Math.floor(milliseconds / 1000);
+        const hh = Math.floor(seconds / 3600)
+          .toString()
+          .padStart(2, "0");
+        const mm = Math.floor((seconds % 3600) / 60)
+          .toString()
+          .padStart(2, "0");
+        const ss = Math.floor((seconds % 3600) % 60)
+          .toString()
+          .padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      };
+
+      const formattedAverageSessionTime = convertToHHMMSS(averageSessionTime);
+      setSessionTimeTotal(formattedAverageSessionTime);
+    }
+  }, [sessionTimeData]);
+
+  const handleClick = (dataName: string) => {
+    let countArray: any = [];
+
+    if (dataName === "click") {
+      countArray = last7Days.map((day) => {
+        const matchingData = clickData.find((data: any) => {
+          const formattedDate = day.split("/").reverse().join("-");
+          const year = new Date().getFullYear();
+          const fullDate = `${year}-${formattedDate}`;
+          return fullDate === data.date;
+        });
+        return matchingData ? matchingData.count : 0;
+      });
+    } else if (dataName === "session") {
+      countArray = last7Days.map((day) => {
+        const matchingData = sessionData.find((data: any) => {
+          const formattedDate = day.split("/").reverse().join("-");
+          const year = new Date().getFullYear();
+          const fullDate = `${year}-${formattedDate}`;
+          return fullDate === data.date;
+        });
+        return matchingData ? matchingData.count : 0;
+      });
+    } else if (dataName === "rebond") {
+      countArray = last7Days.map((day) => {
+        const formattedDate = day.split("/").reverse().join("-");
+        const year = new Date().getFullYear();
+        const fullDate = `${year}-${formattedDate}`;
+
+        const matchingData = rebondData.filter((data: any) =>
+          data.sessions.some((session: any) => session.date === fullDate)
+        );
+
+        if (matchingData.length === 0) return 0;
+
+        const totalSessions = matchingData.length;
+        const sessionsWithSinglePageView = matchingData.filter(
+          (data: any) => data.uniquePageUrls === 1
+        );
+        const totalSessionsWithSinglePageView =
+          sessionsWithSinglePageView.length;
+
+        const bounceRate =
+          totalSessions > 0
+            ? Math.round(
+                (totalSessionsWithSinglePageView / totalSessions) * 100
+              )
+            : 0;
+
+        return bounceRate;
+      });
+    } else if (dataName === "time") {
+      countArray = last7Days.map((day) => {
+        const matchingData = sessionTimeData.find((data: any) => {
+          const formattedDate = day.split("/").reverse().join("-");
+          const year = new Date().getFullYear();
+          const fullDate = `${year}-${formattedDate}`;
+          return fullDate === data.date;
+        });
+        const sessionTime = matchingData ? matchingData.averageSessionTime : 0;
+        const convertToMinutes = (milliseconds: any) => {
+          const minutes = Math.floor(milliseconds / 60000);
+          return minutes;
+        };
+
+        const formattedSessionTime = convertToMinutes(sessionTime);
+        return formattedSessionTime;
+      });
+    }
+
+    setGraphData(countArray);
+
+    setOptionsGraph({
+      xAxis: {
+        type: "category",
+        data: last7Days,
+      },
+      yAxis: {
+        type: "value",
+      },
+      series: [
+        {
+          data: countArray || [0, 0, 0, 0, 0, 0, 10],
           type: "line",
           smooth: true,
         },
@@ -271,7 +397,7 @@ const Dashboard = () => {
                         <div className="ml-2 w-full flex-1">
                           <div>
                             <div className="mt-3 text-3xl font-bold leading-8">
-                              4.510
+                              {percentagesData + "%" || "Pas de données"}
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">
@@ -305,7 +431,7 @@ const Dashboard = () => {
                         <div className="ml-2 w-full flex-1">
                           <div>
                             <div className="mt-3 text-3xl font-bold leading-8">
-                              4.510
+                              {sessionTimeTotal || "Pas de données"}
                             </div>
 
                             <div className="mt-1 text-base text-gray-600">

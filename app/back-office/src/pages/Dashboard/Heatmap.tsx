@@ -7,7 +7,7 @@ import { EChartsOption } from "echarts-for-react";
 
 const Heatmap = () => {
   const [heatmap, setHeatmap] = React.useState([]);
-  const [currentSize, setCurrentSize] = React.useState("md");
+  const [currentSize, setCurrentSize] = React.useState("lg");
   const [urlName, setUrlName] = React.useState("");
   const params = useParams();
 
@@ -30,7 +30,6 @@ const Heatmap = () => {
       });
   }, []);
 
-  // if we have the name of the url then get the mouse position of all the data who have the same url
   React.useEffect(() => {
     if (urlName) {
       const urlNameEncoded = encodeURIComponent(urlName);
@@ -40,14 +39,13 @@ const Heatmap = () => {
         )
         .then((response) => {
           const { data } = response;
-          console.log(data);
           setHeatmap(data);
         })
         .catch((error) => {
           console.error("Error retrieving data:", error);
         });
     }
-  }, [urlName]);
+  }, [urlName, currentSize]);
 
   // I want xAxis and yAxis to be the size of the screen
   const xData = [];

@@ -14,6 +14,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // CORS middleware
 app.use(cors());
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
+let corsOptions = {
+  origin: "http://localhost:8080",
+  credentials: true,
+};
+
 // MongoDB configuration
 console.log(process.env.MONGO_CON_STRING);
 mongoose
@@ -183,16 +193,17 @@ app.get("/mouse-track/distinct/:appId", async (req, res) => {
       $group: {
         _id: "$pageUrl",
         id: { $first: "$_id" },
-        clientId: { $addToSet: "$clientId" }
-      }
+        clientId: { $addToSet: "$clientId" },
+      },
     },
     {
       $project: {
         _id: "$id",
         pageUrl: "$_id",
-        clientIdCount: { $size: "$clientId" }
-      }
-    }
+        clientIdCount: { $size: "$clientId" },
+      },
+    },
+    { $sort: { clientIdCount: -1 } }, // Sort by clientIdCount in descending order
   ]);
 
   res.json(mouseTrack);
@@ -214,7 +225,9 @@ app.get("/mouse-track/distinct/:id/:size", async (req, res) => {
     const screenSize = req.params.size;
 
     const mouseTrack = await MouseEventTrack.aggregate([
-      { $match: { pageUrl: decodedUrl, "mousePosition.screenSize": screenSize } },
+      {
+        $match: { pageUrl: decodedUrl, "mousePosition.screenSize": screenSize },
+      },
       { $project: { _id: 0 } }, // Exclude the _id field
     ]);
 
@@ -224,18 +237,15 @@ app.get("/mouse-track/distinct/:id/:size", async (req, res) => {
   }
 });
 
-
-
 app.post("/mouse-track", async (req, res) => {
-  console.log(req.body.data);
-  const { event, tag, timestamp, appId, clientId, mousePosition, pageUrl } =
-    req.body.data;
+  console.log(JSON.parse(req.body.payload));
+  const { event, timestamp, appId, visitorId, mousePosition, pageUrl } =
+    JSON.parse(req.body.payload);
   const mouseTrack = new MouseEventTrack({
     event,
-    tag,
     timestamp,
     appId,
-    clientId,
+    clientId: visitorId,
     mousePosition,
     pageUrl,
   });
@@ -254,20 +264,22 @@ app.get("/track/:appId", async (req, res) => {
   dateSevenDaysAgo.setDate(dateSevenDaysAgo.getDate() - 7);
 
   const track = await TrackEvent.aggregate([
-    { $match: { appId, event: "click", timestamp: { $gte: dateSevenDaysAgo } } },
+    {
+      $match: { appId, event: "click", timestamp: { $gte: dateSevenDaysAgo } },
+    },
     {
       $group: {
         _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
-        count: { $sum: 1 }
-      }
+        count: { $sum: 1 },
+      },
     },
     {
       $project: {
-        _id: 0, // Exclude the default MongoDB _id field
+        _id: 0,
         date: "$_id",
-        count: 1
-      }
-    }
+        count: 1,
+      },
+    },
   ]);
 
   res.json(track);
@@ -279,42 +291,82 @@ app.get("/track/distinct/:appId", async (req, res) => {
   dateSevenDaysAgo.setDate(dateSevenDaysAgo.getDate() - 7);
 
   const track = await TrackEvent.aggregate([
-    { $match: { appId, event: "click", timestamp: { $gte: dateSevenDaysAgo } } },
+    {
+      $match: { appId, event: "click", timestamp: { $gte: dateSevenDaysAgo } },
+    },
     {
       $group: {
         _id: {
           date: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
-          clientId: "$clientId"
+          clientId: "$clientId",
         },
-        count: { $sum: 1 }
-      }
+        count: { $sum: 1 },
+      },
     },
     {
       $group: {
         _id: "$_id.date",
         users: { $addToSet: "$_id.clientId" },
-        count: { $sum: "$count" }
-      }
+        count: { $sum: "$count" },
+      },
     },
     {
       $project: {
         _id: 0,
         date: "$_id",
         users: 1,
-        count: 1
-      }
-    }
+        count: 1,
+      },
+    },
   ]);
 
   res.json(track);
 });
 
+app.get("/session/:appId", async (req, res) => {
+  const appId = req.params.appId;
+  const dateSevenDaysAgo = new Date();
+  dateSevenDaysAgo.setDate(dateSevenDaysAgo.getDate() - 7);
 
+  const track = await MouseEventTrack.aggregate([
+    {
+      $match: { appId, timestamp: { $gte: dateSevenDaysAgo } },
+    },
+    {
+      $group: {
+        _id: {
+          date: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
+          clientId: "$clientId",
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$_id.date",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: "$_id",
+        count: 1,
+      },
+    },
+  ]);
+
+  res.json(track);
+});
 
 app.post("/track", async (req, res) => {
-  console.log(req.body);
-  const { event, tag, timestamp, appId, clientId } = req.body.data;
-  const track = new TrackEvent({ event, tag, timestamp, appId, clientId });
+  const { event, tag, timestamp, appId, visitorId } = req.body;
+  const track = new TrackEvent({
+    event,
+    tag,
+    timestamp,
+    appId,
+    clientId: visitorId,
+  });
   await track.save();
   res.json(track);
 });
@@ -330,6 +382,147 @@ app.post("/createAppId", async (req, res) => {
   );
   res.json(appId);
 });
+
+app.get("/analytics/users", async (req, res) => {
+  const dateSevenDaysAgo = new Date();
+  dateSevenDaysAgo.setDate(dateSevenDaysAgo.getDate() - 7);
+
+  const track = await TrackEvent.aggregate([
+    { $match: { event: "click", timestamp: { $gte: dateSevenDaysAgo } } },
+    {
+      $group: {
+        _id: "$clientId",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        clientId: "$_id",
+        count: 1,
+      },
+    },
+  ]);
+
+  // Find all distinct clientId and pageUrl in the MouseEventTrack collection
+  const mouseTrack = await MouseEventTrack.aggregate([
+    { $match: { event: "click", timestamp: { $gte: dateSevenDaysAgo } } },
+    {
+      $group: {
+        _id: "$clientId",
+        count: { $sum: 1 },
+        pageUrl: { $addToSet: "$pageUrl" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        clientId: "$_id",
+        count: 1,
+        pageUrl: 1,
+      },
+    },
+  ]);
+
+  // Merge the TrackEvent and MouseEventTrack data
+  const users = [...track, ...mouseTrack];
+
+  // Calculate the bounce rate for each user
+  const usersWithBounceRate = users.map((user) => {
+    const { clientId, count, pageUrl } = user;
+    const bounceRate = pageUrl.length === 1 ? 100 : 0; // Assume bounce rate is 100% if there is only one pageUrl, otherwise 0%
+    return { clientId, count, bounceRate };
+  });
+
+  res.json(usersWithBounceRate);
+});
+
+app.get("/user-page-urls/:appId", async (req, res) => {
+  const appId = req.params.appId;
+  const dateSevenDaysAgo = new Date();
+  dateSevenDaysAgo.setDate(dateSevenDaysAgo.getDate() - 7);
+
+  const users = await MouseEventTrack.aggregate([
+    {
+      $match: { appId, timestamp: { $gte: dateSevenDaysAgo } },
+    },
+    {
+      $group: {
+        _id: {
+          date: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
+          clientId: "$clientId",
+        },
+        pageUrls: { $addToSet: "$pageUrl" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: "$_id.date",
+        clientId: "$_id.clientId",
+        pageUrls: 1,
+      },
+    },
+    {
+      $group: {
+        _id: "$clientId",
+        sessions: {
+          $push: {
+            date: "$date",
+            pageUrls: "$pageUrls",
+          },
+        },
+        uniquePageUrls: { $sum: { $size: "$pageUrls" } },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        clientId: "$_id",
+        sessions: 1,
+        uniquePageUrls: 1,
+        pageUrls: "$sessions.pageUrls",
+      },
+    },
+  ]);
+
+  res.json(users);
+});
+
+app.get("/analytics/average-session-time", async (req, res) => {
+  const dateSevenDaysAgo = new Date();
+  dateSevenDaysAgo.setDate(dateSevenDaysAgo.getDate() - 7);
+
+  const mouseEventData = await MouseEventTrack.find({
+    timestamp: { $gte: dateSevenDaysAgo },
+  });
+
+  const distinctDates = Array.from(new Set(mouseEventData.map((data) => data.timestamp.toISOString().split("T")[0])));
+
+  const averageSessionTimes = distinctDates.map((date) => {
+    const sessions = mouseEventData.filter((data) => data.timestamp.toISOString().split("T")[0] === date);
+    const distinctClientIds = Array.from(new Set(sessions.map((data) => data.clientId)));
+
+    const sessionStarts = sessions.map((session) => new Date(session.timestamp).getTime());
+    const sessionEnds = sessions.map((session) => new Date(session.timestamp).getTime() + session.mousePosition.timestamp);
+
+    const totalSessionTime = sessionEnds.reduce((acc, end, index) => {
+      const start = sessionStarts[index];
+      return acc + (end - start);
+    }, 0);
+
+    const averageSessionTime = sessions.length > 0 ? totalSessionTime / sessions.length : 0;
+
+    return {
+      date: date,
+      clients: distinctClientIds.length,
+      averageSessionTime: averageSessionTime,
+    };
+  });
+
+  res.json(averageSessionTimes);
+});
+
 
 // Load Swagger documentation
 swagger(app);

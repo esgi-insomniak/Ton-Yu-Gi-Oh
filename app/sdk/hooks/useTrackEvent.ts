@@ -26,7 +26,7 @@ export const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type }: 
     React.useEffect(() => {
         const track = () => {
             apiRequest({
-                beacon: true,
+                beacon: false,
                 url: "/track",
                 method: "POST",
                 payload: {
@@ -34,7 +34,7 @@ export const useTrackEvent = <TargetElement extends HTMLElement>({ tag, type }: 
                     tag,
                     timestamp: Date.now(),
                     visitorId,
-                    appId
+                    appId,
                 }
             })
         };
