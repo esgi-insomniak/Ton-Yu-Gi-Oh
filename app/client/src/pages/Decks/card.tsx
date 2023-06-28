@@ -1,7 +1,7 @@
 import GameCard from "@/components/GameCard/GameCard";
 import { Modal } from "@/components/Modal";
 import { useAuth } from "@/helpers/api/hooks";
-import { useGetUserCardSets } from "@/helpers/api/hooks/cards/card-set.hook";
+import { useGetUserCardSets, useScrapCards } from "@/helpers/api/hooks/cards/card-set.hook";
 import useModal from "@/helpers/api/hooks/modal";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
@@ -16,6 +16,7 @@ const CardCollection = () => {
     const [arrayOfDuplicateCard, setArrayOfDuplicateCard] = React.useState<string[]>([])
     const alert = useAlert()
     const { isShowing, toggle } = useModal()
+    const scrapCards = useScrapCards()
 
     const filterDuplicatedIdSets = () => {
         const arrayOfDuplicateCardId: string[] = []
@@ -25,7 +26,6 @@ const CardCollection = () => {
             }
         })
         setArrayOfDuplicateCard(arrayOfDuplicateCardId)
-        console.log(arrayOfDuplicateCardId)
     }
 
 
@@ -54,10 +54,16 @@ const CardCollection = () => {
         } else setArrayOfCardDismantle([...arrayOfCardDismantle, { id: cardId, selected: true }])
     }
 
-    // const handleRequestScrapCardsModal = () => {
-    //     if (arrayOfCardDismantle.length <= 0) return;
-    //     toggle()
-    // }
+    const handleRequestScrapCardsModal = (ids: string[]) => {
+        scrapCards.mutate(ids, {
+            onSuccess: (res) => {
+                setArrayOfCardDismantle([])
+                alert?.success(`Cartes démantelez avec succès !, ${res.data?.coinsEarned} coins ont été ajouté à votre compte !`)
+                refetch()
+            },
+            onError: (error) => alert?.error('Une erreur est survenue lors du démantelement des cartes !')
+        })
+    }
 
     return (
         <div className={`w-full h-full px-20 py-10 flex flex-col space-y-10`}>
@@ -82,7 +88,7 @@ const CardCollection = () => {
                 yesNo
                 yesNoAction={[
                     { text: 'Non', action: () => toggle(), type: 'no' },
-                    { text: 'Oui', action: () => { toggle(); alert?.success("Cartes démantelez avec succès !") }, type: 'yes' }
+                    { text: 'Oui', action: () => handleRequestScrapCardsModal(arrayOfDuplicateCard), type: 'yes' }
                 ]}
             />
         </div>
