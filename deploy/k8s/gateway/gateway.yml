@@ -47,9 +47,30 @@ spec:
     - name: http
       port: 8000
       targetPort: 8000
-  type: LoadBalancer # Can be accessed from outside the cluster
+  # type: LoadBalancer # Can be accessed from outside the cluster
 
 ---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-ingress
+  labels:
+    app: gateway-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+    rules:
+      - http:
+          paths:
+            - path: /api(/|$)(.*)
+              backend:
+                serviceName: gateway-svc
+                servicePort: 8000
+
+---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
