@@ -44,6 +44,7 @@ export const responsePaymentHistorySchema = zod.object({
     userId: zod.string(),
     coinsAmount: zod.number(),
     stripeInfo: zod.string(),
+    sessionId: zod.string(),
 });
 
 export const responseGetAllPromoCodesSchema = zod.object({

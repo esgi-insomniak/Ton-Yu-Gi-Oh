@@ -1,10 +1,13 @@
 import { useAuth } from '@/helpers/api/hooks'
+import { useGetPayementById } from '@/helpers/api/hooks/admin/payement'
 import { useMe } from '@/helpers/api/hooks/users'
 import React from 'react'
 
 const UserProfil = () => {
     const { user } = useAuth()
     const { data } = useMe(user.id)
+    const { data: payementHistories } = useGetPayementById(user.id)
+
 
     return (
         <div className='w-full h-full p-10 scrollbar-none overflow-scroll flex flex-col'>
@@ -26,8 +29,27 @@ const UserProfil = () => {
                 </div>
 
                 {/* Transaction */}
-                <div className='flex flex-grow basis-1/4 bg-white h-2/3 p-5 items-center rounded-lg'>
-                    <span>Mes transactions :</span>
+                <div className='flex flex-grow basis-1/4 bg-white h-fit p-5 items-start rounded-lg flex-col space-y-2'>
+                    <b>Mes transactions :</b>
+                    {
+                        payementHistories?.data.map((item) => (
+                            <div className='flex gap-3 p-2 drop-shadow-md bg-gray-200 w-full rounded-md items-center justify-around'>
+                                <div className='gap-2 flex items-center'>
+                                    <b>ID:</b>
+                                    {item.sessionId}
+                                </div>
+                                <div className='flex items-center gap-2'>
+                                    <span>{item.coinsAmount}</span>
+                                    <img src="/InsomniakCoins.png" alt="" className="h-7 w-7" />
+                                </div>
+                                <span
+                                    className={`badge ${JSON.parse(item.stripeInfo as string).paymentStatus === 'paid' ? 'badge-accent' : 'badge-error'} badge-outline`}
+                                >
+                                    {JSON.parse(item.stripeInfo as string).paymentStatus}
+                                </span>
+                            </div>
+                        ))
+                    }
                 </div>
 
                 {/* Echanges */}
