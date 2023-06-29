@@ -9,10 +9,10 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface ProtectedRouteProps {
-  redirect: string;
-  condition: boolean;
-  children: React.ReactNode;
-  withLayout?: boolean;
+    redirect: string;
+    condition: boolean;
+    children: React.ReactNode;
+    withLayout?: boolean;
 }
 
 /**
@@ -24,18 +24,18 @@ interface ProtectedRouteProps {
  * render a `Navigate` component with the `to` prop set to the `redirect` prop.
  */
 const ProtectedRoute = ({
-  redirect,
-  condition,
-  children,
-  withLayout,
+    redirect,
+    condition,
+    children,
+    withLayout,
 }: ProtectedRouteProps) => {
-  if (condition)
-    return withLayout ? (
-      <Layout>{children}</Layout>
-    ) : (
-      <React.Fragment>{children}</React.Fragment>
-    );
-  else return <Navigate to={redirect} />;
+    if (condition)
+        return withLayout ? (
+            <Layout>{children}</Layout>
+        ) : (
+            <React.Fragment>{children}</React.Fragment>
+        );
+    else return <Navigate to={redirect} />;
 };
 
 /* These lines of code are importing React components lazily. This means that the components will only
@@ -55,115 +55,130 @@ const ShopPage = React.lazy(() => import("@/pages/Shop"));
 const DecksPage = React.lazy(() => import("@/pages/Decks"));
 const NewDecksPage = React.lazy(() => import("@/pages/Decks/NewDeck"));
 //const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
-const AdminUserPage = React.lazy(() => import("@/pages/Admin/user"));
-const AdminExchangePage = React.lazy(() => import("@/pages/Admin/exchange"));
-const AdminPayementPage = React.lazy(() => import("@/pages/Admin/payement"));
-const AdminAuthPage = React.lazy(() => import("@/pages/Admin/auth"));
-const AdminPromoPage = React.lazy(() => import("@/pages/Admin/promos"));
-const DuelPage = React.lazy(() => import("@/pages/Duels"));
-const CreateDeckPage = React.lazy(() => import("@/pages/Decks/deck"));
-const MyCardCollectionPage = React.lazy(() => import("@/pages/Decks/card"));
+const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
+const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
+const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
+const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
+const AdminPromoPage = React.lazy(() => import('@/pages/Admin/promos'));
+const DuelPage = React.lazy(() => import('@/pages/Duels'));
+const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
+const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
+const ExchangePage = React.lazy(() => import('@/pages/Exchange'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
  */
 const Router: React.FC = () => {
-  const { user, isLoggedIn } = useAuth();
-  const router = useLocation().pathname;
+    const { user, isLoggedIn } = useAuth();
+    const router = useLocation().pathname;
 
-  const routesWithoutLayout = React.useMemo(() => ["/", "/admin"], []);
-  return (
-    <React.Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        {/* Protected routes */}
-        <Route
-          element={
-            <ProtectedRoute
-              condition={isLoggedIn}
-              redirect="/login"
-              withLayout={!routesWithoutLayout.includes(router)}
-            >
-              <Outlet />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/" element={<HomePage />} />
-          <Route
-            path="/opening"
-            element={
-              <DndProvider backend={HTML5Backend}>
-                <BoosterPage />
-              </DndProvider>
-            }
-          />
-          <Route
-            path="/collection"
-            element={
-              <GameCardProvider>
-                <CollectionPage />
-              </GameCardProvider>
-            }
-          />
-          <Route path="/shop" element={<ShopPage />} />
-          <Route path="/shop/:sessionId" element={<ShopPage />} />
-          <Route path="/decks" element={<DecksPage />} />
-          <Route path="/decks/create" element={<CreateDeckPage />} />
-          <Route
-            path="/decks/my-cards"
-            element={
-              <GameCardProvider>
-                <MyCardCollectionPage />
-              </GameCardProvider>
-            }
-          />
-          <Route path="/decks/new" element={<NewDecksPage />} />
-          {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
-          <Route path="/duel/:roomId" element={<DuelPage />} />
-        </Route>
+    const routesWithoutLayout = React.useMemo(() => ["/", "/admin"], []);
+    return (
+        <React.Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+                {/* Protected routes */}
+                <Route
+                    element={
+                        <ProtectedRoute
+                            condition={isLoggedIn}
+                            redirect="/login"
+                            withLayout={!routesWithoutLayout.includes(router)}
+                        >
+                            <Outlet />
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/" element={<HomePage />} />
+                    <Route
+                        path="/opening"
+                        element={
+                            <DndProvider backend={HTML5Backend}>
+                                <BoosterPage />
+                            </DndProvider>
+                        }
+                    />
+                    <Route
+                        path="/collection"
+                        element={
+                            <GameCardProvider>
+                                <CollectionPage />
+                            </GameCardProvider>
+                        }
+                    />
+                    <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/shop/:sessionId" element={<ShopPage />} />
+                    <Route path="/decks" element={<DecksPage />} />
+                    <Route path="/decks/create" element={<CreateDeckPage />} />
+                    <Route
+                        path="/decks/my-cards"
+                        element={
+                            <GameCardProvider>
+                                <MyCardCollectionPage />
+                            </GameCardProvider>
+                        }
+                    />
+                    <Route path="/decks/new" element={<NewDecksPage />} />
+                    {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
+                    <Route path="/duel/:roomId" element={<DuelPage />} />
+                </Route>
 
-        {/* Admin routes */}
-        <Route
-          element={
-            <ProtectedRoute
-              condition={user.roles.includes(ROLES.ADMIN)}
-              redirect="/"
-            >
-              <LayoutAdmin>
-                <Outlet />
-              </LayoutAdmin>
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/admin" element={<AdminUserPage />} />
-          <Route path="/admin/exchange" element={<AdminExchangePage />} />
-          <Route path="/admin/payement" element={<AdminPayementPage />} />
-          <Route path="/admin/auth" element={<AdminAuthPage />} />
-          <Route path="/admin/promo" element={<AdminPromoPage />} />
-        </Route>
+                {/* Protected routes */}
+                <Route
+                    element={
+                        <ProtectedRoute
+                            condition={isLoggedIn}
+                            redirect="/login"
+                            withLayout={!routesWithoutLayout.includes(router)}
+                        >
+                            <Outlet />
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/opening" element={<BoosterPage />} />
+                    <Route path="/collection" element={
+                        <GameCardProvider>
+                            <CollectionPage />
+                        </GameCardProvider>
+                    } />
+                    <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/shop/:sessionId" element={<ShopPage />} />
+                    <Route path="/decks" element={<DecksPage />} />
+                    <Route path="/decks/create" element={<CreateDeckPage />} />
+                    <Route path="/decks/my-cards" element={
+                        <GameCardProvider>
+                            <MyCardCollectionPage />
+                        </GameCardProvider>
+                    } />
+                    <Route path="/decks/new" element={<NewDecksPage />} />
+                    {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
+                    <Route path="/duel/:roomId" element={<DuelPage />} />
+                    <Route path="/exchange/:cardId" element={<ExchangePage />} />
+                </Route>
 
-        {/* Public routes */}
-        <Route
-          element={
-            <ProtectedRoute condition={!isLoggedIn} redirect="/">
-              <Outlet />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/account-confirmation/:token"
-            element={<ConfirmAccPage />}
-          />
-          <Route path="/password-reset" element={<ResetPwdPage />} />
-          <Route path="/password-reset/:token" element={<ResetPwdPage />} />
-        </Route>
+                {/* Public routes */}
+                <Route
+                    element={
+                        <ProtectedRoute condition={!isLoggedIn} redirect="/">
+                            <Outlet />
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route
+                        path="/account-confirmation/:token"
+                        element={<ConfirmAccPage />}
+                    />
+                    <Route path="/password-reset" element={<ResetPwdPage />} />
+                    <Route path="/password-reset/:token" element={<ResetPwdPage />} />
+                </Route>
 
-        <Route path="/logout" element={<LogoutPage />} />
-        <Route path="/error" element={<ErrorPage />} />
-      </Routes>
-    </React.Suspense>
-  );
+                <Route path="/logout" element={<LogoutPage />} />
+                <Route path="/error" element={<ErrorPage />} />
+            </Routes>
+        </React.Suspense>
+    );
 };
 
 export default Router;

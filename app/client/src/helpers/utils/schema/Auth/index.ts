@@ -22,10 +22,11 @@ export const userSchema = zod.object({
     phone: zod.string().nullable(),
     coins: zod.number(),
     roles: zod.array(zod.string()),
+    isOnline: zod.boolean(),
 });
 
 export const responseRegisterSchema = zod.object({
-    data: zod.object({ userSchema }),
+    data: userSchema,
 });
 
 export const responseConfirmAccountSchema = zod.string();

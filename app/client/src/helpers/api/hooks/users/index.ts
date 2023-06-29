@@ -1,6 +1,8 @@
 import { apiRequest } from "@/helpers/api";
+import { ApiGetItemResponse } from "@/helpers/types/common";
 import { Card, MyCards, MyObj, SameCards } from "@/helpers/types/decks";
 import { UserMe } from "@/helpers/types/users";
+import { userSchemaType } from "@/helpers/utils/schema/Admin";
 import { responseRegisterSchema } from "@/helpers/utils/schema/Auth";
 import React from "react";
 import { useQuery } from "react-query";
@@ -8,6 +10,7 @@ import { useQuery } from "react-query";
 const QUERY_URLS = {
   me: (id: string) => `/users/${id}`,
   userCardSets: (userId: string) => `/users/${userId}/user_card_sets?limit=100`,
+  getUsers: (cardSetId: string, itemPerPage?: number, pageNumber?: number) => `/users?limit=${itemPerPage}&offset=${pageNumber}&cardSetId=${cardSetId}`,
 } as const;
 
 const userKeys = {
@@ -27,16 +30,6 @@ const requestMe = (id: string) =>
     responseRegisterSchema
   );
 
-export const useMe = (id: string) => {
-    const { data, isLoading, error, refetch } = useQuery<UserMe>(userKeys.me(id, token), () => requestMe(id), {
-        enabled: !!id,
-        refetchOnReconnect: "always",
-        refetchOnWindowFocus: false,
-    })
-
-    return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
-}
-
 const requestUserCardSets = (userId: string) =>
   apiRequest({
     url: QUERY_URLS.userCardSets(userId),
@@ -44,12 +37,38 @@ const requestUserCardSets = (userId: string) =>
     token: !!token ? token : undefined,
   });
 
+const requestGetUsers = (cardSetId: string, itemPerPage?: number, pageNumber?: number) =>
+  apiRequest({
+    url: QUERY_URLS.getUsers(cardSetId, itemPerPage, pageNumber),
+    method: "GET",
+    token: !!token ? token : undefined,
+  });
+
+export const useMe = (id: string) => {
+  const { data, isLoading, error, refetch } = useQuery<UserMe>(userKeys.me(id, token), () => requestMe(id), {
+    enabled: !!id,
+    refetchOnReconnect: "always",
+    refetchOnWindowFocus: true,
+  })
+
+  return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
+}
+
+
 export const useGetAllMyUserCardSets = (userId: string) => {
   const myCards = useQuery(["userCardSets", userId], () =>
     requestUserCardSets(userId)
   );
 
   return myCards;
+};
+
+export const useGetUserWithCardSetId = (cardSetId: string, itemPerPage?: number, pageNumber?: number) => {
+  const users = useQuery<ApiGetItemResponse<userSchemaType[]>>(["users", cardSetId, itemPerPage, pageNumber], () =>
+    requestGetUsers(cardSetId, itemPerPage, pageNumber)
+  );
+
+  return React.useMemo(() => ({ users }), [users, cardSetId, itemPerPage, pageNumber]);
 };
 
 export const getAllCardInDoubleAndIncrement = (

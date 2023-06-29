@@ -51,11 +51,10 @@ export class UserController {
     @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
     @Inject('USER_DECK_SERVICE')
     private readonly userDeckServiceClient: ClientProxy,
-  ) {}
+  ) { }
 
   @Get()
   @Authorization(true)
-  @Permission([IUserRoles.admin])
   @ApiCreatedResponse({
     type: GetUsersResponseDto,
   })
