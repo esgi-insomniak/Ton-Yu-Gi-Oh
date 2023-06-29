@@ -1,5 +1,12 @@
 import * as zod from "zod";
 import { setPartialSchema } from "../cards/set.schema";
+import { userCardSetsSchema } from "../User";
+
+export const profilePictureSchema = zod.object({
+    id: zod.string(),
+    name: zod.string(),
+    path: zod.string()
+})
 
 export const userSchema = zod.object({
     id: zod.string(),
@@ -9,7 +16,9 @@ export const userSchema = zod.object({
     roles: zod.array(zod.string()),
     coins: zod.number(),
     isOnline: zod.boolean().nullable(),
+    profilePicture: profilePictureSchema.nullable(),
 });
+
 
 export const getAllUsersSchema = zod.object({
     data: zod.array(userSchema),
@@ -63,6 +72,23 @@ export const responseAuthSchema = zod.object({
     data: zod.array(AuthLogSchema),
 });
 
+export const ExchangeSchema = zod.object({
+    id: zod.string(),
+    ownerAccepted: zod.boolean(),
+    targetAccepted: zod.boolean(),
+    isClosed: zod.boolean(),
+    ownerCoinsProposed: zod.number(),
+    targetCoinsProposed: zod.number(),
+    ownerCardSetsProposed: zod.array(userCardSetsSchema),
+    targetCardSetsProposed: zod.array(userCardSetsSchema),
+    exchangeOwner: userSchema,
+    exchangeTarget: userSchema
+})
+
+export const responseExchangeSchema = zod.object({
+    data: zod.array(ExchangeSchema)
+})
+
 export type getAllUsersSchemaType = zod.infer<typeof getAllUsersSchema>;
 export type userSchemaType = zod.infer<typeof userSchema>;
 export type createPromoCodeWithCoinsSchemaType = zod.infer<typeof createPromoCodeWithCoinsSchema>;
@@ -73,3 +99,5 @@ export type responseGetAllPromoCodesSchemaType = zod.infer<typeof responseGetAll
 export type responseAuthSchemaType = zod.infer<typeof responseAuthSchema>;
 export type responsePatchUserSchemaType = zod.infer<typeof responsePatchUserSchema>;
 export type AuthLogSchemaType = zod.infer<typeof AuthLogSchema>;
+export type ExchangeSchemaType = zod.infer<typeof ExchangeSchema>;
+export type responseExchangeSchemaType = zod.infer<typeof responseExchangeSchema>;
