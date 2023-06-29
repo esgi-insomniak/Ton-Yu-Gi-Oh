@@ -11,6 +11,7 @@ import {
   IsOptional,
   IsString,
   IsStrongPassword,
+  IsUUID,
   MaxLength,
   Min,
   MinLength,
@@ -85,6 +86,11 @@ export class UpdateUserBodyDto {
   @IsInt()
   @Min(0)
   coins: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsUUID(4)
+  profilePicture: string;
 }
 
 export class LoginUserBodyDto {

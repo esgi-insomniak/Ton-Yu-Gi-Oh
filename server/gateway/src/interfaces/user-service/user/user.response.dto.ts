@@ -12,6 +12,7 @@ export class GetUsersResponseDto {
         roles: ['user'],
         coins: 10,
         isOnline: true,
+        profilePicture: null,
       },
     ],
   })
@@ -28,6 +29,7 @@ export class GetUserByIdResponseDto {
       roles: ['user'],
       coins: 10,
       isOnline: true,
+      profilePicture: null,
     },
   })
   data: IUser;
@@ -43,6 +45,7 @@ export class CreateUserResponseDto {
       roles: ['user'],
       coins: 10,
       isOnline: true,
+      profilePicture: null,
     },
   })
   data: IUser;
