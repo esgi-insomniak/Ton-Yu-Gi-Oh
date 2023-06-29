@@ -64,6 +64,8 @@ const DuelPage = React.lazy(() => import('@/pages/Duels'));
 const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
 const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
 const ExchangePage = React.lazy(() => import('@/pages/Exchange'));
+const UserProfilPage = React.lazy(() => import('@/pages/User'));
+const ExchangeRoomPage = React.lazy(() => import('@/pages/Exchange/exchangeRoom'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -154,6 +156,8 @@ const Router: React.FC = () => {
                     {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
                     <Route path="/duel/:roomId" element={<DuelPage />} />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
+                    <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
+                    <Route path="/me" element={<UserProfilPage />} />
                 </Route>
 
                 {/* Public routes */}

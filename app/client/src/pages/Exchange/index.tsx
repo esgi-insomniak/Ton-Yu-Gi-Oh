@@ -3,6 +3,7 @@ import { useGetCardById } from '@/helpers/api/hooks/cards/card-set.hook'
 import { useGetUserWithCardSetId } from '@/helpers/api/hooks/users'
 import { userSchemaType } from '@/helpers/utils/schema/Admin'
 import React from 'react'
+import { BsDot } from 'react-icons/bs'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 const Exchange = () => {
@@ -39,7 +40,10 @@ const Exchange = () => {
                             ?.filter((user: userSchemaType) => user.id !== me.id)
                             ?.map((user: userSchemaType) => (
                                 <div className='rounded-md bg-white flex-grow basis-80 max-w-sm h-fit p-3 drop-shadow-lg relative flex justify-between items-center'>
-                                    <p>{user.username}</p>
+                                    <div className='flex items-center'>
+                                        <p>{user.username}</p>
+                                        <BsDot className={`${user.isOnline ? 'text-green-500' : 'text-red-500'} h-10 w-10`} />
+                                    </div>
                                     <button className='btn'>Faire une offre</button>
                                 </div>
                             )
