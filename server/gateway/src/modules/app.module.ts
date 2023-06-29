@@ -14,6 +14,7 @@ import { MailerModule } from './mailer.module';
 import { WebsocketModule } from './websoket.module';
 import { PromoModule } from './promo.module';
 import { DuelModule } from './duel.module';
+import { MeToIdGuard } from 'src/services/guard/me-to-id.guard';
 
 @Module({
   imports: [
@@ -100,6 +101,10 @@ import { DuelModule } from './duel.module';
     {
       provide: APP_GUARD,
       useClass: PermissionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: MeToIdGuard,
     },
   ],
   exports: [

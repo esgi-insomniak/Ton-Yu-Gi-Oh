@@ -36,6 +36,7 @@ import {
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { IUserRoles } from 'src/interfaces/user-service/user/user.interface';
 import { Permission } from 'src/decorators/permission.decorator';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('users_relations')
 @ApiTags('UsersRelation')
@@ -219,6 +220,7 @@ export class UserRelationUserController {
   ) {}
 
   @Authorization(true)
+  @MeToId()
   @Get(':id/users_relations')
   @ApiOkResponse({
     type: GetUserRelationResponseDto,

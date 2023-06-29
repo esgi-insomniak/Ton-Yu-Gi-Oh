@@ -45,6 +45,7 @@ import {
   IUserCardSet,
   IUserCardSetPartial,
 } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('user_decks')
 @ApiTags('UserDeck')
@@ -286,6 +287,7 @@ export class UserDeckUserController {
 
   @Get(':id/user_decks')
   @Authorization(true)
+  @MeToId()
   @ApiOkResponse({
     type: GetUserDecksResponseDto,
   })
