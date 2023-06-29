@@ -51,25 +51,25 @@ spec:
 
 ---
 
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
-namespace: default
 metadata:
   name: gateway-ingress
   labels:
     app: gateway-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
-    rules:
-      - http:
-          paths:
-            - path: /api(/|$)(.*)
-              backend:
-                serviceName: gateway-svc
-                servicePort: 8000
-
+  rules:
+    - host: api.ton-yugi.com
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            backend:
+                service:
+                  name: gateway-svc
+                  port:
+                    number: 8000
 ---
 
 apiVersion: v1
