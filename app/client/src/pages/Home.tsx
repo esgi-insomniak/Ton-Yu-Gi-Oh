@@ -65,7 +65,7 @@ const Home = () => {
                 <div className="dropdown dropdown-right dropdown-end">
                     <label tabIndex={0} className="w-16 h-10 p-2 rounded-full bg-white/20 flex items-center justify-center cursor-pointer text-2xl hover:bg-white/30">⚙️</label>
                     <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 ml-2">
-                        <li><Link to={`/me/${user.username}`}>{user.username}</Link></li>
+                        <li><Link to={`/me`}>{user.username}</Link></li>
                         <li><Link to={'/logout'}>Se déconnecter</Link></li>
                     </ul>
                 </div>
