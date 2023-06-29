@@ -33,6 +33,7 @@ import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.inter
 import { GetUserCardSetsQuery } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.query.dto';
 import { IUserDeckPartial } from 'src/interfaces/user-deck-service/userDeck/user-deck.interface';
 import { GetScrapUserCardSetByIdsDto } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.body.dto';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('user_card_sets')
 @ApiTags('UserCardSet')
@@ -314,6 +315,7 @@ export class UserController {
 
   @Get(':id/user_card_sets')
   @Authorization(true)
+  @MeToId()
   @ApiOkResponse({
     type: GetUserCardSetsResponseDto,
   })

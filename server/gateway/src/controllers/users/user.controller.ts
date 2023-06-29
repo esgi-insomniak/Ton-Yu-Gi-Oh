@@ -40,6 +40,7 @@ import { Permission } from 'src/decorators/permission.decorator';
 import { IBasicAuth } from 'src/interfaces/auth-service/auth/basic-auth.interface';
 import { GetUsersQuery } from 'src/interfaces/user-service/user/user.query.dto';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('users')
 @ApiTags('User')
@@ -51,7 +52,7 @@ export class UserController {
     @Inject('CARD_SERVICE') private readonly cardServiceClient: ClientProxy,
     @Inject('USER_DECK_SERVICE')
     private readonly userDeckServiceClient: ClientProxy,
-  ) { }
+  ) {}
 
   @Get()
   @Authorization(true)
@@ -124,6 +125,7 @@ export class UserController {
 
   @Get(':id')
   @Authorization(true)
+  @MeToId()
   @ApiOkResponse({
     type: GetUserByIdResponseDto,
   })
@@ -194,6 +196,7 @@ export class UserController {
   }
 
   @Authorization(true)
+  @MeToId()
   @Patch(':id')
   @SerializeOptions({
     groups: ['admin'],

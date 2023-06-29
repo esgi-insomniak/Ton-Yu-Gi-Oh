@@ -34,6 +34,7 @@ import {
   IUserCardSetPartial,
 } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('exchanges')
 @ApiTags('Exchange')
@@ -271,6 +272,7 @@ export class UserExchangeUserController {
   ) {}
 
   @Authorization(true)
+  @MeToId()
   @Get(':id/exchanges')
   @ApiOkResponse({
     type: GetUserExchangesResponseDto,
