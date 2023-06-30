@@ -122,42 +122,29 @@ const Router: React.FC = () => {
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
                     <Route path="/duel/:roomId" element={<DuelPage />} />
-                </Route>
-
-                {/* Protected routes */}
-                <Route
-                    element={
-                        <ProtectedRoute
-                            condition={isLoggedIn}
-                            redirect="/login"
-                            withLayout={!routesWithoutLayout.includes(router)}
-                        >
-                            <Outlet />
-                        </ProtectedRoute>
-                    }
-                >
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/opening" element={<BoosterPage />} />
-                    <Route path="/collection" element={
-                        <GameCardProvider>
-                            <CollectionPage />
-                        </GameCardProvider>
-                    } />
-                    <Route path="/shop" element={<ShopPage />} />
-                    <Route path="/shop/:sessionId" element={<ShopPage />} />
-                    <Route path="/decks" element={<DecksPage />} />
-                    <Route path="/decks/create" element={<CreateDeckPage />} />
-                    <Route path="/decks/my-cards" element={
-                        <GameCardProvider>
-                            <MyCardCollectionPage />
-                        </GameCardProvider>
-                    } />
-                    <Route path="/decks/new" element={<NewDecksPage />} />
-                    {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
-                    <Route path="/duel/:roomId" element={<DuelPage />} />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
                     <Route path="/me" element={<UserProfilPage />} />
+                </Route>
+
+                {/* Admin routes */}
+                <Route
+                    element={
+                        <ProtectedRoute
+                            condition={user.roles.includes(ROLES.ADMIN)}
+                            redirect="/"
+                        >
+                            <LayoutAdmin>
+                                <Outlet />
+                            </LayoutAdmin>
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/admin" element={<AdminUserPage />} />
+                    <Route path="/admin/exchange" element={<AdminExchangePage />} />
+                    <Route path="/admin/payement" element={<AdminPayementPage />} />
+                    <Route path="/admin/auth" element={<AdminAuthPage />} />
+                    <Route path="/admin/promo" element={<AdminPromoPage />} />
                 </Route>
 
                 {/* Public routes */}

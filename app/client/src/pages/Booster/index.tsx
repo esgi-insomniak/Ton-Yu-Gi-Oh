@@ -4,12 +4,7 @@ import {
   useGetUserBooster,
   useOpeningBooster,
 } from "@/helpers/api/hooks/booster";
-import {
-  BoosterData,
-  BoosterGetAll,
-  DropBooster,
-  OpenedBooster,
-} from "@/helpers/types/booster";
+import { BoosterData, BoosterGetAll, DropBooster, OpenedBooster } from "@/helpers/types/booster";
 import { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 
@@ -21,13 +16,9 @@ const Booster = () => {
   const { user } = useAuth();
   const { data, isLoading, isError } = useGetUserBooster(user?.id);
   const [boosterData, setBoosterData] = useState<BoosterData[]>([]);
-  const [droppedBooster, setDroppedBooster] = useState<DropBooster | null>(
-    null
-  );
+  const [droppedBooster, setDroppedBooster] = useState<DropBooster | null>(null);
   const openBooster = useOpeningBooster();
-  const [openedBooster, setOpenedBooster] = useState<OpenedBooster | null>(
-    null
-  );
+  const [openedBooster, setOpenedBooster] = useState<OpenedBooster | null>(null);
   const [showButton, setShowButton] = useState<Boolean>(false);
 
   useEffect(() => {
@@ -71,15 +62,12 @@ const Booster = () => {
       return updatedBoosterData;
     });
 
-    setDroppedBooster(
-      (prevDroppedBooster) =>
-        ({
-          ...prevDroppedBooster,
-          id: item.ids[0],
-          set:
-            boosterData.find((booster) => booster.id === item.id)?.set || null,
-        } as DropBooster | null)
-    );
+    setDroppedBooster((prevDroppedBooster) => ({
+      ...prevDroppedBooster,
+      id: item.ids[0],
+      set: boosterData.find((booster) => booster.id === item.id)?.set || null,
+    }) as DropBooster | null);
+
   };
 
   useEffect(() => {
@@ -119,71 +107,53 @@ const Booster = () => {
   return (
     <div className="flex w-full h-screen">
       <div className="flex flex-col w-1/3 overflow-scroll">
-        {boosterData.length > 0 ? (
-          boosterData.map((booster: BoosterData) => (
-            <div key={booster.id} className="mx-auto">
-              {booster.count > 0 && <BoosterItem booster={booster} />}
-            </div>
-          ))
-        ) : (
-          <p className="text-center my-auto font-bold text-xl">Pas de booster disponible</p>
-        )}
+        {boosterData.map((booster: BoosterData) => (
+          <div key={booster.id} className="mx-auto">
+            {booster.count > 0 && <BoosterItem booster={booster} />}
+          </div>
+        ))}
       </div>
-
       <div
-        className="flex justify-center items-center w-1/2 mx-auto my-3"
+        className="flex justify-center items-center w-2/3"
         ref={dropRef}
+        style={{
+          backgroundColor: canDrop && isOver ? "lightgreen" : "white",
+        }}
       >
         {droppedBooster && !openedBooster && (
-          <div className="drop-zone">
-            <img
-              src={droppedBooster.set.image}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              alt=""
-            />
-          </div>
+          <img
+            src={droppedBooster.set.image}
+            style={{ width: "200px" }}
+            alt=""
+          />
         )}
         {openedBooster && (
-          <div className="booster-overlay">
-            <h2 className="text-xl">Cartes obtenues : </h2>
-            <div className="card-container">
-              {openedBooster.data.map((booster, index: number) => (
-                <div className="card-item" key={index}>
-                  <img
-                    src={booster.cardSet.card.imageUrl}
-                    style={{ width: "200px" }}
-                    className="my-3"
-                    alt=""
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="button-container">
-              {showButton && (
-                <button
-                  onClick={() => {
-                    setShowButton(false);
-                    setDroppedBooster(null);
-                    setOpenedBooster(null);
-                  }}
-                  className="z-40 btn btn-primary"
-                >
-                  Continue
-                </button>
-              )}
-            </div>
+          <div className="booster-overlay flex flex-wrap justify-between items-start">
+            {openedBooster.data.map((booster, index: number) => (
+              <div key={index}>
+                <img
+                  src={booster.cardSet.card.imageUrl}
+                  style={{ width: "200px" }}
+                  className="my-3"
+                  alt=""
+                />
+              </div>
+            ))}
           </div>
         )}
 
-        {!droppedBooster && !openedBooster && (
-          <div
-            className={`${canDrop && isOver ? "drop-zone-hover" : "drop-zone"}`}
+        {!droppedBooster && !openedBooster && <h1>Drop me</h1>}
+        {showButton && (
+          <button
+            onClick={() => {
+              setShowButton(false);
+              setDroppedBooster(null);
+              setOpenedBooster(null);
+            }}
+            className="z-40 btn btn-primary"
           >
-            {/* shadow inner */}
-            <div className="drop-zone-content">
-              <h1>Déposez votre booster ici pour l'ouvrir</h1>
-            </div>
-          </div>
+            Continue
+          </button>
         )}
       </div>
     </div>
