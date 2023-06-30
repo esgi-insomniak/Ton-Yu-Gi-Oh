@@ -123,7 +123,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({ options, setValue })
 
             />
             {filteredOptions.length > 0 && onFocus && (
-                <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-sm" onBlur={() => setOnFocus(false)} >
+                <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-sm overflow-scroll h-96" onBlur={() => setOnFocus(false)} >
                     {filteredOptions.map((option) => (
                         <li
                             key={option}
