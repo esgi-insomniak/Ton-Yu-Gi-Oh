@@ -24,11 +24,11 @@ const requestUserBooster = (userId: string) =>
   });
 
 export const useGetUserBooster = (userId: string) => {
-  const userDecks = useQuery(["userDecks", userId], () =>
+  const userBooster = useQuery(["userBooster", userId], () =>
     requestUserBooster(userId)
   );
 
-  return userDecks;
+  return userBooster;
 };
 
 export const useOpeningBooster = () => {
