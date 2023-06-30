@@ -13,7 +13,7 @@ build-and-publish:
 	deploy/scripts/push-image.sh $(service)
 
 start:
-	cd app && cd client && make up
+	# cd app && cd client && make up
 	docker compose -f ./docker-compose.yml up -d
 
 start-mutagen:
