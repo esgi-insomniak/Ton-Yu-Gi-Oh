@@ -14,7 +14,8 @@ import { useMe } from "@/helpers/api/hooks/users";
 
 const Decks = () => {
   const { me } = useMe();
-  const { data, isLoading, isError } = useGetAllUserDecks(me?.id!);
+  const { data: decksData, isLoading, isError } = useGetAllUserDecks(me?.id!);
+  const [decks, setDecks] = React.useState<DeckProps[]>([]);
   const { toggle: previewDeckToggle, isShowing: previewDeckShowing } = useModal();
   const navigate = useNavigate();
   const deleteUserDeck = useDeleteUserDeck();

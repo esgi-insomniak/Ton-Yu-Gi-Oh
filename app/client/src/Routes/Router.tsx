@@ -4,11 +4,11 @@ import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
 import Layout from "@/components/Layout";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import { LayoutAdmin } from "@/pages/Admin/Layout";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { useMe } from "@/helpers/api/hooks/users";
 import Loader from "@/components/Loader";
 import { SocketContextProvider } from "@/helpers/providers/socket/SocketProvider";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface ProtectedRouteProps {
     redirect: string;
@@ -93,7 +93,11 @@ const Router: React.FC = () => {
                     }
                 >
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/opening" element={<BoosterPage />} />
+                    <Route path="/opening" element={
+                        <DndProvider backend={HTML5Backend}>
+                            <BoosterPage />
+                        </DndProvider>
+                    } />
                     <Route path="/collection" element={
                         <GameCardProvider>
                             <CollectionPage />

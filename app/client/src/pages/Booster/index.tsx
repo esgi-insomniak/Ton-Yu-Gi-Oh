@@ -1,9 +1,9 @@
 import BoosterItem from "@/components/Booster/Booster";
-import { useAuth } from "@/helpers/api/hooks";
 import {
   useGetUserBooster,
   useOpeningBooster,
 } from "@/helpers/api/hooks/booster";
+import { useMe } from "@/helpers/api/hooks/users";
 import { BoosterData, BoosterGetAll, DropBooster, OpenedBooster } from "@/helpers/types/booster";
 import { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
@@ -13,8 +13,8 @@ export const itemTypes = {
 };
 
 const Booster = () => {
-  const { user } = useAuth();
-  const { data, isLoading, isError } = useGetUserBooster(user?.id);
+  const { me } = useMe();
+  const { data, isLoading, isError } = useGetUserBooster(me?.id!);
   const [boosterData, setBoosterData] = useState<BoosterData[]>([]);
   const [droppedBooster, setDroppedBooster] = useState<DropBooster | null>(null);
   const openBooster = useOpeningBooster();

@@ -9,7 +9,7 @@ import { CardIPrice, CardIUserCardSet, IGameCard } from "@/helpers/types/cards";
 import React from "react";
 
 const CardCollection = () => {
-    const { me } = useMe()
+    const { me, refetch: refetchUser } = useMe()
     const { data: cardSetsResponse, refetch } = useGetUserCardSets(me?.id!, 0, 24, "", "", "", "")
     const { cardSets, setCardSets } = useGameCard()
     const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<string[]>([])
@@ -24,6 +24,7 @@ const CardCollection = () => {
                 setArrayOfCardDismantle([])
                 alert?.success(`Cartes démantelez avec succès !, ${res.data?.coinsEarned} coins ont été ajouté à votre compte !`)
                 refetch()
+                refetchUser()
                 toggle()
             },
             onError: (error) => alert?.error('Vous ne pouvez pas démantelez certaines cartes car elles appartiennent à un deck !')
