@@ -78,6 +78,7 @@ export class WebsocketGateway
     });
   }
 
+  // Ping route for testing
   @SetMetadata('permission', { roles: ['admin'], areAuthorized: true })
   @UseGuards(PermissionGuard)
   @SubscribeMessage('ping')
@@ -88,6 +89,7 @@ export class WebsocketGateway
     } as ISocketMessage);
   }
 
+  // Duel Queues routes
   @SubscribeMessage('duel__join_queue')
   async duelJoinQueue(@ConnectedSocket() client: IAuthorizedSocket) {
     const eventName = 'duel__queue';
@@ -202,6 +204,7 @@ export class WebsocketGateway
     } as ISocketEvent);
   }
 
+  // Duel Queues routes
   @SubscribeMessage('duel__leave_queue')
   async duelLeaveQueue(@ConnectedSocket() client: IAuthorizedSocket) {
     const eventName = 'duel__queue';

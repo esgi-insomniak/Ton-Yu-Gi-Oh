@@ -14,9 +14,6 @@ export class TokenController {
   @MessagePattern('token_create')
   public async createToken(data: {
     userId: string;
-    username: string;
-    roles: string[];
-    email: string;
   }): Promise<GetResponseOne<Token>> {
     let result: GetResponseOne<Token> = {
       status: HttpStatus.BAD_REQUEST,
@@ -27,9 +24,6 @@ export class TokenController {
     try {
       const createTokenResult = await this.tokenService.createToken({
         userId: data.userId,
-        username: data.username,
-        roles: data.roles,
-        email: data.email,
       });
       result = {
         status: HttpStatus.CREATED,
