@@ -11,7 +11,6 @@ type TableAuthProps = Omit<AuthLogSchemaType, 'isSuccess' | 'user'> & {
 }
 
 const columns: TableColumn<TableAuthProps>[] = [
-    { key: 'id', label: 'ID' },
     { key: 'user', label: 'Username' },
     { key: 'ipAddress', label: 'IP' },
     { key: 'isSuccess', label: 'Status' },

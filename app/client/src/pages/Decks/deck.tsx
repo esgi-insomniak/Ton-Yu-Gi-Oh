@@ -1,9 +1,5 @@
 import React from "react";
-import { useAuth } from "@/helpers/api/hooks";
-import {
-  useGetAllUserDecks,
-  useDeleteUserDeck,
-} from "@/helpers/api/hooks/decks";
+import { useGetAllUserDecks, useDeleteUserDeck } from "@/helpers/api/hooks/decks";
 import { useNavigate } from "react-router-dom";
 import { DeckProps } from "@/helpers/types/decks";
 import { Modal } from "@/components/Modal";
@@ -14,13 +10,13 @@ import { BsFillTrashFill } from "react-icons/bs";
 import { AiFillEye } from "react-icons/ai";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { useGetCardDeckUser } from "@/helpers/api/hooks/decks"; // Import the hook
+import { useMe } from "@/helpers/api/hooks/users";
 
 const Decks = () => {
-  const { user } = useAuth();
-  const { data: decksData, isLoading, isError } = useGetAllUserDecks(user?.id);
+  const { me } = useMe();
+  const { data: decksData, isLoading, isError } = useGetAllUserDecks(me?.id!);
   const [decks, setDecks] = React.useState<DeckProps[]>([]);
-  const { toggle: previewDeckToggle, isShowing: previewDeckShowing } =
-    useModal();
+  const { toggle: previewDeckToggle, isShowing: previewDeckShowing } = useModal();
   const navigate = useNavigate();
   const deleteUserDeck = useDeleteUserDeck();
   const alert = useAlert();

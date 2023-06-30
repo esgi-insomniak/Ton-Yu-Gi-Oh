@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "react-query";
 import { apiRequest } from "@/helpers/api";
-import { cardSetArrayResponseSchema } from "@/helpers/utils/schema/cards/card-set.schema";
+import { cardSetArrayResponseSchema, cardSetOneResponseSchema, cardSetSchema } from "@/helpers/utils/schema/cards/card-set.schema";
 
 import React from "react";
 import { ApiGetItemResponse } from "@/helpers/types/common";
@@ -12,6 +12,7 @@ const QUERY_URLS = {
   getBooster: (id: string) => `/card_sets?setId=${id}&limit=150`,
   getUserCardSets: (id: string, pageNumber: number, itemPerPage: number) => `/users/${id}/user_card_sets?limit=${itemPerPage}&offset=${pageNumber}`,
   scrapCards: () => `/user_card_sets/scrap`,
+  getCardById: (id: string) => `/card_sets/${id}`,
 } as const;
 
 const token = localStorage.getItem("token");
@@ -56,6 +57,13 @@ const requestScrapCards = (arrayOfIds: string[]) =>
     token: !!token ? token : undefined
   });
 
+const requestCardById = (id: string) =>
+  apiRequest({
+    url: QUERY_URLS.getCardById(id),
+    method: "GET",
+    token: !!token ? token : undefined
+  }, cardSetOneResponseSchema);
+
 export const useGetCardSets = (pageNumber: number, itemPerPage: number, attributeId?: string, rarityId?: string, archetypeId?: string, cardName?: string) => {
   const arrayOfCards = useQuery<ApiGetItemResponse<CardICardSet[]>>(
     cardSetsKeys.cardSets(pageNumber, itemPerPage, attributeId, rarityId, archetypeId, cardName),
@@ -94,3 +102,16 @@ export const useGetBoosterById = () => {
 }
 
 export const useScrapCards = () => useMutation((arrayOfIds: string[]) => requestScrapCards(arrayOfIds));
+
+export const useGetCardById = (id: string) => {
+  const { data, isLoading } = useQuery<ApiGetItemResponse<CardICardSet>>(
+    cardSetsKeys.booster(id),
+    () => requestCardById(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!id,
+    }
+  );
+
+  return React.useMemo(() => ({ data, isLoading }), [data, id]);
+}

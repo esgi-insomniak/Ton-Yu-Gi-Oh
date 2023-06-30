@@ -1,9 +1,9 @@
 import BoosterItem from "@/components/Booster/Booster";
-import { useAuth } from "@/helpers/api/hooks";
 import {
   useGetUserBooster,
   useOpeningBooster,
 } from "@/helpers/api/hooks/booster";
+import { useMe } from "@/helpers/api/hooks/users";
 import {
   BoosterData,
   BoosterGetAll,
@@ -18,8 +18,8 @@ export const itemTypes = {
 };
 
 const Booster = () => {
-  const { user } = useAuth();
-  const { data, isLoading, isError } = useGetUserBooster(user?.id);
+  const { me } = useMe();
+  const { data, isLoading, isError } = useGetUserBooster(me?.id!);
   const [boosterData, setBoosterData] = useState<BoosterData[]>([]);
   const [droppedBooster, setDroppedBooster] = useState<DropBooster | null>(
     null
@@ -73,12 +73,12 @@ const Booster = () => {
 
     setDroppedBooster(
       (prevDroppedBooster) =>
-        ({
-          ...prevDroppedBooster,
-          id: item.ids[0],
-          set:
-            boosterData.find((booster) => booster.id === item.id)?.set || null,
-        } as DropBooster | null)
+      ({
+        ...prevDroppedBooster,
+        id: item.ids[0],
+        set:
+          boosterData.find((booster) => booster.id === item.id)?.set || null,
+      } as DropBooster | null)
     );
   };
 

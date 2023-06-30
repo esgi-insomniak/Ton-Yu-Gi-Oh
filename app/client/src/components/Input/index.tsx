@@ -1,5 +1,5 @@
 import React from "react";
-import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { FieldValues, Path, UseFormRegister, set } from "react-hook-form";
 import { VscEyeClosed, VscEye } from "react-icons/vsc";
 
 interface InputProps<T extends FieldValues> {
@@ -87,3 +87,54 @@ export const Select = <T extends FieldValues>({
         </select>
     ) : null
 }
+
+interface AutocompleteProps {
+    options: string[];
+    setValue: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const Autocomplete: React.FC<AutocompleteProps> = ({ options, setValue }) => {
+    const [inputValue, setInputValue] = React.useState('');
+    const [filteredOptions, setFilteredOptions] = React.useState<string[]>([]);
+    const [onFocus, setOnFocus] = React.useState<boolean>(false);
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setInputValue(value);
+        setValue(value);
+        setOnFocus(true);
+        setFilteredOptions(options.filter((option) => option.toLowerCase().includes(value.toLowerCase())));
+    };
+
+    const handleOptionClick = (value: string) => {
+        setInputValue(value);
+        setValue(value);
+        setFilteredOptions([]);
+    };
+
+    return (
+        <div className="relative" onFocus={() => setOnFocus(true)}>
+            <input
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                placeholder="Rechercher dans mes cartes..."
+                className="w-full px-4 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+
+            />
+            {filteredOptions.length > 0 && onFocus && (
+                <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-sm overflow-scroll h-96" onBlur={() => setOnFocus(false)} >
+                    {filteredOptions.map((option) => (
+                        <li
+                            key={option}
+                            onClick={() => handleOptionClick(option)}
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        >
+                            {option}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+};

@@ -18,6 +18,7 @@ export class UserService {
     const users = await this.userRepository.find({
       take: query.limit || 10,
       skip: query.offset * query.limit || 0,
+      relations: ['profilePicture'],
     });
     return users;
   }
@@ -25,6 +26,7 @@ export class UserService {
   async getUserById(param: ParamGetItemById): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: param.id },
+      relations: ['profilePicture'],
     });
     return user;
   }
@@ -38,6 +40,7 @@ export class UserService {
             id,
           },
         ],
+        relations: ['profilePicture'],
       });
       if (user) users.push(user);
     }
@@ -58,6 +61,7 @@ export class UserService {
         data.username ? { username: data.username } : null,
         data.phone ? { phone: data.phone } : null,
       ],
+      relations: ['profilePicture'],
     });
     return user;
   }
@@ -67,12 +71,12 @@ export class UserService {
     email: string;
     phone: string;
   }): Promise<User> {
-    const user = this.userRepository.create({
+    const user = await this.userRepository.save({
       username: params.username,
       email: params.email,
       phone: params.phone,
     });
-    return this.userRepository.save(user);
+    return await this.getUserById({ id: user.id });
   }
 
   async updateUserById(id: string, user: User): Promise<User> {
@@ -87,6 +91,7 @@ export class UserService {
   async addCoinsUser(userId: string, coins: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
+      relations: ['profilePicture'],
     });
     user.coins += coins;
     return this.userRepository.save(user);
@@ -95,6 +100,7 @@ export class UserService {
   async removeCoinsUser(userId: string, coins: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
+      relations: ['profilePicture'],
     });
     user.coins -= coins;
     return this.userRepository.save(user);

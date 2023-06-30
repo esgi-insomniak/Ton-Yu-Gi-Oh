@@ -16,7 +16,7 @@ const requestUserBooster = (userId: string) =>
     token: !!token ? token : undefined,
   });
 
-  const requestBoosterOpening = (boosterUserId: string) =>
+const requestBoosterOpening = (boosterUserId: string) =>
   apiRequest({
     url: QUERY_URLS.boosterOpening(boosterUserId),
     method: "POST",
@@ -24,11 +24,11 @@ const requestUserBooster = (userId: string) =>
   });
 
 export const useGetUserBooster = (userId: string) => {
-  const userBooster = useQuery(["userBooster", userId], () =>
+  const userDecks = useQuery(["userDecks", userId], () =>
     requestUserBooster(userId)
   );
 
-  return userBooster;
+  return userDecks;
 };
 
 export const useOpeningBooster = () => {

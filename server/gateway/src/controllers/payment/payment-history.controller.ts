@@ -19,6 +19,7 @@ import {
   IUser,
   IUserRoles,
 } from 'src/interfaces/user-service/user/user.interface';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('payment_histories')
 @ApiTags('PaymentHistory')
@@ -68,6 +69,7 @@ export class PaymentHistoryUserController {
 
   @Get(':id/payment_histories')
   @Authorization(true)
+  @MeToId()
   @ApiCreatedResponse({
     type: GetPaymentHistoriesResponseDto,
   })
