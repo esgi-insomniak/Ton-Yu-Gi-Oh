@@ -1,8 +1,8 @@
 import React from "react";
-import { useAuth } from "@/helpers/api/hooks";
 import {
   useGetAllMyUserCardSets,
   getAllCardInDoubleAndIncrement,
+  useMe,
 } from "@/helpers/api/hooks/users";
 import { usePostUserDeck } from "@/helpers/api/hooks/decks";
 import UserCardSets from "@/components/Decks/UserCardSets";
@@ -12,8 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 
 const NewDecks = () => {
-  const { user } = useAuth();
-  const { data, isLoading, isError } = useGetAllMyUserCardSets(user?.id);
+  const { me: user } = useMe();
+  const { data, isLoading, isError } = useGetAllMyUserCardSets(user?.id!);
   const [allUserCards, setAllUserCards] = React.useState<SameCards[]>([]);
   const [decksImages, setDecksImages] = React.useState<DecksImages[]>([]);
   const [decks, setDecks] = React.useState<Array<string>>([]);
@@ -86,10 +86,10 @@ const NewDecks = () => {
     setCountCard(
       allUserCards[index]["item"].cardSet.id in countCard
         ? {
-            ...countCard,
-            [allUserCards[index]["item"].cardSet.id]:
-              countCard[allUserCards[index]["item"].cardSet.id] - 1,
-          }
+          ...countCard,
+          [allUserCards[index]["item"].cardSet.id]:
+            countCard[allUserCards[index]["item"].cardSet.id] - 1,
+        }
         : { ...countCard, [allUserCards[index]["item"].cardSet.id]: 1 }
     );
     const cardIndex = decksImages.findIndex((card) => card.index === index);

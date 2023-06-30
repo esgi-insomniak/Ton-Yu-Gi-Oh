@@ -1,6 +1,5 @@
-import { useAuth } from '@/helpers/api/hooks'
 import { useGetCardById } from '@/helpers/api/hooks/cards/card-set.hook'
-import { useGetUserWithCardSetId } from '@/helpers/api/hooks/users'
+import { useGetUserWithCardSetId, useMe } from '@/helpers/api/hooks/users'
 import { userSchemaType } from '@/helpers/utils/schema/Admin'
 import React from 'react'
 import { BsDot } from 'react-icons/bs'
@@ -11,7 +10,7 @@ const Exchange = () => {
     const { cardId } = useParams<{ cardId: string }>()
     const { data: cardSetResponse, isLoading } = useGetCardById(cardId!)
     const { users: usersResponse } = useGetUserWithCardSetId(cardId!, 25, 0)
-    const { user: me } = useAuth()
+    const { me } = useMe()
     const router = useNavigate()
 
     React.useEffect(() => {
@@ -35,9 +34,9 @@ const Exchange = () => {
             </div>
             <div className='flex flex-wrap gap-5'>
                 {
-                    usersResponse.data && usersResponse?.data?.data?.filter((user: userSchemaType) => user.id !== me.id)?.length > 0 ? (
+                    usersResponse.data && usersResponse?.data?.data?.filter((user: userSchemaType) => user.id !== me?.id)?.length > 0 ? (
                         usersResponse?.data?.data
-                            ?.filter((user: userSchemaType) => user.id !== me.id)
+                            ?.filter((user: userSchemaType) => user.id !== me?.id)
                             ?.map((user: userSchemaType) => (
                                 <div className='rounded-md bg-white flex-grow basis-80 max-w-sm h-fit p-3 drop-shadow-lg relative flex justify-between items-center'>
                                     <div className='flex items-center'>

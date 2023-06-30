@@ -1,4 +1,4 @@
-import { apiRequest } from "@/helpers/api";
+import { apiRequest, getToken } from "@/helpers/api";
 import { ApiGetItemResponse } from "@/helpers/types/common";
 import { Card, MyCards, MyObj, SameCards } from "@/helpers/types/decks";
 import { UserMe } from "@/helpers/types/users";
@@ -6,26 +6,24 @@ import { userSchemaType } from "@/helpers/utils/schema/Admin";
 import { responseRegisterSchema } from "@/helpers/utils/schema/Auth";
 import React from "react";
 import { useQuery } from "react-query";
+import { useNavigate, useHref } from "react-router-dom";
 
 const QUERY_URLS = {
-  me: (id: string) => `/users/${id}`,
+  me: () => `/users/me`,
   userCardSets: (userId: string) => `/users/${userId}/user_card_sets?limit=100`,
   getUsers: (cardSetId: string, itemPerPage?: number, pageNumber?: number) => `/users?limit=${itemPerPage}&offset=${pageNumber}&cardSetId=${cardSetId}`,
 } as const;
 
 const userKeys = {
   all: ["me"],
-  me: (id: string, token: string) => [...userKeys.all, id, token],
+  me: () => [...userKeys.all, "user"],
 } as const;
-
-const token = localStorage.getItem("token") || "";
-
-const requestMe = (id: string) =>
+const requestMe = () =>
   apiRequest(
     {
-      url: QUERY_URLS.me(id),
+      url: QUERY_URLS.me(),
       method: "GET",
-      token: !!token ? token : undefined,
+      token: getToken(),
     },
     responseRegisterSchema
   );
@@ -34,24 +32,29 @@ const requestUserCardSets = (userId: string) =>
   apiRequest({
     url: QUERY_URLS.userCardSets(userId),
     method: "GET",
-    token: !!token ? token : undefined,
+    token: getToken(),
   });
 
 const requestGetUsers = (cardSetId: string, itemPerPage?: number, pageNumber?: number) =>
   apiRequest({
     url: QUERY_URLS.getUsers(cardSetId, itemPerPage, pageNumber),
     method: "GET",
-    token: !!token ? token : undefined,
+    token: getToken(),
   });
 
-export const useMe = (id: string) => {
-  const { data, isLoading, error, refetch } = useQuery<UserMe>(userKeys.me(id, token), () => requestMe(id), {
-    enabled: !!id,
+export const useMe = () => {
+  const { data, isLoading, error, refetch } = useQuery<ApiGetItemResponse<userSchemaType>>(userKeys.me(), () => requestMe(), {
     refetchOnReconnect: "always",
     refetchOnWindowFocus: true,
+    enabled: !!getToken(),
+    retry: 0,
   })
 
-  return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
+  if (error) { window.location.reload() }
+
+  const me = data?.data
+
+  return React.useMemo(() => ({ me, isLoading, error, refetch }), [data, isLoading, error])
 }
 
 

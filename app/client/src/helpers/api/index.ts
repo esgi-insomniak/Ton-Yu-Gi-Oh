@@ -27,3 +27,7 @@ export const apiRequest = async <Body extends object, Schema extends ZodSchema>(
 
     return schema ? schema.parse(json) : json
 }
+
+export const getToken = () => {
+    return localStorage.getItem("token") || "";
+};

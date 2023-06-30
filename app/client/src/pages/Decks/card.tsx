@@ -1,16 +1,16 @@
 import GameCard from "@/components/GameCard/GameCard";
 import { Modal } from "@/components/Modal";
-import { useAuth } from "@/helpers/api/hooks";
 import { useGetUserCardSets, useScrapCards } from "@/helpers/api/hooks/cards/card-set.hook";
 import useModal from "@/helpers/api/hooks/modal";
+import { useMe } from "@/helpers/api/hooks/users";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { CardIPrice, CardIUserCardSet, IGameCard } from "@/helpers/types/cards";
 import React from "react";
 
 const CardCollection = () => {
-    const { user } = useAuth()
-    const { data: cardSetsResponse, refetch } = useGetUserCardSets(user.id, 0, 24, "", "", "", "")
+    const { me } = useMe()
+    const { data: cardSetsResponse, refetch } = useGetUserCardSets(me?.id!, 0, 24, "", "", "", "")
     const { cardSets, setCardSets } = useGameCard()
     const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<string[]>([])
     const [coinsEarned, setCoinsEarned] = React.useState<number>(0)

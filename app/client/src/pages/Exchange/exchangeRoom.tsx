@@ -1,15 +1,15 @@
 import { ChatBubble } from "@/components/Chat"
 import { Autocomplete } from "@/components/Input"
 import { Modal } from "@/components/Modal"
-import { useAuth } from "@/helpers/api/hooks"
 import { useGetUserCardSets } from "@/helpers/api/hooks/cards/card-set.hook"
 import useModal from "@/helpers/api/hooks/modal"
+import { useMe } from "@/helpers/api/hooks/users"
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider"
 import React from "react"
 
 const ExchangeRoom = () => {
-    const { user } = useAuth()
-    const { data: cardSetsResponse } = useGetUserCardSets(user.id, 0, 100, "", "", "", "")
+    const { me } = useMe()
+    const { data: cardSetsResponse } = useGetUserCardSets(me?.id!, 0, 100, "", "", "", "")
     const { toggle, isShowing } = useModal()
     const alert = useAlert()
 

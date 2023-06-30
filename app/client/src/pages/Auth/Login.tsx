@@ -2,7 +2,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { loginSchema } from "@/helpers/utils/schema/Auth";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useAuth } from "@/helpers/api/hooks";
 import { useLogin } from "@/helpers/api/hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { MdAlternateEmail, MdPassword } from "react-icons/md";
@@ -10,14 +9,14 @@ import { BiLockOpenAlt } from "react-icons/bi";
 import OurLogoWithoutRect from "@/assets/insomniak2";
 import { Input } from "@/components/Input";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { useMe } from "@/helpers/api/hooks/users";
 
 const Login = () => {
-    const { login } = useAuth();
     const loginQuery = useLogin();
+    const { refetch } = useMe();
     const router = useNavigate()
     const alert = useAlert()
     const [error, setError] = React.useState<string>("");
-
 
     const { register, handleSubmit, formState: {
         errors, isSubmitting
@@ -29,7 +28,7 @@ const Login = () => {
         const { username, password } = data;
         loginQuery.mutate({ username, password }, {
             onSuccess: (data) => {
-                login(data.token);
+                refetch();
                 router('/');
                 alert?.success(`Bienvenue !`)
             },

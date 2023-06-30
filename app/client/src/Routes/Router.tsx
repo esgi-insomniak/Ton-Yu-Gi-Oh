@@ -1,18 +1,21 @@
 import React from "react";
 import { Routes, Route, Outlet, Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/helpers/api/hooks";
 import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
 import Layout from "@/components/Layout";
 import { ROLES } from "@/helpers/utils/enum/roles";
 import { LayoutAdmin } from "@/pages/Admin/Layout";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useMe } from "@/helpers/api/hooks/users";
+import Loader from "@/components/Loader";
+import { SocketContextProvider } from "@/helpers/providers/socket/SocketProvider";
 
 interface ProtectedRouteProps {
     redirect: string;
     condition: boolean;
     children: React.ReactNode;
     withLayout?: boolean;
+    isLoading?: boolean;
 }
 
 /**
@@ -23,18 +26,9 @@ interface ProtectedRouteProps {
  * render the `children` prop wrapped in a `React.Fragment`. If the `condition` prop is false, it will
  * render a `Navigate` component with the `to` prop set to the `redirect` prop.
  */
-const ProtectedRoute = ({
-    redirect,
-    condition,
-    children,
-    withLayout,
-}: ProtectedRouteProps) => {
-    if (condition)
-        return withLayout ? (
-            <Layout>{children}</Layout>
-        ) : (
-            <React.Fragment>{children}</React.Fragment>
-        );
+const ProtectedRoute = ({ redirect, condition, children, withLayout, isLoading }: ProtectedRouteProps) => {
+    if (isLoading) return <Loader />;
+    if (condition) return withLayout ? <Layout>{children}</Layout> : <React.Fragment>{children}</React.Fragment>
     else return <Navigate to={redirect} />;
 };
 
@@ -42,18 +36,17 @@ const ProtectedRoute = ({
 be loaded when they are actually needed, instead of being loaded all at once when the application
 starts. This can improve the performance of the application by reducing the initial load time. The
 `import()` function is used to dynamically import the components. */
-const HomePage = React.lazy(() => import("@/pages/Home"));
-const ErrorPage = React.lazy(() => import("@/pages/Errors/ErrorPage"));
-const LoginPage = React.lazy(() => import("@/pages/Auth/Login"));
-const LogoutPage = React.lazy(() => import("@/pages/Auth/Logout"));
-const BoosterPage = React.lazy(() => import("@/pages/Booster"));
-const RegisterPage = React.lazy(() => import("@/pages/Auth/Register"));
-const ConfirmAccPage = React.lazy(() => import("@/pages/Auth/ConfirmAcc"));
-const ResetPwdPage = React.lazy(() => import("@/pages/Auth/ResetPwd"));
-const CollectionPage = React.lazy(() => import("@/pages/Collection"));
-const ShopPage = React.lazy(() => import("@/pages/Shop"));
-const DecksPage = React.lazy(() => import("@/pages/Decks"));
-const NewDecksPage = React.lazy(() => import("@/pages/Decks/NewDeck"));
+const HomePage = React.lazy(() => import('@/pages/Home'));
+const ErrorPage = React.lazy(() => import('@/pages/Errors/ErrorPage'));
+const LoginPage = React.lazy(() => import('@/pages/Auth/Login'));
+const BoosterPage = React.lazy(() => import('@/pages/Booster'));
+const RegisterPage = React.lazy(() => import('@/pages/Auth/Register'));
+const ConfirmAccPage = React.lazy(() => import('@/pages/Auth/ConfirmAcc'));
+const ResetPwdPage = React.lazy(() => import('@/pages/Auth/ResetPwd'));
+const CollectionPage = React.lazy(() => import('@/pages/Collection'));
+const ShopPage = React.lazy(() => import('@/pages/Shop'));
+const DecksPage = React.lazy(() => import('@/pages/Decks'));
+const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
 //const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
 const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
 const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
@@ -71,54 +64,50 @@ const ExchangeRoomPage = React.lazy(() => import('@/pages/Exchange/exchangeRoom'
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
  */
 const Router: React.FC = () => {
-    const { user, isLoggedIn } = useAuth();
-    const router = useLocation().pathname;
+    const { me, isLoading } = useMe()
+    const router = useLocation().pathname
 
-    const routesWithoutLayout = React.useMemo(() => ["/", "/admin"], []);
+    const routesWithoutLayout = React.useMemo(() => ['/', '/admin'], [])
+
+    React.useEffect(() => {
+        if (isLoading) return
+    }, [isLoading])
+
     return (
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<Loader />}>
             <Routes>
+
                 {/* Protected routes */}
                 <Route
                     element={
                         <ProtectedRoute
-                            condition={isLoggedIn}
+                            condition={!!me}
                             redirect="/login"
                             withLayout={!routesWithoutLayout.includes(router)}
+                            isLoading={isLoading}
                         >
-                            <Outlet />
+                            <SocketContextProvider>
+                                <Outlet />
+                            </SocketContextProvider>
                         </ProtectedRoute>
                     }
                 >
                     <Route path="/" element={<HomePage />} />
-                    <Route
-                        path="/opening"
-                        element={
-                            <DndProvider backend={HTML5Backend}>
-                                <BoosterPage />
-                            </DndProvider>
-                        }
-                    />
-                    <Route
-                        path="/collection"
-                        element={
-                            <GameCardProvider>
-                                <CollectionPage />
-                            </GameCardProvider>
-                        }
-                    />
+                    <Route path="/opening" element={<BoosterPage />} />
+                    <Route path="/collection" element={
+                        <GameCardProvider>
+                            <CollectionPage />
+                        </GameCardProvider>
+                    } />
                     <Route path="/shop" element={<ShopPage />} />
                     <Route path="/shop/:sessionId" element={<ShopPage />} />
                     <Route path="/decks" element={<DecksPage />} />
                     <Route path="/decks/create" element={<CreateDeckPage />} />
-                    <Route
-                        path="/decks/my-cards"
-                        element={
-                            <GameCardProvider>
-                                <MyCardCollectionPage />
-                            </GameCardProvider>
-                        }
-                    />
+                    <Route path="/decks/my-cards" element={
+                        <GameCardProvider>
+                            <MyCardCollectionPage />
+                        </GameCardProvider>
+                    } />
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
                     <Route path="/duel/:roomId" element={<DuelPage />} />
@@ -128,18 +117,17 @@ const Router: React.FC = () => {
                 </Route>
 
                 {/* Admin routes */}
-                <Route
-                    element={
-                        <ProtectedRoute
-                            condition={user.roles.includes(ROLES.ADMIN)}
-                            redirect="/"
-                        >
-                            <LayoutAdmin>
-                                <Outlet />
-                            </LayoutAdmin>
-                        </ProtectedRoute>
-                    }
-                >
+                <Route element={
+                    <ProtectedRoute
+                        condition={me?.roles?.includes(ROLES.ADMIN)!}
+                        redirect="/"
+                        isLoading={isLoading}
+                    >
+                        <LayoutAdmin>
+                            <Outlet />
+                        </LayoutAdmin>
+                    </ProtectedRoute>
+                }>
                     <Route path="/admin" element={<AdminUserPage />} />
                     <Route path="/admin/exchange" element={<AdminExchangePage />} />
                     <Route path="/admin/payement" element={<AdminPayementPage />} />
@@ -150,23 +138,24 @@ const Router: React.FC = () => {
                 {/* Public routes */}
                 <Route
                     element={
-                        <ProtectedRoute condition={!isLoggedIn} redirect="/">
+                        <ProtectedRoute
+                            condition={me === undefined}
+                            redirect="/"
+                        >
                             <Outlet />
                         </ProtectedRoute>
                     }
                 >
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route
-                        path="/account-confirmation/:token"
-                        element={<ConfirmAccPage />}
-                    />
-                    <Route path="/password-reset" element={<ResetPwdPage />} />
-                    <Route path="/password-reset/:token" element={<ResetPwdPage />} />
+                    <Route path='/register' element={<RegisterPage />} />
+                    <Route path='/account-confirmation/:token' element={<ConfirmAccPage />} />
+                    <Route path='/password-reset' element={<ResetPwdPage />} />
+                    <Route path='/password-reset/:token' element={<ResetPwdPage />} />
                 </Route>
 
-                <Route path="/logout" element={<LogoutPage />} />
+
                 <Route path="/error" element={<ErrorPage />} />
+
             </Routes>
         </React.Suspense>
     );

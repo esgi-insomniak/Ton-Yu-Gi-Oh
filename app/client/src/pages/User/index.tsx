@@ -1,12 +1,10 @@
-import { useAuth } from '@/helpers/api/hooks'
 import { useGetPayementById } from '@/helpers/api/hooks/admin/payement'
 import { useMe } from '@/helpers/api/hooks/users'
 import React from 'react'
 
 const UserProfil = () => {
-    const { user } = useAuth()
-    const { data } = useMe(user.id)
-    const { data: payementHistories } = useGetPayementById(user.id)
+    const { me } = useMe()
+    const { data: payementHistories } = useGetPayementById(me?.id!)
 
 
     return (
@@ -16,7 +14,7 @@ const UserProfil = () => {
                 <div className='absolute -bottom-14 h-28 w-1/4 left-4 right-4 rounded-b-lg drop-shadow-2xl shadow-xl mx-auto rounded-lg p-3 flex items-center backdrop-filter backdrop-blur-2xl bg-opacity-90 bg-gray-100/50'>
                     <div className='flex items-start gap-5'>
                         <img src="/logo_app.png" alt="" className='w-20 h-20 drop-shadow-xl rounded-lg' />
-                        <span className='text-xl font-semibold text-gray-700'>{data?.data.username}</span>
+                        <span className='text-xl font-semibold text-gray-700'>{me?.username}</span>
                     </div>
                 </div>
             </div>
@@ -24,8 +22,8 @@ const UserProfil = () => {
                 {/* Mes infos */}
                 <div className='flex flex-grow basis-1/4 bg-white h-fit p-5 items-start rounded-lg flex-col'>
                     <b>Mes informations :</b>
-                    <span>Role : {data?.data.roles.join(' ').toUpperCase()}</span>
-                    <span>Email: {data?.data.email}</span>
+                    <span>Role : {me?.roles.join(' ').toUpperCase()}</span>
+                    <span>Email: {me?.email}</span>
                 </div>
 
                 {/* Transaction */}

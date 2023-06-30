@@ -1,5 +1,4 @@
 import { CardCoins } from "@/components/Cards"
-import { useAuth } from "@/helpers/api/hooks"
 import { useMe } from "@/helpers/api/hooks/users"
 import React from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -14,8 +13,7 @@ import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider"
 import { Input } from "@/components/Input"
 
 const Shop = () => {
-    const { user } = useAuth()
-    const { refetch } = useMe(user.id)
+    const { refetch, me } = useMe()
     const { toggle: buyCoinsToggle, isShowing: buyCoinsShowing } = useModal()
     const { toggle: previewBoosterToggle, isShowing: previewBoosterShowing } = useModal()
     const { toggle: confirmBuyBoosterToggle, isShowing: confirmBuyBoosterShowing } = useModal()
@@ -88,6 +86,7 @@ const Shop = () => {
                 onSuccess: (res) => {
                     router('/shop')
                     alert?.success(`Vous avez bien acheté ${res.data.coins} coins !`)
+                    refetch()
                 },
                 onError: (err) => {
                     alert?.error('Une erreur est survenue lors de l\'achat')
