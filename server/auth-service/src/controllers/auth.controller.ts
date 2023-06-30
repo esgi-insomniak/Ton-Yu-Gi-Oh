@@ -64,9 +64,6 @@ export class AuthController {
       if (isValidPassword) {
         const createTokenResult = await this.tokenService.createToken({
           userId: data.userId,
-          username: data.username,
-          roles: data.roles,
-          email: data.email,
         });
         result = {
           status: HttpStatus.CREATED,
