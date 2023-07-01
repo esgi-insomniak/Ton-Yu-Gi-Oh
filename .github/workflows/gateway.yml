@@ -64,8 +64,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud config set project {{ secrets.PROJECT_ID }}
-            gcloud container clusters get-credentials {{ secrets.GKE_CLUSTER }} --region {{ secrets.GKE_REGION }} --project {{ secrets.PROJECT_ID }}
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region ${{ secrets.GKE_REGION }} --project ${{ secrets.PROJECT_ID }}
             gcloud auth --quiet configure-docker
             kubectl config current-context
 
