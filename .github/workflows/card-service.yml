@@ -10,15 +10,17 @@ on:
       - "deploy/docker/**"
 
 env:
+  ## Docker Hub
   CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
   REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
   REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
-  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  GKE_ZONE: europe-west1-b
-  GKE_REGION: europe-west1
   VERSION: ${{ github.sha }}
+
+  ## Google Cloud Platform
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  GKE_REGION: ${{ secrets.GKE_REGION }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
 jobs:
 
@@ -63,7 +65,7 @@ jobs:
       - name: Configure Kubernetes cluster
         run: |
             gcloud auth --quiet configure-docker
-            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region europe-west1
+            gcloud container clusters get-credentials {{ secrets.GKE_CLUSTER }} --region {{ secrets.GKE_REGION }} --project {{ secrets.PROJECT_ID }}
             kubectl config current-context
 
         #
