@@ -1,6 +1,6 @@
 import * as zod from "zod";
 import { cardSchema } from "./card.schema";
-import { setPartialSchema } from "./set.schema";
+import { setPartialSchema, setSchema } from "./set.schema";
 import { raritySchema } from "./rarity.schema";
 
 export const cardSetSchema = zod.object({
@@ -30,6 +30,27 @@ export const cardSetBuyableSchema = zod.object({
   }),
 });
 
+export const deckSchema = zod.object({
+  id: zod.string(),
+  card: cardSchema,
+  set: setSchema,
+  price: zod.number(),
+  rarity: raritySchema
+})
+
+export const arrayOfCardSetsSchema = zod.object({
+  id: zod.string(),
+  userId: zod.string(),
+  cardSet: deckSchema
+})
+
+export const userCardSets = zod.object({
+  id: zod.string(),
+  userId: zod.string(),
+  name: zod.string(),
+  cardSets: zod.array(arrayOfCardSetsSchema)
+})
+
 export const cardSetOneResponseSchema = zod.object({
   data: cardSetSchema,
 });
@@ -37,3 +58,10 @@ export const cardSetOneResponseSchema = zod.object({
 export const cardSetArrayResponseSchema = zod.object({
   data: cardSetSchema.array(),
 });
+
+export const userCardSetsResponseSchema = zod.object({
+  data: userCardSets.array(),
+})
+
+export type userCardSetReponseType = zod.infer<typeof userCardSetsResponseSchema>;
+export type userCardSetsType = zod.infer<typeof userCardSets>;
