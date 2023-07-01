@@ -58,14 +58,13 @@ jobs:
           install_components: kubectl
 
         #
-        # Connect to GKE
+        # Configures the Kubernetes cluster.
         #
-      - name: Connect to GKE
-        uses: google-github-actions/get-gke-credentials@v1
-        with:
-          cluster_name: ${{ secrets.GKE_CLUSTER }}
-          location: europe-west1-b
-          project_id: ${{ secrets.PROJECT_ID }}
+      - name: Configure Kubernetes cluster
+        run: |
+            gcloud auth --quiet configure-docker
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region europe-west1
+            kubectl config current-context
 
         #
         # Builds the Docker image.
