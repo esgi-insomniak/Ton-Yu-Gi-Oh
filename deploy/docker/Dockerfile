@@ -23,4 +23,4 @@ COPY . .
 RUN yarn build
 RUN yarn cache clean
 
-CMD ["node", "dist/main.js"]
+CMD ["yarn", "start:prod"]
