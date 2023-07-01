@@ -15,21 +15,14 @@ export class TokenService {
     this.tokenRepository = dataSource.getRepository(Token);
   }
 
-  public async createToken({
-    username,
-    userId,
-    roles,
-    email,
-  }: ITokenParamsType): Promise<Token> {
+  public async createToken({ userId }: ITokenParamsType): Promise<Token> {
     const token = this.jwtService.sign(
       {
         userId,
-        username,
-        roles,
-        email,
       },
       {
-        expiresIn: this.configService.get('jwtExpiration'),
+        // expiration in seconds
+        expiresIn: `${this.configService.get('jwtExpiration')}s`,
         secret: this.configService.get('jwtSecret'),
       },
     );

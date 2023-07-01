@@ -15,15 +15,18 @@ export const responseLoginSchema = zod.object({
     token: zod.string(),
 });
 
+export const userSchema = zod.object({
+    id: zod.string(),
+    username: zod.string(),
+    email: zod.string(),
+    phone: zod.string().nullable(),
+    coins: zod.number(),
+    roles: zod.array(zod.string()),
+    isOnline: zod.boolean(),
+});
+
 export const responseRegisterSchema = zod.object({
-    data: zod.object({
-        id: zod.string(),
-        username: zod.string(),
-        email: zod.string(),
-        phone: zod.string().nullable(),
-        coins: zod.number(),
-        roles: zod.array(zod.string()),
-    }),
+    data: userSchema,
 });
 
 export const responseConfirmAccountSchema = zod.string();

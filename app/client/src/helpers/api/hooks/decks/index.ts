@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "react-query";
 import { apiRequest } from "@/helpers/api";
+import React from "react";
 
 const QUERY_URLS = {
   userDecks: (userId: string) => `/users/${userId}/user_decks?_=${Date.now()}`,
@@ -47,13 +48,24 @@ export const useGetAllUserDecks = (userId: string) => {
   return userDecks;
 };
 
-export const useGetCardDeckUser = (userDeckId: string) => {
-  const userCardsDeck = useQuery(["userDecksId", userDeckId], () =>
-    requestDeckUserId(userDeckId)
+export const useGetCardDeckUser = () => {
+  const [userDeckId, setUserDeckId] = React.useState<string>("");
+
+  const userCardsDeck = useQuery(
+    ["userDecksId", userDeckId],
+    () => requestDeckUserId(userDeckId),
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!userDeckId,
+    }
   );
 
-  return userCardsDeck;
+  return React.useMemo(() => ({ userCardsDeck, setUserDeckId }), [
+    userCardsDeck,
+    setUserDeckId,
+  ]);
 };
+
 
 export const usePostUserDeck = () =>
   useMutation<void, Error, { userCardSetIds: Array<string>; name: string }>(

@@ -1,4 +1,4 @@
 import React from "react";
-import { UserContext } from "@/helpers/context/users/UserManagement";
+import { SocketContext } from "@/helpers/context/socket/SocketContext";
 
-export const useAuth = () => React.useContext(UserContext)
+export const useSocket = () => React.useContext(SocketContext)

@@ -2,18 +2,18 @@ import React from "react";
 import { generateId } from '../common';
 
 type TrackingContextType = {
-    clientId: string;
+    visitorId: string;
     appId: string;
 };
 
 const TrackingContext = React.createContext<TrackingContextType>({
-    clientId: '',
+    visitorId: '',
     appId: '',
 });
 
-const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
+const TrackingProvider = ({ children, appId }: { children: React.ReactNode, appId: string }) => {
 
-    const clientId = React.useMemo<string>(() => {
+    const visitorId = React.useMemo<string>(() => {
         const localStorageClientId = localStorage.getItem('clientId');
         if (localStorageClientId) return localStorageClientId;
         else {
@@ -23,19 +23,9 @@ const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, []);
 
-    const appId = React.useMemo<string>(() => {
-        const localStorageAppId = localStorage.getItem('appId');
-        if (localStorageAppId) return localStorageAppId;
-        else {
-            const newAppId = generateId('app');
-            localStorage.setItem('appId', newAppId);
-            return newAppId;
-        }
-    }, []);
-
     const trackingContext = React.useMemo<TrackingContextType>(() => {
-        return { clientId, appId }
-    }, [clientId, appId]);
+        return { visitorId, appId }
+    }, [visitorId, appId]);
 
     return (
         <TrackingContext.Provider value={trackingContext}>

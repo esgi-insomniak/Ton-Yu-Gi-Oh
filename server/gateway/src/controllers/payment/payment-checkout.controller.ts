@@ -22,6 +22,7 @@ import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
 import { ICheckout } from 'src/interfaces/payment-service/checkout/checkout.interface';
 import { CreatePaymentCheckoutBodyDto } from 'src/interfaces/payment-service/checkout/checkout.body.dto';
 import { UpdatePaymentCheckoutBodyDto } from 'src/interfaces/payment-service/checkout/checkout.param.dto';
+import { IPaymentHistory } from 'src/interfaces/payment-service/paymentHistory/payment-history.interface';
 
 @Controller('payment_checkout')
 @ApiTags('PaymentCheckout')
@@ -99,6 +100,27 @@ export class PaymentCheckoutController {
     }
 
     if (paymentResponse.item.paymentStatus === 'paid') {
+      const newPaymentHistory: Partial<IPaymentHistory> = {
+        userId: request.user.id,
+        sessionId: paymentResponse.item.sessionId,
+        coinsAmount: paymentResponse.item.coins,
+        stripeInfo: JSON.stringify(paymentResponse.item),
+      };
+
+      const paymentHistoryResponse = await firstValueFrom(
+        this.paymentServiceClient.send(
+          'create_payment_history',
+          newPaymentHistory,
+        ),
+      );
+
+      if (paymentHistoryResponse.status !== HttpStatus.CREATED) {
+        throw new HttpException(
+          paymentHistoryResponse.message,
+          paymentHistoryResponse.status,
+        );
+      }
+
       await firstValueFrom(
         this.userServiceClient.send('add_coins_user', {
           userId: request.user.id,

@@ -31,6 +31,25 @@ export class UserCardSetService {
     return userCardSets;
   }
 
+  async getUsersIdsByCardSetId(
+    cardSetId: string,
+    query: QueryGetItems,
+  ): Promise<string[]> {
+    // find all users that have this card set
+    // group by user id
+    const userQuery = await this.dataSource
+      .getRepository(UserCardSet)
+      .createQueryBuilder('userCardSet')
+      .select('userCardSet.userId userId')
+      .where('userCardSet.cardSetId = :cardSetId', { cardSetId })
+      .groupBy('userCardSet.userId')
+      .take(query.limit || 10)
+      .skip(query.offset * query.limit || 0)
+      .getRawMany();
+
+    return userQuery.map((userCardSet) => userCardSet.userid);
+  }
+
   async getUserCardSetsByIds(ids: string[]): Promise<UserCardSet[]> {
     const usercardSets: UserCardSet[] = [];
     for (const id of ids) {
@@ -75,6 +94,13 @@ export class UserCardSetService {
     const deleteResult = await this.dataSource
       .getRepository(UserCardSet)
       .delete({ id });
+    return deleteResult.affected > 0;
+  }
+
+  async deleteUserCardSetsByIds(ids: string[]): Promise<boolean> {
+    const deleteResult = await this.dataSource
+      .getRepository(UserCardSet)
+      .delete(ids);
     return deleteResult.affected > 0;
   }
 }

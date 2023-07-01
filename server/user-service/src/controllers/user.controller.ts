@@ -38,6 +38,20 @@ export class UserController {
     return result;
   }
 
+  @MessagePattern('get_users_by_ids')
+  public async getUsersByIds(params: {
+    ids: string[];
+  }): Promise<GetResponseArray<User>> {
+    const users = await this.userService.getUsersByIds(params.ids);
+    const result: GetResponseArray<User> = {
+      status: users ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: users ? null : 'Users not found',
+      items: users,
+    };
+
+    return result;
+  }
+
   @MessagePattern('get_user_by_credentials')
   public async getUserByCredentials(params: {
     email?: string;
@@ -52,6 +66,24 @@ export class UserController {
     const result: GetResponseOne<User> = {
       status: user ? HttpStatus.OK : HttpStatus.UNAUTHORIZED,
       message: user ? null : 'Invalid credentials provided',
+      item: user,
+    };
+
+    return result;
+  }
+
+  @MessagePattern('update_user_by_id')
+  public async updateUserById(request: {
+    params: ParamGetItemById;
+    body: User;
+  }): Promise<GetResponseOne<User>> {
+    const user = await this.userService.updateUserById(
+      request.params.id,
+      request.body,
+    );
+    const result: GetResponseOne<User> = {
+      status: user ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
+      message: user ? null : 'User not updated',
       item: user,
     };
 

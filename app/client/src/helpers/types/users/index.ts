@@ -1,32 +1,20 @@
 import { ROLES } from "@/helpers/utils/enum/roles";
 import { ApiGetItemResponse } from "../common";
+import { userSchemaType } from "@/helpers/utils/schema/Admin";
 
 
-export interface UserManagementContextProps {
+export interface SocketContextProps {
     children: React.ReactNode;
 }
-export interface UserType {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    roles: ROLES[];
-    createdAt: string;
-    updatedAt: string;
-    username: string;
-    coins?: number;
-}
 
-export type UserContextType = Omit<UserType, 'createdAt' | 'updatedAt' | 'firstName' | 'lastName'>
-
-export type DecodedTokenType = Omit<UserContextType, 'id'> & {
+export type DecodedTokenType = Omit<userSchemaType, 'id'> & {
     userId: string
     iat: number
     exp: number
 }
 
-export type AuthRegisterType = Omit<UserContextType, 'id' | 'roles'> & {
+export type AuthRegisterType = Omit<userSchemaType, 'id' | 'roles'> & {
     password: string
 }
 
-export type UserMe = ApiGetItemResponse<Omit<UserType, 'createdAt' | 'updatedAt'>> 
+export type UserMe = ApiGetItemResponse<userSchemaType> 

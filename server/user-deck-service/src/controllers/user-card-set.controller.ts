@@ -75,6 +75,24 @@ export class UserCardSetController {
     return result;
   }
 
+  @MessagePattern('get_users_ids_by_cardset_id')
+  public async getUsersIdsByCardSetId(request: {
+    params: { cardSetId: string };
+    query: QueryGetItems;
+  }): Promise<GetResponseArray<string>> {
+    const usersIds = await this.userCardSetService.getUsersIdsByCardSetId(
+      request.params.cardSetId,
+      request.query,
+    );
+
+    const result: GetResponseArray<string> = {
+      status: HttpStatus.OK,
+      items: usersIds,
+    };
+
+    return result;
+  }
+
   @MessagePattern('post_usercardset')
   public async postUserCardSet(query: {
     userId: string;
@@ -115,6 +133,20 @@ export class UserCardSetController {
         ? HttpStatus.NO_CONTENT
         : HttpStatus.NOT_FOUND,
       message: userCardSetIsDeleted ? null : 'UserCardSet not found',
+    };
+
+    return result;
+  }
+
+  @MessagePattern('delete_usercardsets_by_ids')
+  public async deleteUserCardSetsByIds(params: { ids: string[] }) {
+    const userCardSetsIsDeleted =
+      await this.userCardSetService.deleteUserCardSetsByIds(params.ids);
+    const result: DefaultResponse = {
+      status: userCardSetsIsDeleted
+        ? HttpStatus.NO_CONTENT
+        : HttpStatus.NOT_FOUND,
+      message: userCardSetsIsDeleted ? null : 'UserCardSets not found',
     };
 
     return result;

@@ -7,12 +7,14 @@ import { GetResponseOne } from './interfaces/common/common.response';
 import { firstValueFrom } from 'rxjs';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { NextFunction } from 'express';
+import { IUser } from './interfaces/user-service/user/user.interface';
 
 export class SocketIoAdapter extends IoAdapter {
   constructor(
     private readonly app: INestApplicationContext,
     private readonly configService = app.get(ConfigService),
     private readonly authServiceClient = app.get<ClientProxy>('AUTH_SERVICE'),
+    private readonly userServiceClient = app.get<ClientProxy>('USER_SERVICE'),
   ) {
     super(app);
   }
@@ -52,7 +54,18 @@ export class SocketIoAdapter extends IoAdapter {
       return next(new Error('Unauthorized'));
     }
 
-    socket.userId = userTokenResponse.item.userId;
+    const userResponse: GetResponseOne<IUser> = await firstValueFrom(
+      this.userServiceClient.send('get_user_by_id', {
+        id: userTokenResponse.item.userId,
+      }),
+    );
+
+    if (userResponse.status !== HttpStatus.OK) {
+      return next(new Error('Unauthorized'));
+    }
+
+    socket.userId = userResponse.item.id;
+    socket.username = userResponse.item.username;
 
     return next();
   };

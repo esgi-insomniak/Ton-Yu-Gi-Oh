@@ -29,7 +29,7 @@ const GameCard = (props: IGameCard) => {
 
     // const [componentIsLoaded, setComponentIsLoaded] = React.useState(false);
 
-    const { cardSets, setIsDraggable, setIsActive, setIsHidden, setCanFlip, setIsLoaded, deactivateAllCardSets } = React.useContext(GameCardContext);
+    const { cardSets, setIsDraggable, setIsActive, setIsHidden, setCanFlip, setCanActivate, setCanInteract, setIsLoaded, deactivateAllCardSets } = React.useContext(GameCardContext);
     const currentCardSet = cardSets.find((cardSet) => cardSet.id === props.id) as IGameCard;
     const [frontImg, setFrontImg] = React.useState('');
 
@@ -91,7 +91,7 @@ const GameCard = (props: IGameCard) => {
     const interact = (e: CardInteractPointerEvent<HTMLElement> | CardInteractTouchEvent<HTMLElement>) => {
         endShowcase();
 
-        if (!isVisible || currentCardSet.isHidden) {
+        if (!isVisible || currentCardSet.isHidden || !currentCardSet.canInteract) {
             return setInteracting(false);
         }
 
@@ -148,6 +148,9 @@ const GameCard = (props: IGameCard) => {
     };
 
     const activate = (e: React.MouseEvent<HTMLElement>) => {
+        if (!currentCardSet.canActivate) {
+            return;
+        }
         if (currentCardSet.isHidden && currentCardSet.canFlip) {
             deactivateAllCardSets();
             setIsHidden(currentCardSet, false);
@@ -342,8 +345,7 @@ const GameCard = (props: IGameCard) => {
             data-rarity={props.rarity.name.replace(/\W/g, '-').toLowerCase()}
             style={dynamicStyles}
             ref={thisCardElement as React.RefObject<HTMLDivElement>}>
-            <div className="yugi-card__translater"
-                onBlur={deactivate}>
+            <div className="yugi-card__translater">
                 <div className="yugi-card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
                     <img className="yugi-card__back" src={backImg} loading="lazy" width="660" height="921" />
                     <div className="yugi-card__front" style={staticStyles}>

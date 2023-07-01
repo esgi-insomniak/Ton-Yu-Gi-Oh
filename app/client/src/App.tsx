@@ -1,7 +1,7 @@
 import Router from './Routes/Router';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { UserContextProvider } from '@/helpers/providers/users/usersProvider';
+import { SocketContextProvider } from '@/helpers/providers/socket/SocketProvider';
 import { TrackingProvider } from 'insomniak-sdk-analytics'
 
 function App() {
@@ -10,11 +10,9 @@ function App() {
     <div className="App">
       <QueryClientProvider client={queryClient}>
         <TrackingProvider appId=''>
-          <UserContextProvider>
-            <BrowserRouter>
-              <Router />
-            </BrowserRouter>
-          </UserContextProvider>
+          <BrowserRouter>
+            <Router />
+          </BrowserRouter>
         </TrackingProvider>
       </QueryClientProvider>
     </div>

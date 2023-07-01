@@ -20,7 +20,6 @@ export type MyObj = Record<
 
 //Dans les components
 export interface DeckProps {
-  deck: {
     cardSets: [
       id: string,
       cardSet: CardICardSet,
@@ -29,7 +28,14 @@ export interface DeckProps {
     name: string;
     id: string;
     userId: string;
-  };
+}
+
+export interface DeckCard {
+  cardSets: [
+    id: string,
+    cardSet: CardICardSet,
+    userId: string,
+  ];
 }
 
 export type CountCard = Record<string, number>;

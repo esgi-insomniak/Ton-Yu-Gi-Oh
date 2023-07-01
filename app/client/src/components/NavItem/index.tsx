@@ -6,6 +6,8 @@ export const NavItem: React.FC<NavItemProps> = ({
     title,
     videoUrl,
     linkUrl,
+    isButton,
+    action,
 }) => {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -31,22 +33,41 @@ export const NavItem: React.FC<NavItemProps> = ({
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
         >
-            <Link to={linkUrl}>
-                <div className="relative z-10 flex justify-center items-center h-full">
-                    <h2 className="text-4xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
+            {isButton ?
+                <div onClick={action} className="flex justify-center items-center relative h-full">
+                    <div className="relative z-10 flex justify-center items-center h-full">
+                        <h2 className="text-4xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
+                    </div>
+                    <div className="absolute inset-0 z-0">
+                        <video
+                            ref={videoRef}
+                            muted
+                            loop
+                            playsInline
+                            className={`object-cover w-full h-full ${isPlaying ? 'block' : 'hidden'}`}
+                        >
+                            <source src={videoUrl} type="video/mp4" />
+                        </video>
+                    </div>
                 </div>
-                <div className="absolute inset-0 z-0">
-                    <video
-                        ref={videoRef}
-                        muted
-                        loop
-                        playsInline
-                        className={`object-cover w-full h-full ${isPlaying ? 'block' : 'hidden'}`}
-                    >
-                        <source src={videoUrl} type="video/mp4" />
-                    </video>
-                </div>
-            </Link>
+                :
+                <Link to={linkUrl}>
+                    <div className="relative z-10 flex justify-center items-center h-full">
+                        <h2 className="text-4xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
+                    </div>
+                    <div className="absolute inset-0 z-0">
+                        <video
+                            ref={videoRef}
+                            muted
+                            loop
+                            playsInline
+                            className={`object-cover w-full h-full ${isPlaying ? 'block' : 'hidden'}`}
+                        >
+                            <source src={videoUrl} type="video/mp4" />
+                        </video>
+                    </div>
+                </Link>
+            }
         </div>
     );
-};
+}

@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -28,10 +29,11 @@ import {
 } from '../../interfaces/user-deck-service/userCardSet/user-card-set.response.dto';
 import { Authorization } from 'src/decorators/authorization.decorator';
 import { IAuthorizedRequest } from 'src/interfaces/common/common.request';
-import { Permission } from 'src/decorators/permission.decorator';
 import { ICardCardSet } from 'src/interfaces/card-service/cardSet/card-set.interface';
 import { GetUserCardSetsQuery } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.query.dto';
 import { IUserDeckPartial } from 'src/interfaces/user-deck-service/userDeck/user-deck.interface';
+import { GetScrapUserCardSetByIdsDto } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.body.dto';
+import { MeToId } from 'src/decorators/me-to-id.decorator';
 
 @Controller('user_card_sets')
 @ApiTags('UserCardSet')
@@ -190,6 +192,114 @@ export class UserCardSetController {
 
     return result;
   }
+
+  @Delete('/scrap')
+  @Authorization(true)
+  @ApiOkResponse({
+    type: ScrapUserCardSetByIdResponseDto,
+  })
+  public async scrapCards(
+    @Body() body: GetScrapUserCardSetByIdsDto,
+    @Request() request: IAuthorizedRequest,
+  ): Promise<ScrapUserCardSetByIdResponseDto> {
+    // get userCardSets by ids
+    const userCardSetsResponse: GetResponseArray<IUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardsets_by_ids', {
+          ids: body.userCardSetIds,
+        }),
+      );
+
+    if (userCardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetsResponse.message,
+        userCardSetsResponse.status,
+      );
+    }
+
+    if (userCardSetsResponse.items.length !== body.userCardSetIds.length) {
+      throw new HttpException(
+        'Some of userCardSetIds are not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // check all userCardSets belongs to the same user
+    userCardSetsResponse.items.forEach((item) => {
+      if (item.userId !== request.user.id) {
+        throw new HttpException(
+          'You can not scrap cardSets that do not belong to you',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    });
+
+    // check if cardSets is in a deck
+    const userDecksResponse: GetResponseArray<IUserDeckPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_userdecks_by_usercard_ids', {
+          ids: body.userCardSetIds,
+        }),
+      );
+
+    if (userDecksResponse.items.length !== 0) {
+      throw new HttpException(
+        'Cannot scrap cardSet that is in a deck',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    // get cardSets by ids
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: userCardSetsResponse.items.map((item) => item.cardSetId),
+        }),
+      );
+
+    // delete userCardSets
+    const deletedUserCardSetResponse: GetResponseOne<IUserCardSet> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('delete_usercardsets_by_ids', {
+          ids: body.userCardSetIds,
+        }),
+      );
+
+    if (deletedUserCardSetResponse.status !== HttpStatus.NO_CONTENT) {
+      throw new HttpException(
+        'Failed to scrap cardSet',
+        deletedUserCardSetResponse.status,
+      );
+    }
+
+    const cardsPrice = cardSetsResponse.items.map((cardSet) => {
+      delete cardSet.card.price.id;
+      return cardSet.card.price;
+    });
+
+    // use reduce to get the max value of each card price
+    const coinsEarned = Math.round(
+      cardsPrice.reduce((acc, curr) => {
+        const maxPrice = Math.max(...Object.values(curr));
+        return maxPrice !== 0 ? acc + maxPrice : acc + 1;
+      }, 0),
+    );
+
+    await firstValueFrom(
+      this.userServiceClient.send('add_coins_user', {
+        userId: request.user.id,
+        coins: coinsEarned !== 0 ? coinsEarned : 1,
+      }),
+    );
+
+    const result: ScrapUserCardSetByIdResponseDto = {
+      data: {
+        coinsEarned,
+      },
+    };
+
+    return result;
+  }
 }
 
 @Controller('users')
@@ -205,6 +315,7 @@ export class UserController {
 
   @Get(':id/user_card_sets')
   @Authorization(true)
+  @MeToId()
   @ApiOkResponse({
     type: GetUserCardSetsResponseDto,
   })
@@ -262,15 +373,13 @@ export class UserController {
 
     // create response with combined data of cardSets and userCardSets
     const result: GetUserCardSetsResponseDto = {
-      data: cardSetsResponse.items.map((cardSet) => {
+      data: userCardSetResponse.items.map((userCardSetPartial) => {
         const userCardSet: IUserCardSet = {
-          id: userCardSetResponse.items.find(
-            (item) => item.cardSetId === cardSet.id,
-          ).id,
-          userId: userCardSetResponse.items.find(
-            (item) => item.cardSetId === cardSet.id,
-          ).userId,
-          cardSet,
+          id: userCardSetPartial.id,
+          userId: userCardSetPartial.userId,
+          cardSet: cardSetsResponse.items.find(
+            (item) => item.id === userCardSetPartial.cardSetId,
+          ),
         };
         return userCardSet;
       }),

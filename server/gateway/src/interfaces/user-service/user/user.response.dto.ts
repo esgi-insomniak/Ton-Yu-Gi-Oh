@@ -6,11 +6,13 @@ export class GetUsersResponseDto {
     example: [
       {
         id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-        firstName: 'John',
-        lastName: 'Doe',
+        username: 'JohnDoe',
         email: 'john.doe@test.fr',
         phone: '0123456789',
+        roles: ['user'],
         coins: 10,
+        isOnline: true,
+        profilePicture: null,
       },
     ],
   })
@@ -21,11 +23,13 @@ export class GetUserByIdResponseDto {
   @ApiProperty({
     example: {
       id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-      username: 'johndoe',
+      username: 'JohnDoe',
       email: 'john.doe@test.fr',
       phone: '0123456789',
-      coins: 10,
       roles: ['user'],
+      coins: 10,
+      isOnline: true,
+      profilePicture: null,
     },
   })
   data: IUser;
@@ -35,11 +39,13 @@ export class CreateUserResponseDto {
   @ApiProperty({
     example: {
       id: '9249ed40-1826-4a1f-bdaf-bfe49b96e1fe',
-      username: 'johndoe',
+      username: 'JohnDoe',
       email: 'john.doe@test.fr',
       phone: '0123456789',
-      coins: 0,
       roles: ['user'],
+      coins: 10,
+      isOnline: true,
+      profilePicture: null,
     },
   })
   data: IUser;
