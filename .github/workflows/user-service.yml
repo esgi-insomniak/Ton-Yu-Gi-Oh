@@ -37,17 +37,6 @@ jobs:
       - name: Testing
         run: deploy/scripts/test-service.sh user-service
 
-        #
-        # Builds the Docker image.
-        #
-      - name: Build
-        run: deploy/scripts/build-image.sh user-service
-
-        #
-        # Publishes the Docker image to the container registry.
-        #
-      - name: Publish
-        run: deploy/scripts/push-image.sh user-service
 
         #
         # Authenticates with the Google Cloud Platform.
@@ -68,13 +57,30 @@ jobs:
           install_components: kubectl
 
         #
-        # Configures the Kubernetes cluster.
+        # Configures Docker to use the Google Cloud Platform.
         #
-      - name: Configure Kubernetes cluster
-        run: |
-            gcloud auth configure-docker
-            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region ${{ secrets.GKE_ZONE }} --project ${{ secrets.PROJECT_ID }}
-            kubectl config current-context
+      - name: Configure Docker
+        run: gcloud --quiet auth configure-docker
+
+      - name: Get the GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_ZONE }}
+          credentials: ${{ secrets.GCP_CREDENTIALS }}
+
+
+        #
+        # Builds the Docker image.
+        #
+      - name: Build
+        run: deploy/scripts/build-image.sh user-service
+
+        #
+        # Publishes the Docker image to the container registry.
+        #
+      - name: Publish
+        run: deploy/scripts/push-image.sh user-service
 
         #
         # Deploys the Docker image to the Kubernetes cluster.
