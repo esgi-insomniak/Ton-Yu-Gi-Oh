@@ -64,7 +64,8 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
-          location: ${{ secrets.GKE_ZONE }}
+          location: europe-west1-b
+          project_id: ${{ secrets.PROJECT_ID }}
 
         #
         # Builds the Docker image.
