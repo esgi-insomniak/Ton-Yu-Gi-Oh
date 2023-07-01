@@ -1,9 +1,12 @@
 import { useMutation, useQuery } from "react-query";
 import { apiRequest } from "@/helpers/api";
 import React from "react";
+import { CardIUserCardSet } from "@/helpers/types/cards";
+import { ApiGetItemResponse } from "@/helpers/types/common";
+import { userCardSetReponseType, userCardSetsResponseSchema, userCardSetsType } from "@/helpers/utils/schema/cards/card-set.schema";
 
 const QUERY_URLS = {
-  userDecks: (userId: string) => `/users/${userId}/user_decks?_=${Date.now()}`,
+  userDecks: (userId: string, limit: number, offset: number) => `/users/${userId}/user_decks?limit=${limit}&offset=${offset}`,
   requestPostUserDeck: "/user_decks",
   requestDeleteUserDeck: (userDeckId: string) => `/user_decks/${userDeckId}`,
   requestUserDeck: (userDeckId: string) => `/user_decks/${userDeckId}`,
@@ -11,9 +14,9 @@ const QUERY_URLS = {
 
 const token = localStorage.getItem('token')
 
-const requestUserDecks = (userId: string) =>
+const requestUserDecks = (userId: string, limit: number, offset: number) =>
   apiRequest({
-    url: QUERY_URLS.userDecks(userId),
+    url: QUERY_URLS.userDecks(userId, limit, offset),
     method: "GET",
     token: !!token ? token : undefined,
   });
@@ -40,9 +43,9 @@ const requestDeleteUserDeck = (userDeckId: string) =>
     token: !!token ? token : undefined,
   });
 
-export const useGetAllUserDecks = (userId: string) => {
-  const userDecks = useQuery(["userDecks", userId], () =>
-    requestUserDecks(userId)
+export const useGetAllUserDecks = (userId: string, limit: number, offset: number) => {
+  const userDecks = useQuery<userCardSetReponseType>(["userDecks", userId, limit, offset], () =>
+    requestUserDecks(userId, limit, offset)
   );
 
   return userDecks;
@@ -51,7 +54,7 @@ export const useGetAllUserDecks = (userId: string) => {
 export const useGetCardDeckUser = () => {
   const [userDeckId, setUserDeckId] = React.useState<string>("");
 
-  const userCardsDeck = useQuery(
+  const userCardsDeck = useQuery<userCardSetsType>(
     ["userDecksId", userDeckId],
     () => requestDeckUserId(userDeckId),
     {

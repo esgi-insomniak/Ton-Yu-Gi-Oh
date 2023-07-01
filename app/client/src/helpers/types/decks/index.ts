@@ -20,14 +20,14 @@ export type MyObj = Record<
 
 //Dans les components
 export interface DeckProps {
-    cardSets: [
-      id: string,
-      cardSet: CardICardSet,
-      userId: string,
-    ];
-    name: string;
-    id: string;
-    userId: string;
+  cardSets: {
+    id: string,
+    cardSet: CardICardSet,
+    userId: string,
+  };
+  name: string;
+  id: string;
+  userId: string;
 }
 
 export interface DeckCard {
