@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "start:prod": "vite preview",
+    "start:prod": "npx http-server dist -p 8080",
     "preview": "vite preview",
     "test": "npx playwright test --headed",
     "codegen": "pnpm playwright codegen"
