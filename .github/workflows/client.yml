@@ -38,7 +38,6 @@ jobs:
       # - name: Testing
         # run: deploy/scripts/test-service.sh client
 
-
         #
         # Authenticates with the Google Cloud Platform.
         #
