@@ -21,6 +21,6 @@ RUN yarn install --production
 RUN yarn build
 RUN yarn cache clean
 
-COPY ./dist ./dist
+COPY /usr/src/${SERVICE_NAME}/dist ./dist
 
 CMD ["yarn", "start:prod"]
