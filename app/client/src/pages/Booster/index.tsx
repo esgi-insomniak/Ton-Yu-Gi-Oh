@@ -19,7 +19,7 @@ export const itemTypes = {
 
 const Booster = () => {
   const { me } = useMe();
-  const { data, isLoading, isError } = useGetUserBooster(me?.id!);
+  const { data: booster, isLoading, isError } = useGetUserBooster(me?.id!);
   const [boosterData, setBoosterData] = useState<BoosterData[]>([]);
   const [droppedBooster, setDroppedBooster] = useState<DropBooster | null>(
     null
@@ -31,13 +31,13 @@ const Booster = () => {
   const [showButton, setShowButton] = useState<Boolean>(false);
 
   useEffect(() => {
-    if (!isLoading && !isError && data) {
+    if (booster && !isLoading && !isError) {
       if (boosterData.length === 0) {
-        const boosterData = countBoosters(data);
-        setBoosterData(boosterData);
+        const updatedBoosterData = countBoosters(booster);
+        setBoosterData(updatedBoosterData);
       }
     }
-  }, [data, isLoading, isError]);
+  }, [booster, isLoading, isError]);
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: itemTypes.BOOSTER,
@@ -73,12 +73,12 @@ const Booster = () => {
 
     setDroppedBooster(
       (prevDroppedBooster) =>
-      ({
-        ...prevDroppedBooster,
-        id: item.ids[0],
-        set:
-          boosterData.find((booster) => booster.id === item.id)?.set || null,
-      } as DropBooster | null)
+        ({
+          ...prevDroppedBooster,
+          id: item.ids[0],
+          set:
+            boosterData.find((booster) => booster.id === item.id)?.set || null,
+        } as DropBooster | null)
     );
   };
 
@@ -126,7 +126,9 @@ const Booster = () => {
             </div>
           ))
         ) : (
-          <p className="text-center my-auto font-bold text-xl">Pas de booster disponible</p>
+          <p className="text-center my-auto font-bold text-xl">
+            Pas de booster disponible
+          </p>
         )}
       </div>
 
