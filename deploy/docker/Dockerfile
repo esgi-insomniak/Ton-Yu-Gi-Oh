@@ -18,9 +18,9 @@ ENV NODE_ENV=production
 
 RUN yarn install --production
 
+COPY . .
+
 RUN yarn build
 RUN yarn cache clean
-
-COPY /usr/src/${SERVICE_NAME}/dist ./dist
 
 CMD ["yarn", "start:prod"]
