@@ -1,0 +1,92 @@
+name: Deploy Client Frontend
+
+on:
+  push:
+    paths:
+      - app/client/** # Path to the client folder
+      - .github/workflows/client.yml
+
+env:
+  ## Docker Hub
+  CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+  REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
+  REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+  VERSION: ${{ github.sha }}
+
+  ## Google Cloud Platform
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  GKE_REGION: ${{ secrets.GKE_CLIENT_REGION }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLIENT_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_CLIENT_ZONE }}
+
+jobs:
+
+  test-build-publish-deploy:
+    name: Test, Build, Publish, Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+        #
+        # Tests the Service.
+        #
+      - name: Testing
+        run: deploy/scripts/test-service.sh client
+
+
+        #
+        # Authenticates with the Google Cloud Platform.
+        #
+      - id: auth
+        name: Authenticate
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+        #
+        # Sets up the Google Cloud SDK (gcloud).
+        #
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          install_components: kubectl
+
+        #
+        # Configures the Kubernetes cluster.
+        #
+      - name: Configure Kubernetes cluster
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLIENT_CLUSTER }} --region ${{ secrets.GKE_CLIENT_REGION }} --project ${{ secrets.PROJECT_ID }}
+          gcloud auth --quiet configure-docker
+          kubectl config current-context
+
+        #
+        # Builds the Docker image.
+        #
+      - name: Build
+        run: deploy/scripts/build-image.sh client
+
+        #
+        # Publishes the Docker image to the container registry.
+        #
+      - name: Publish
+        run: deploy/scripts/push-image.sh client
+
+        #
+        # Deploys the Docker image to the Kubernetes cluster.
+        #
+      - name: Deploy Image
+        run: deploy/scripts/deploy-image.sh client
+
+        #
+        # Applies the Kubernetes files
+        #
+      - name: Apply Kubernetes files
+        run: |
+          kubectl apply -f deploy/k8s/client/client.yml
+

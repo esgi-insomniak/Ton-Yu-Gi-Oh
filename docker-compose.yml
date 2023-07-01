@@ -1,6 +1,25 @@
 version: "3.4"
 services:
 
+    ### CLIENT ###
+    client-node:
+      build:
+        context: ./app/client
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=client
+      hostname: client
+      container_name: client
+      command: sh -c "yarn install && yarn dev --host"
+      env_file:
+        - .env.dev
+      volumes:
+        - ./app/client:/usr/src/client
+      stdin_open: true
+      tty: true
+      ports:
+        - ${VITE_CLIENT_PORT}:${VITE_CLIENT_PORT}
 
     ### FRONTEND GATEWAY ###
     gateway-node:
@@ -11,6 +30,7 @@ services:
         args:
           - SERVICE_NAME=gateway
       hostname: gateway
+      container_name: gateway
       env_file:
         - .env.dev
       volumes:
@@ -31,6 +51,7 @@ services:
         args:
           - SERVICE_NAME=card-service
       hostname: card-service-node
+      container_name: card-service-node
       command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
@@ -318,6 +339,9 @@ networks:
     driver: bridge
   frontend-dev:
     driver: bridge
+  react_app_network:
+    driver: bridge
+
 
 volumes:
     card-service-postgres-dev:

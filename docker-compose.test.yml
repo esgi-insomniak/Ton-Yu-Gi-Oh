@@ -1,6 +1,26 @@
 version: "3.4"
 services:
 
+    ### CLIENT ###
+    client-node:
+      build:
+        context: ./app/client
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: test
+        args:
+          - SERVICE_NAME=client
+      hostname: client
+      container_name: client
+      command: sh -c "yarn install && npx playwright install-deps chromium && yarn test"
+      env_file:
+        - ./app/client/.env.dev
+      volumes:
+        - ./app/client:/usr/src/client
+      stdin_open: true
+      tty: true
+      ports:
+        - ${VITE_CLIENT_PORT}:${VITE_CLIENT_PORT}
+
 
     ### FRONTEND GATEWAY ###
     gateway-node:
