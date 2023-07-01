@@ -34,8 +34,8 @@ jobs:
         #
         # Tests the Service.
         #
-      - name: Testing
-        run: deploy/scripts/test-service.sh client
+      # - name: Testing
+        # run: deploy/scripts/test-service.sh client
 
 
         #

@@ -13,7 +13,7 @@ services:
       container_name: client
       command: sh -c "yarn install && npx playwright install-deps chromium && yarn test"
       env_file:
-        - ./app/client/.env.dev
+        - .env.dev
       volumes:
         - ./app/client:/usr/src/client
       stdin_open: true
