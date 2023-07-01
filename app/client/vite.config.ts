@@ -11,6 +11,9 @@ export default defineConfig({
         },
         port: process.env.VITE_CLIENT_PORT as number,
     },
+    preview: {
+        port: process.env.VITE_CLIENT_PORT as number,
+    },
     resolve: {
         alias: { '@': resolve(__dirname, 'src') },
     }
