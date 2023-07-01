@@ -24,6 +24,7 @@ set -u # or set -o nounset
 : "$1"
 : "$CONTAINER_REGISTRY"
 : "$VERSION"
+: "$LOCATION"
 
 export DIR=$1
-docker build -t $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION --file ./deploy/docker/Dockerfile ./server/$DIR --target prod --build-arg SERVICE_NAME=$DIR
+docker build -t $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION --file ./deploy/docker/Dockerfile $LOCATION --target prod --build-arg SERVICE_NAME=$DIR

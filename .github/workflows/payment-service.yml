@@ -15,6 +15,7 @@ env:
   REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
   REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
   VERSION: ${{ github.sha }}
+  LOCATION: ./server/payment-service
 
   ## Google Cloud Platform
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
