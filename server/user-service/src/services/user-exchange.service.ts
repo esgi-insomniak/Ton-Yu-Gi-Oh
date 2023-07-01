@@ -61,11 +61,40 @@ export class UserExchangeService {
     return userExchange;
   }
 
+  async getActiveUserExchangeBetweenUsers(
+    exchangeOwnerId: string,
+    exchangeTargetId: string,
+  ): Promise<UserExchange> {
+    const userExchange = await this.userExchangeRepository.findOne({
+      where: [
+        {
+          exchangeOwner: {
+            id: exchangeOwnerId,
+          },
+          exchangeTarget: {
+            id: exchangeTargetId,
+          },
+          isClosed: false,
+        },
+        {
+          exchangeOwner: {
+            id: exchangeTargetId,
+          },
+          exchangeTarget: {
+            id: exchangeOwnerId,
+          },
+          isClosed: false,
+        },
+      ],
+    });
+    return userExchange;
+  }
+
   async createUserExchange(
     userExchangePartial: DeepPartial<UserExchange>,
   ): Promise<UserExchange> {
     try {
-      const userExchange = await this.userExchangeRepository.create(
+      const userExchange = await this.userExchangeRepository.save(
         userExchangePartial,
       );
 

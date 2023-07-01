@@ -52,6 +52,34 @@ export class UserRelationService {
     return userRelation;
   }
 
+  async getUserRelationByUsersIds(params: {
+    currentUserId: string;
+    targetUserId: string;
+  }): Promise<UserRelation> {
+    const userRelation = await this.userRelationRepository.findOne({
+      where: [
+        {
+          relationOwner: {
+            id: params.currentUserId,
+          },
+          targetUser: {
+            id: params.targetUserId,
+          },
+        },
+        {
+          relationOwner: {
+            id: params.targetUserId,
+          },
+          targetUser: {
+            id: params.currentUserId,
+          },
+        },
+      ],
+      relations: ['relationOwner.profilePicture', 'targetUser.profilePicture'],
+    });
+    return userRelation;
+  }
+
   async createUserRelation(
     userRelation: DeepPartial<UserRelation>,
   ): Promise<UserRelation> {

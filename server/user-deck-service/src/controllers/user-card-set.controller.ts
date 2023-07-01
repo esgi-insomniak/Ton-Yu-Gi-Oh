@@ -93,6 +93,25 @@ export class UserCardSetController {
     return result;
   }
 
+  @MessagePattern('get_usercardsets_by_cardset_and_user_id')
+  public async getUserCardSetsByCardSetAndUserId(params: {
+    cardSetId: string;
+    userId: string;
+  }): Promise<GetResponseArray<UserCardSet>> {
+    const userCardSets =
+      await this.userCardSetService.getUserCardSetsByCardSetAndUserId(
+        params.cardSetId,
+        params.userId,
+      );
+
+    const result: GetResponseArray<UserCardSet> = {
+      status: HttpStatus.OK,
+      items: userCardSets,
+    };
+
+    return result;
+  }
+
   @MessagePattern('post_usercardset')
   public async postUserCardSet(query: {
     userId: string;
@@ -103,6 +122,23 @@ export class UserCardSetController {
       status: userCardSet ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
       message: userCardSet ? null : 'UserCardSet not created',
       item: userCardSet,
+    };
+
+    return result;
+  }
+
+  @MessagePattern('change_usercardset_owner_by_ids')
+  public async updateUserCardSetOwner(query: {
+    ids: string[];
+    newOwnerId: string;
+  }): Promise<GetResponseArray<UserCardSet>> {
+    const userCardSets = await this.userCardSetService.updateUserCardSetOwner(
+      query,
+    );
+    const result: GetResponseArray<UserCardSet> = {
+      status: userCardSets.length > 0 ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
+      message: userCardSets.length > 0 ? null : 'UserCardSets not updated',
+      items: userCardSets,
     };
 
     return result;

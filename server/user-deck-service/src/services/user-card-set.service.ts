@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserCardSet } from 'src/entities/user-card-set.entity';
 import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
-import { DataSource, DeepPartial } from 'typeorm';
+import { DataSource, DeepPartial, In } from 'typeorm';
 
 @Injectable()
 export class UserCardSetService {
@@ -65,6 +65,16 @@ export class UserCardSetService {
     return usercardSets;
   }
 
+  async getUserCardSetsByCardSetAndUserId(
+    cardSetId: string,
+    userId: string,
+  ): Promise<UserCardSet[]> {
+    const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
+      where: { cardSetId, userId },
+    });
+    return userCardSets;
+  }
+
   async createUserCardSet(query: {
     userId: string;
     cardSetId: string;
@@ -74,6 +84,29 @@ export class UserCardSetService {
       cardSetId: query.cardSetId,
     });
     return this.dataSource.getRepository(UserCardSet).save(userCardSet);
+  }
+
+  async updateUserCardSetOwner(query: {
+    ids: string[];
+    newOwnerId: string;
+  }): Promise<UserCardSet[]> {
+    const userCardSets = await this.dataSource
+      .getRepository(UserCardSet)
+      .update(
+        {
+          id: In(query.ids),
+        },
+        {
+          userId: query.newOwnerId,
+        },
+      );
+
+    if (userCardSets.affected > 0) {
+      return await this.dataSource.getRepository(UserCardSet).find({
+        where: { id: In(query.ids) },
+      });
+    }
+    return null;
   }
 
   async createUserCardSetsByCardSetIds(query: {

@@ -1,11 +1,18 @@
 import * as zod from 'zod';
+import { cardSetSchema } from '../cards/card-set.schema';
 
-export const userCardSetsSchema = zod.object({
+export const userCardSetSchema = zod.object({
+    id: zod.string(),
+    userId: zod.string(),
+    cardSet: cardSetSchema,
+});
+
+export const userCardSetSchemaPartial = zod.object({
     id: zod.string(),
     userId: zod.string(),
     cardSetId: zod.string(),
 });
 
-export const userCardSetsResponseSchema = zod.object({
-    data: zod.array(userCardSetsSchema),
+export const userCardSetPartialResponseSchema = zod.object({
+    data: zod.array(userCardSetSchemaPartial),
 });

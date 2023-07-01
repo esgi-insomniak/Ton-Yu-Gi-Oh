@@ -16,7 +16,11 @@ const Home = () => {
     const router = useNavigate()
 
     const opponentSearch = React.useCallback(() => {
+        ioClient?.off('duel__queue');
+        ioClient?.off('duel__found');
+        
         ioClient?.emit('duel__join_queue');
+
         ioClient?.on('duel__queue', (event: ISocketEvent) => {
             if (event.type === ISocketEventType.ERROR) {
                 alert?.closeAll()
@@ -26,6 +30,8 @@ const Home = () => {
         ioClient?.on('duel__found', (event: ISocketEvent) => {
             alert?.closeAll()
             alert?.success("Adversaire trouvé !")
+            ioClient?.off('duel__queue');
+            ioClient?.off('duel__found');
             router(`/duel/${event.data.roomId}`)
         })
         alert?.custom('Recherche d\'un adversaire en cours...')
