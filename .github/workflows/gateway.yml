@@ -16,7 +16,8 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  GKE_ZONE: ${{ secrets.GKE_ZONE }}
+  GKE_ZONE: europe-west1-b
+  GKE_REGION: europe-west1
   VERSION: ${{ github.sha }}
 
 jobs:
@@ -57,18 +58,13 @@ jobs:
           install_components: kubectl
 
         #
-        # Configures Docker to use the Google Cloud Platform.
+        # Connect to GKE
         #
-      - name: Configure Docker
-        run: gcloud --quiet auth configure-docker
-
-      - name: Get the GKE credentials
+      - name: Connect to GKE
         uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER }}
           location: ${{ secrets.GKE_ZONE }}
-          credentials: ${{ secrets.GCP_CREDENTIALS }}
-
 
         #
         # Builds the Docker image.
