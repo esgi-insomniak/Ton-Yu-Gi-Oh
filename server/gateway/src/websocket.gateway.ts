@@ -1,8 +1,12 @@
 import {
+  ArgumentsHost,
+  Catch,
+  HttpException,
   HttpStatus,
   Inject,
   Logger,
   SetMetadata,
+  UseFilters,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -15,8 +19,11 @@ import {
   WebSocketServer,
   SubscribeMessage,
   ConnectedSocket,
+  MessageBody,
+  BaseWsExceptionFilter,
+  WsException,
 } from '@nestjs/websockets';
-import { Namespace } from 'socket.io';
+import { Namespace, RemoteSocket } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
@@ -28,11 +35,71 @@ import {
   ISocketEventType,
 } from './interfaces/websocket/socket-emit/socket-event.interface';
 import { IDuel } from './interfaces/duel-service/duel/duel.interface';
-import { IDuelPlayer } from './interfaces/duel-service/duelPlayer/duel-player.interface';
-import { GetResponseOne } from './interfaces/common/common.response';
+import {
+  GetResponseArray,
+  GetResponseOne,
+} from './interfaces/common/common.response';
 import { firstValueFrom } from 'rxjs';
+import {
+  AcceptUserExchangeByIdDto,
+  CreateUserExchangeBodyDto,
+  UpdateUserExchangeByIdDto,
+} from './interfaces/user-service/userExchange/user-exchange.body.dto';
+import { ICardSet } from './interfaces/card-service/set/set.interface';
+import { IUser } from './interfaces/user-service/user/user.interface';
+import {
+  IUserExchange,
+  IUserExchangePartial,
+} from './interfaces/user-service/userExchange/user-exchange.interface';
+import {
+  IUserCardSet,
+  IUserCardSetPartial,
+} from './interfaces/user-deck-service/userCardSet/user-card-set.interface';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { IUserRelation } from './interfaces/user-service/userRelation/user-relation.interface';
+import { GetItemByIdDto } from './interfaces/common/common.params.dto';
+import { ICardCardSet } from './interfaces/card-service/cardSet/card-set.interface';
 
-@UsePipes(new ValidationPipe())
+@Catch()
+export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
+  constructor(private readonly eventName: string) {
+    super();
+  }
+
+  // Catch all websocket exceptions and send them to the client
+  catch(exception: HttpException | WsException, host: ArgumentsHost): void {
+    const ctx = host.switchToWs();
+    const client = ctx.getClient<IAuthorizedSocket>();
+    const socketEventError: ISocketEvent = {
+      event: this.eventName,
+      type: ISocketEventType.ERROR,
+      data: null,
+    };
+
+    // check if the exception is a HttpException or a WsException
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse() as ISocketMessage & {
+        error: string;
+      };
+      delete exceptionResponse.error;
+      socketEventError.data = {
+        statusCode: exceptionResponse.statusCode,
+        message: exceptionResponse.message,
+      };
+    } else if (exception instanceof WsException) {
+      socketEventError.data = exception.getError();
+    }
+
+    client.emit(this.eventName, socketEventError);
+  }
+}
+
+@UsePipes(
+  new ValidationPipe(),
+  new ValidationPipe({
+    whitelist: true,
+  }),
+)
 @WebSocketGateway()
 export class WebsocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -60,14 +127,42 @@ export class WebsocketGateway
   }
 
   async handleConnection(client: IAuthorizedSocket) {
+    // disconnect if user is already connected
+    // if (
+    //   (await this.io.fetchSockets()).filter(
+    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) => s.userId === client.userId,
+    //   ).length > 1
+    // ) {
+    //   return client.disconnect();
+    // }
+
     this.userServiceClient.emit('set_user_is_online', {
       id: client.userId,
       isOnline: true,
     });
+
     client.join(client.userId);
+
+    this.io.emit('user__is_online', {
+      event: 'user__is_online',
+      type: ISocketEventType.INFO,
+      data: {
+        userId: client.userId,
+        isOnline: true,
+      },
+    } as ISocketEvent);
   }
 
   async handleDisconnect(client: IAuthorizedSocket) {
+    // not update user isOnline if user is still connected
+    // if (
+    //   (await this.io.fetchSockets()).filter(
+    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) => s.userId === client.userId,
+    //   ).length > 0
+    // ) {
+    //   return;
+    // }
+
     this.duelQueue = this.duelQueue.filter(
       (user) => user.socket.userId !== client.userId,
     );
@@ -76,6 +171,15 @@ export class WebsocketGateway
       id: client.userId,
       isOnline: false,
     });
+
+    this.io.emit('user__is_online', {
+      event: 'user__is_online',
+      type: ISocketEventType.INFO,
+      data: {
+        userId: client.userId,
+        isOnline: false,
+      },
+    } as ISocketEvent);
   }
 
   // Ping route for testing
@@ -242,5 +346,548 @@ export class WebsocketGateway
         message: 'You are not in the queue.',
       } as ISocketMessage,
     } as ISocketEvent);
+  }
+
+  // Exchange routes
+  @SubscribeMessage('exchange__create')
+  @UseFilters(new WebsocketExceptionsFilter('exchange__created'))
+  async exchangeCreate(
+    @ConnectedSocket() client: IAuthorizedSocket,
+    @MessageBody() body: CreateUserExchangeBodyDto,
+  ) {
+    const eventName = 'exchange__created';
+
+    if (body.userId === client.userId) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You cannot exchange with yourself.',
+      } as ISocketMessage);
+    }
+
+    // check if target user exists
+    const getExchangeTargetResponse: GetResponseOne<IUser> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_user_by_id', {
+          id: body.userId,
+        }),
+      );
+
+    if (getExchangeTargetResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getExchangeTargetResponse.status,
+        message: getExchangeTargetResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if users relation is not blocked
+    const usersRelationResponse: GetResponseOne<IUserRelation> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_user_relation_by_users_ids', {
+          currentUserId: client.userId,
+          targetUserId: body.userId,
+        }),
+      );
+
+    if (
+      usersRelationResponse.status === HttpStatus.OK &&
+      usersRelationResponse.item.isBlocked
+    ) {
+      throw new WsException({
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'You cannot exchange with this user.',
+      } as ISocketMessage);
+    }
+
+    // check if cardSet exists
+    const getCardSetByIdResponse: GetResponseOne<ICardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardset_by_id', {
+          id: body.cardSetId,
+        }),
+      );
+
+    if (getCardSetByIdResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getCardSetByIdResponse.status,
+        message: getCardSetByIdResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if target user has this card set
+    const getUserCardSetResponse: GetResponseArray<IUserCardSet> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send(
+          'get_usercardsets_by_cardset_and_user_id',
+          {
+            cardSetId: body.cardSetId,
+            userId: body.userId,
+          },
+        ),
+      );
+
+    if (getUserCardSetResponse.items.length <= 0) {
+      throw new WsException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'This user does not have this card set.',
+      } as ISocketMessage);
+    }
+
+    // check if already have an active exchange with this user
+    const getActiveExchangeResponse: GetResponseOne<IUserExchange> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_active_user_exchange_between_users', {
+          exchangeOwnerId: client.userId,
+          exchangeTargetId: body.userId,
+        }),
+      );
+
+    if (getActiveExchangeResponse.status !== HttpStatus.NOT_FOUND) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You already have an active exchange with this user.',
+      } as ISocketMessage);
+    }
+
+    // create exchange
+    const createdExchangeResponse: GetResponseOne<IUserExchange> =
+      await firstValueFrom(
+        this.userServiceClient.send('create_user_exchange', {
+          exchangeOwner: client.userId,
+          exchangeTarget: body.userId,
+          ownerCardSetsProposed: [],
+          targetCardSetsProposed: [getUserCardSetResponse.items[0].id],
+        }),
+      );
+
+    if (createdExchangeResponse.status !== HttpStatus.CREATED) {
+      throw new WsException({
+        statusCode: createdExchangeResponse.status,
+        message: createdExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.INFO,
+      data: createdExchangeResponse.item,
+    };
+
+    client.emit(eventName, socketEventResponse);
+    this.io.to(body.userId).emit('exchange__request', socketEventResponse);
+  }
+
+  // Exchange routes
+  @SubscribeMessage('exchange__cancel')
+  @UseFilters(new WebsocketExceptionsFilter('exchange__updated'))
+  async exchangeCancel(
+    @ConnectedSocket() client: IAuthorizedSocket,
+    @MessageBody() body: GetItemByIdDto,
+  ) {
+    const eventName = 'exchange__updated';
+
+    // check if exchange exists
+    const getExchangeResponse: GetResponseOne<IUserExchange> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_user_exchange_by_id', {
+          id: body.id,
+        }),
+      );
+
+    if (getExchangeResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getExchangeResponse.status,
+        message: getExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is owner or target
+    if (
+      getExchangeResponse.item.exchangeOwner.id !== client.userId &&
+      getExchangeResponse.item.exchangeTarget.id !== client.userId
+    ) {
+      throw new WsException({
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'You cannot cancel this exchange.',
+      } as ISocketMessage);
+    }
+
+    // check if exchange is already closed
+    if (getExchangeResponse.item.isClosed) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'This exchange is already closed.',
+      } as ISocketMessage);
+    }
+
+    // cancel exchange
+    const updatedExchangeResponse: GetResponseOne<IUserExchange> =
+      await firstValueFrom(
+        this.userServiceClient.send('update_user_exchange_by_id', {
+          params: {
+            id: body.id,
+          },
+          body: {
+            isClosed: true,
+          },
+        }),
+      );
+
+    if (updatedExchangeResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updatedExchangeResponse.status,
+        message: updatedExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.UPDATE,
+      data: updatedExchangeResponse.item,
+    };
+
+    const targetUserId =
+      getExchangeResponse.item.exchangeOwner.id === client.userId
+        ? getExchangeResponse.item.exchangeTarget.id
+        : getExchangeResponse.item.exchangeOwner.id;
+
+    client.emit(eventName, socketEventResponse);
+    this.io.to(targetUserId).emit(eventName, socketEventResponse);
+  }
+
+  // Exchange routes
+  @SubscribeMessage('exchange__update')
+  @UseFilters(new WebsocketExceptionsFilter('exchange__updated'))
+  async exchangeUpdated(
+    @ConnectedSocket() client: IAuthorizedSocket,
+    @MessageBody() body: UpdateUserExchangeByIdDto,
+  ) {
+    const eventName = 'exchange__updated';
+
+    // check if exchange exists
+    const getExchangeResponse: GetResponseOne<IUserExchange> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_user_exchange_by_id', {
+          id: body.id,
+        }),
+      );
+
+    if (getExchangeResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getExchangeResponse.status,
+        message: getExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if exchange is closed
+    if (getExchangeResponse.item.isClosed) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You cannot update a closed exchange.',
+      } as ISocketMessage);
+    }
+
+    // check if user is owner
+    if (getExchangeResponse.item.exchangeOwner.id !== client.userId) {
+      throw new WsException({
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'You cannot update this exchange.',
+      } as ISocketMessage);
+    }
+
+    // update exchange
+    // remove all accepted propositions
+    const updatedExchangeResponse: GetResponseOne<IUserExchangePartial> =
+      await firstValueFrom(
+        this.userServiceClient.send('update_user_exchange_by_id', {
+          params: {
+            id: body.id,
+          },
+          body: {
+            ownerCardSetsProposed: body.ownerCardSetsProposed,
+            ownerAccepted: false,
+            targetAccepted: false,
+          },
+        }),
+      );
+
+    if (updatedExchangeResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updatedExchangeResponse.status,
+        message: updatedExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    // store all userCardSets of owner & target
+    const allUserCardSetsIds: string[] = [
+      ...updatedExchangeResponse.item.ownerCardSetsProposed,
+      ...updatedExchangeResponse.item.targetCardSetsProposed,
+    ];
+
+    // get userCardSets
+    const userCardSetsResponse: GetResponseArray<IUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardsets_by_ids', {
+          ids: allUserCardSetsIds,
+        }),
+      );
+
+    if (userCardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetsResponse.message,
+        userCardSetsResponse.status,
+      );
+    }
+
+    // get cardSets
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: userCardSetsResponse.items.map(
+            (userCardSet) => userCardSet.cardSetId,
+          ),
+        }),
+      );
+
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    const returnedExchange: IUserExchange = {
+      ...updatedExchangeResponse.item,
+      ownerCardSetsProposed:
+        updatedExchangeResponse.item.ownerCardSetsProposed.map(
+          (userCardSetId: string) => {
+            const userCardSet: IUserCardSet = {
+              id: userCardSetId,
+              userId: updatedExchangeResponse.item.exchangeOwner.id,
+              cardSet: cardSetsResponse.items.find(
+                (cardSet) =>
+                  cardSet.id ===
+                  userCardSetsResponse.items.find(
+                    (userCardSet) => userCardSet.id === userCardSetId,
+                  ).cardSetId,
+              ),
+            };
+            return userCardSet;
+          },
+        ),
+      targetCardSetsProposed:
+        updatedExchangeResponse.item.targetCardSetsProposed.map(
+          (userCardSetId: string) => {
+            const userCardSet: IUserCardSet = {
+              id: userCardSetId,
+              userId: updatedExchangeResponse.item.exchangeTarget.id,
+              cardSet: cardSetsResponse.items.find(
+                (cardSet) =>
+                  cardSet.id ===
+                  userCardSetsResponse.items.find(
+                    (userCardSet) => userCardSet.id === userCardSetId,
+                  ).cardSetId,
+              ),
+            };
+            return userCardSet;
+          },
+        ),
+    };
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.UPDATE,
+      data: returnedExchange,
+    };
+
+    const targetUserId =
+      getExchangeResponse.item.exchangeOwner.id === client.userId
+        ? getExchangeResponse.item.exchangeTarget.id
+        : getExchangeResponse.item.exchangeOwner.id;
+
+    client.emit(eventName, socketEventResponse);
+    this.io.to(targetUserId).emit(eventName, socketEventResponse);
+  }
+
+  // Exchange routes
+  @SubscribeMessage('exchange__accept')
+  @UseFilters(new WebsocketExceptionsFilter('exchange__updated'))
+  async exchangeAccepted(
+    @ConnectedSocket() client: IAuthorizedSocket,
+    @MessageBody() body: AcceptUserExchangeByIdDto,
+  ) {
+    const eventName = 'exchange__updated';
+
+    // check if exchange exists
+    const getExchangeResponse: GetResponseOne<IUserExchange> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_user_exchange_by_id', {
+          id: body.id,
+        }),
+      );
+
+    if (getExchangeResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getExchangeResponse.status,
+        message: getExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is owner or target
+    if (
+      getExchangeResponse.item.exchangeOwner.id !== client.userId &&
+      getExchangeResponse.item.exchangeTarget.id !== client.userId
+    ) {
+      throw new WsException({
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'You cannot access this exchange.',
+      } as ISocketMessage);
+    }
+
+    // check if exchange is closed
+    if (getExchangeResponse.item.isClosed) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You cannot update a closed exchange.',
+      } as ISocketMessage);
+    }
+
+    if (getExchangeResponse.item.ownerCardSetsProposed.length === 0) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You cannot accept the exchange',
+      } as ISocketMessage);
+    }
+
+    const userAccepted =
+      getExchangeResponse.item.exchangeOwner.id === client.userId
+        ? {
+            ownerAccepted: body.accept,
+            isClosed: getExchangeResponse.item.targetAccepted,
+          }
+        : {
+            targetAccepted: body.accept,
+            isClosed: getExchangeResponse.item.ownerAccepted,
+          };
+
+    const updatedExchangeResponse: GetResponseOne<IUserExchangePartial> =
+      await firstValueFrom(
+        this.userServiceClient.send('update_user_exchange_by_id', {
+          params: {
+            id: body.id,
+          },
+          body: userAccepted,
+        }),
+      );
+
+    if (updatedExchangeResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updatedExchangeResponse.status,
+        message: updatedExchangeResponse.message,
+      } as ISocketMessage);
+    }
+
+    // if exchange is closed, exchange cards of owner & target
+    if (updatedExchangeResponse.item.isClosed) {
+      // give to owner
+      this.userDeckServiceClient.emit('change_usercardset_owner_by_ids', {
+        ids: updatedExchangeResponse.item.targetCardSetsProposed,
+        newOwnerId: updatedExchangeResponse.item.exchangeOwner.id,
+      });
+      // give to target
+      this.userDeckServiceClient.emit('change_usercardset_owner_by_ids', {
+        ids: updatedExchangeResponse.item.ownerCardSetsProposed,
+        newOwnerId: updatedExchangeResponse.item.exchangeTarget.id,
+      });
+    }
+
+    // store all userCardSets of owner & target
+    const allUserCardSetsIds: string[] = [
+      ...updatedExchangeResponse.item.ownerCardSetsProposed,
+      ...updatedExchangeResponse.item.targetCardSetsProposed,
+    ];
+
+    // get userCardSets
+    const userCardSetsResponse: GetResponseArray<IUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardsets_by_ids', {
+          ids: allUserCardSetsIds,
+        }),
+      );
+
+    if (userCardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetsResponse.message,
+        userCardSetsResponse.status,
+      );
+    }
+
+    // get cardSets
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: userCardSetsResponse.items.map(
+            (userCardSet) => userCardSet.cardSetId,
+          ),
+        }),
+      );
+
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    const returnedExchange: IUserExchange = {
+      ...updatedExchangeResponse.item,
+      ownerCardSetsProposed:
+        updatedExchangeResponse.item.ownerCardSetsProposed.map(
+          (userCardSetId: string) => {
+            const userCardSet: IUserCardSet = {
+              id: userCardSetId,
+              userId: updatedExchangeResponse.item.exchangeOwner.id,
+              cardSet: cardSetsResponse.items.find(
+                (cardSet) =>
+                  cardSet.id ===
+                  userCardSetsResponse.items.find(
+                    (userCardSet) => userCardSet.id === userCardSetId,
+                  ).cardSetId,
+              ),
+            };
+            return userCardSet;
+          },
+        ),
+      targetCardSetsProposed:
+        updatedExchangeResponse.item.targetCardSetsProposed.map(
+          (userCardSetId: string) => {
+            const userCardSet: IUserCardSet = {
+              id: userCardSetId,
+              userId: updatedExchangeResponse.item.exchangeTarget.id,
+              cardSet: cardSetsResponse.items.find(
+                (cardSet) =>
+                  cardSet.id ===
+                  userCardSetsResponse.items.find(
+                    (userCardSet) => userCardSet.id === userCardSetId,
+                  ).cardSetId,
+              ),
+            };
+            return userCardSet;
+          },
+        ),
+    };
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.UPDATE,
+      data: returnedExchange,
+    };
+
+    const targetUserId =
+      getExchangeResponse.item.exchangeOwner.id === client.userId
+        ? getExchangeResponse.item.exchangeTarget.id
+        : getExchangeResponse.item.exchangeOwner.id;
+
+    client.emit(eventName, socketEventResponse);
+    this.io.to(targetUserId).emit(eventName, socketEventResponse);
   }
 }

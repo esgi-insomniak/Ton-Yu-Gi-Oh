@@ -50,7 +50,10 @@ export const useMe = () => {
     retry: 0,
   })
 
-  if (error) { window.location.reload() }
+  if (error) {
+    localStorage.removeItem("token")
+    window.location.reload()
+  }
 
   const me = data?.data
 

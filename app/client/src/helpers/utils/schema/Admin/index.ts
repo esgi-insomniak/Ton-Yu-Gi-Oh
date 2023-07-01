@@ -1,6 +1,6 @@
 import * as zod from "zod";
 import { setPartialSchema } from "../cards/set.schema";
-import { userCardSetsSchema } from "../User";
+import { userCardSetSchemaPartial } from "../User";
 
 export const profilePictureSchema = zod.object({
     id: zod.string(),
@@ -79,8 +79,8 @@ export const ExchangeSchema = zod.object({
     isClosed: zod.boolean(),
     ownerCoinsProposed: zod.number(),
     targetCoinsProposed: zod.number(),
-    ownerCardSetsProposed: zod.array(userCardSetsSchema),
-    targetCardSetsProposed: zod.array(userCardSetsSchema),
+    ownerCardSetsProposed: zod.array(userCardSetSchemaPartial),
+    targetCardSetsProposed: zod.array(userCardSetSchemaPartial),
     exchangeOwner: userSchema,
     exchangeTarget: userSchema
 })

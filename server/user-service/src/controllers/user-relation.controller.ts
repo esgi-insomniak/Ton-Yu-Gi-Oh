@@ -47,6 +47,22 @@ export class UserRelationController {
     return result;
   }
 
+  @MessagePattern('get_user_relation_by_users_ids')
+  public async getUserRelationByUsersIds(params: {
+    currentUserId: string;
+    targetUserId: string;
+  }): Promise<GetResponseOne<UserRelation>> {
+    const userRelation =
+      await this.userRelationService.getUserRelationByUsersIds(params);
+    const result: GetResponseOne<UserRelation> = {
+      status: userRelation !== null ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: userRelation !== null ? null : 'UserRelation not found',
+      item: userRelation,
+    };
+
+    return result;
+  }
+
   @MessagePattern('get_user_relation_by_id')
   public async getUserRelationById(
     params: ParamGetItemById,

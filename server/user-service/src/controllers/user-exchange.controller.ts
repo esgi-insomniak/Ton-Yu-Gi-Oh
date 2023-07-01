@@ -61,6 +61,26 @@ export class UserExchangeController {
     return result;
   }
 
+  @MessagePattern('get_active_user_exchange_between_users')
+  public async getActiveUserExchangeBetweenUsers(params: {
+    exchangeOwnerId: string;
+    exchangeTargetId: string;
+  }): Promise<GetResponseOne<UserExchange>> {
+    const userExchange =
+      await this.userExchangeService.getActiveUserExchangeBetweenUsers(
+        params.exchangeOwnerId,
+        params.exchangeTargetId,
+      );
+
+    const result: GetResponseOne<UserExchange> = {
+      status: userExchange ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: userExchange ? null : 'Exchange not found',
+      item: userExchange,
+    };
+
+    return result;
+  }
+
   @MessagePattern('create_user_exchange')
   public async createUserExchange(
     body: DeepPartial<UserExchange>,
@@ -78,13 +98,13 @@ export class UserExchangeController {
   }
 
   @MessagePattern('update_user_exchange_by_id')
-  public async updateUserExchangeById(
-    params: ParamGetItemById,
-    body: UserExchange,
-  ): Promise<GetResponseOne<UserExchange>> {
+  public async updateUserExchangeById(request: {
+    params: ParamGetItemById;
+    body: UserExchange;
+  }): Promise<GetResponseOne<UserExchange>> {
     const userExchange = await this.userExchangeService.updateUserExchangeById(
-      params.id,
-      body,
+      request.params.id,
+      request.body,
     );
     const result: GetResponseOne<UserExchange> = {
       status: userExchange ? HttpStatus.OK : HttpStatus.NOT_FOUND,

@@ -14,5 +14,5 @@ export interface ISocketEvent {
 
 export interface ISocketMessage {
   statusCode: number;
-  message: string;
+  message: string | string[];
 }
