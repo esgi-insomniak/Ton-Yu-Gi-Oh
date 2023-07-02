@@ -10,7 +10,7 @@ import { DataSource, Repository } from 'typeorm';
 export class UserService {
   private userRepository: Repository<User>;
 
-  constructor(dataSource: DataSource) {
+  constructor(private readonly dataSource: DataSource) {
     this.userRepository = dataSource.getRepository(User);
   }
 
@@ -110,5 +110,9 @@ export class UserService {
     const user = await this.getUserById({ id: userId });
     user.isOnline = isOnline;
     return this.userRepository.save(user);
+  }
+
+  async deleteAllUsers(): Promise<void> {
+    await this.userRepository.clear();
   }
 }
