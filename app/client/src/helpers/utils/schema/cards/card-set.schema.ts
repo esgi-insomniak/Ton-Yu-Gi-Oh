@@ -33,7 +33,7 @@ export const cardSetBuyableSchema = zod.object({
 export const deckSchema = zod.object({
   id: zod.string(),
   card: cardSchema,
-  set: setSchema,
+  set: zod.lazy(() => setSchema),
   price: zod.number(),
   rarity: raritySchema
 })
@@ -65,3 +65,4 @@ export const userCardSetsResponseSchema = zod.object({
 
 export type userCardSetReponseType = zod.infer<typeof userCardSetsResponseSchema>;
 export type userCardSetsType = zod.infer<typeof userCardSets>;
+export type arrayOfCardSetsSchemaType = zod.infer<typeof arrayOfCardSetsSchema>;

@@ -1,188 +1,110 @@
 import React from "react";
 import {
-  useGetAllMyUserCardSets,
-  getAllCardInDoubleAndIncrement,
-  useMe,
+    useGetAllMyUserCardSets,
+    useMe,
 } from "@/helpers/api/hooks/users";
 import { usePostUserDeck } from "@/helpers/api/hooks/decks";
-import UserCardSets from "@/components/Decks/UserCardSets";
-import DeckCard from "@/components/Decks/DeckCard";
-import { CountCard, DecksImages, SameCards } from "@/helpers/types/decks";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { BiCheckCircle } from "react-icons/bi";
+import { MdArrowBack } from "react-icons/md";
+import { Select } from "@/components/Input";
+import { useGetAllRarities, useGetAllAttributes } from "@/helpers/api/hooks/cards/attribute.hook";
+import Loader from "@/components/Loader";
 
 const NewDecks = () => {
-  const { me: user } = useMe();
-  const { data, isLoading, isError } = useGetAllMyUserCardSets(user?.id!);
-  const [allUserCards, setAllUserCards] = React.useState<SameCards[]>([]);
-  const [decksImages, setDecksImages] = React.useState<DecksImages[]>([]);
-  const [decks, setDecks] = React.useState<Array<string>>([]);
-  const [countCard, setCountCard] = React.useState<CountCard>({});
-  const [initialState, setInitialState] = React.useState<SameCards[]>([]);
-  const [deckName, setDeckName] = React.useState("");
-  const postDeck = usePostUserDeck();
-  const navigate = useNavigate();
-  const alert = useAlert();
+    const { me: user } = useMe();
+    const { data, isLoading } = useGetAllMyUserCardSets(24, 0);
+    const { data: rarities } = useGetAllRarities()
+    const { data: attributes } = useGetAllAttributes()
+    const postDeck = usePostUserDeck();
+    const navigate = useNavigate();
+    const alert = useAlert();
 
-  if (!isLoading && !isError && data) {
-    if (allUserCards.length === 0) {
-      setAllUserCards(getAllCardInDoubleAndIncrement(data));
-    }
-    if (initialState.length === 0) {
-      setInitialState(getAllCardInDoubleAndIncrement(data));
-    }
-  }
+    const [deckName, setDeckName] = React.useState("");
+    const [selectedCardIds, setSelectedCardIds] = React.useState<string[]>([]);
 
-  const AddCard = (index: number, isUpdated = false, isUpdateDeck = false) => {
-    const [userCardSetId] = allUserCards[index]["userCardSetIds"];
+    const handleCardClick = (cardId: string) => {
+        if (selectedCardIds.filter(id => id === cardId).length >= 3) return
 
-    setCountCard((prevCountCard) => {
-      const itemId = allUserCards[index]["item"].cardSet.id;
-      const newCount = itemId in prevCountCard ? prevCountCard[itemId] + 1 : 1;
+        setSelectedCardIds(prevSelectedCardIds => [...prevSelectedCardIds, cardId]);
+    };
 
-      if (newCount > 3) {
-        return prevCountCard;
-      }
-
-      return { ...prevCountCard, [itemId]: newCount };
-    });
-
-    if (!(countCard[allUserCards[index]["item"].id] >= 3)) {
-      setAllUserCards((prevSelectedCards) => {
-        const newAllUserCards = [...prevSelectedCards];
-        const selectedCard = newAllUserCards[index];
-
-        if (selectedCard.count > 0 && !isUpdated) {
-          selectedCard.count -= 1;
-          isUpdated = true;
+    const groupedCardsMap = data?.data.reduce((map, card) => {
+        const cardId = card.cardSet.card.id;
+        if (map.has(cardId)) {
+            map.set(cardId, map.get(cardId) + 1);
+        } else {
+            map.set(cardId, 1);
         }
+        return map;
+    }, new Map());
 
-        return newAllUserCards;
-      });
+    const groupedCards = groupedCardsMap && Array.from(groupedCardsMap!, ([cardId, count]) => ({
+        card: data?.data.find(card => card.cardSet.card.id === cardId)?.cardSet.card,
+        count
+    }));
 
-      setDecksImages((prevSelectedCards) => [
-        ...prevSelectedCards,
-        {
-          id: userCardSetId,
-          cardSet: allUserCards[index]["item"].cardSet,
-          index: index,
-        },
-      ]);
-
-      if (!isUpdateDeck) {
-        setDecks((prevSelectedCards) => [...prevSelectedCards, userCardSetId]);
-        allUserCards[index]["userCardSetIds"].splice(0, 1);
-        isUpdateDeck = true;
-      }
-    }
-  };
-
-  const RemoveCard = (
-    index: number,
-    isUpdated = false,
-    isUpdateDeck = false,
-    cardIdDeck: string
-  ) => {
-    setCountCard(
-      allUserCards[index]["item"].cardSet.id in countCard
-        ? {
-          ...countCard,
-          [allUserCards[index]["item"].cardSet.id]:
-            countCard[allUserCards[index]["item"].cardSet.id] - 1,
-        }
-        : { ...countCard, [allUserCards[index]["item"].cardSet.id]: 1 }
-    );
-    const cardIndex = decksImages.findIndex((card) => card.index === index);
-
-    if (cardIndex !== -1) {
-      setDecksImages((prevSelectedCards) =>
-        prevSelectedCards.filter(
-          (_, selectedIndex) => selectedIndex !== cardIndex
-        )
-      );
-
-      setDecks((prevSelectedCards) => {
-        const newAllUserCards = [...prevSelectedCards];
-        if (!isUpdateDeck) {
-          let index = newAllUserCards.indexOf(cardIdDeck);
-          if (index !== -1) {
-            newAllUserCards.splice(index, 1);
-            if (!allUserCards[index]["userCardSetIds"].includes(cardIdDeck)) {
-              allUserCards[index]["userCardSetIds"].push(cardIdDeck);
-            }
-            return newAllUserCards;
-          }
-          isUpdateDeck = true;
-        }
-        return newAllUserCards;
-      });
-
-      setAllUserCards((prevSelectedCards) => {
-        const newAllUserCards = [...prevSelectedCards];
-        const selectedCard = newAllUserCards[index];
-
-        if (
-          (selectedCard.count <= 0 ||
-            selectedCard.count < initialState[index].count) &&
-          !isUpdated
-        ) {
-          selectedCard.count += 1;
-          isUpdated = true;
-        }
-
-        return newAllUserCards;
-      });
-    }
-  };
-
-  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDeckName(e.target.value);
-  };
-
-  const handleSubmitDeck = () => {
-    if (decks.length > 40 && decks.length < 60) {
-      postDeck.mutate({ userCardSetIds: decks, name: deckName });
-      alert?.success("Votre deck a bien été créé");
-    } else {
-      alert?.error("Votre deck doit contenir entre 40 et 60 cartes");
-    }
-  };
-
-  return (
-    <React.Fragment>
-      <div className="flex flex-col w-1/3">
-        <div className="flex justify-between my-3 mx-3">
-          <button onClick={() => navigate('/decks')} className="btn">
-            Revenir en arrière
-          </button>
-          <button className="btn" onClick={handleSubmitDeck}>
-            Valider mon deck
-          </button>
+    return (
+        <div className="w-full flex flex-col h-full p-2">
+            <div className="text-sm breadcrumbs">
+                <ul>
+                    <li><Link to={'/decks'}>Crafting zone</Link></li>
+                    <li><Link to={'/decks/create'}>Mes decks</Link></li>
+                </ul>
+            </div>
+            <div className="flex gap-2 overflow-scroll h-full">
+                <div className="w-9/12 h-full border rounded-md flex flex-col space-y-2 pt-2">
+                    <form className="flex w-full space-x-2 items-center justify-center">
+                        <input type="text" className="input input-bordered" name="searchBar" placeholder="Rechercher" />
+                        <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" theme="dark" />
+                        <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" theme="dark" />
+                        <button className="btn" type="submit">Rechercher</button>
+                        {/* <button className="btn" onClick={handleClear}>Vider</button> */}
+                    </form>
+                    <div className="w-full h-full grid grid-cols-8 gap-2 px-2 overflow-scroll">
+                        {isLoading ? <Loader /> : groupedCards?.map((groupedCard) => (
+                            <div className="indicator flex flex-col items-center hover:scale-95 duration-150 ease-in-out cursor-pointer" key={groupedCard?.card?.id}>
+                                <span className="indicator-item badge">{groupedCard.count > 99 ? '99+' : groupedCard.count}</span>
+                                <img
+                                    src={groupedCard.card?.imageUrl}
+                                    alt=""
+                                    className={`w-32 h-64 rounded-md`}
+                                    style={{ maxWidth: "100%", height: "auto" }}
+                                    onClick={() => handleCardClick(groupedCard?.card?.id!)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className="w-3/12 h-full border p-2 rounded-md space-y-2 overflow-scroll">
+                    <div className="flex gap-2 h-12">
+                        <input className="w-full glass rounded-md focus:outline-none p-2 text-white" type="text" placeholder="Nom du deck" onChange={(e) => setDeckName(e.target.value)} />
+                        <div className={`btn hover:btn-error group tooltip tooltip-up flex justify-center items-center`}
+                            data-tip="Revenir en arrière">
+                            <MdArrowBack className="text-red-500 group-hover:text-white" />
+                        </div>
+                        <div className={`btn hover:btn-success group tooltip tooltip-left flex justify-center items-center`}
+                            data-tip="Sauvegarder le deck">
+                            <BiCheckCircle className="text-green-500 group-hover:text-white" />
+                        </div>
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                        <React.Fragment>
+                            <span className={`${selectedCardIds.length < 40 || selectedCardIds.length > 60 ? 'text-red-500' : 'text-green-500'}`}>
+                                {selectedCardIds.length} / 40 (min) - 60 (max)
+                            </span>
+                            {selectedCardIds.map((cardId) => (
+                                <div className="h-14 w-full p-2 bg-gray-300/20 rounded-md">
+                                    {cardId}
+                                </div>
+                            ))}
+                        </React.Fragment>
+                    </div>
+                </div>
+            </div>
         </div>
-        <input
-          type="text"
-          placeholder="Nom du deck"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mx-3 my-3"
-          id="deckName"
-          onChange={handleChangeName}
-        />
-      </div>
-      <div className="flex justify-between w-full">
-        <UserCardSets
-          countCard={countCard}
-          addCard={AddCard}
-          allUserCards={allUserCards || []}
-          isLoading={isLoading}
-          isError={isError}
-        />
-        <DeckCard
-          decks={decks}
-          decksImages={decksImages}
-          removeCard={RemoveCard}
-        />
-      </div>
-    </React.Fragment>
-  );
+    );
 };
 
 export default NewDecks;

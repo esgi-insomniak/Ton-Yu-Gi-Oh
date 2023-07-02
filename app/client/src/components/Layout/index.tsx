@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                 </div>
             </div>
-            <main className="h-full">{children}</main>
+            <main className="h-[calc(100%-5rem)]">{children}</main>
         </div>
     );
 }

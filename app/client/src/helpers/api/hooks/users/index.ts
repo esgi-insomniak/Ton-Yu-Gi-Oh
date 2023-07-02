@@ -4,13 +4,13 @@ import { Card, MyCards, MyObj, SameCards } from "@/helpers/types/decks";
 import { UserMe } from "@/helpers/types/users";
 import { userSchemaType } from "@/helpers/utils/schema/Admin";
 import { responseRegisterSchema } from "@/helpers/utils/schema/Auth";
+import { arrayOfCardSetsSchemaType } from "@/helpers/utils/schema/cards/card-set.schema";
 import React from "react";
 import { useQuery } from "react-query";
-import { useNavigate, useHref } from "react-router-dom";
 
 const QUERY_URLS = {
   me: () => `/users/me`,
-  userCardSets: (userId: string) => `/users/${userId}/user_card_sets?limit=100`,
+  userCardSets: (limit: number, pageNumber: number) => `/users/me/user_card_sets?limit=${limit}&offset=${pageNumber}`,
   getUsers: (cardSetId: string, itemPerPage?: number, pageNumber?: number) => `/users?limit=${itemPerPage}&offset=${pageNumber}&cardSetId=${cardSetId}`,
 } as const;
 
@@ -28,9 +28,9 @@ const requestMe = () =>
     responseRegisterSchema
   );
 
-const requestUserCardSets = (userId: string) =>
+const requestUserCardSets = (limit: number, pageNumber: number) =>
   apiRequest({
-    url: QUERY_URLS.userCardSets(userId),
+    url: QUERY_URLS.userCardSets(limit, pageNumber),
     method: "GET",
     token: getToken(),
   });
@@ -61,12 +61,12 @@ export const useMe = () => {
 }
 
 
-export const useGetAllMyUserCardSets = (userId: string) => {
-  const myCards = useQuery(["userCardSets", userId], () =>
-    requestUserCardSets(userId)
+export const useGetAllMyUserCardSets = (limit: number, pageNumber: number) => {
+  const { data, isLoading } = useQuery<ApiGetItemResponse<arrayOfCardSetsSchemaType[]>>(["userCardSets", limit, pageNumber], () =>
+    requestUserCardSets(limit, pageNumber)
   );
 
-  return myCards;
+  return React.useMemo(() => ({ data, isLoading }), [data, isLoading]);
 };
 
 export const useGetUserWithCardSetId = (cardSetId: string, itemPerPage?: number, pageNumber?: number) => {
