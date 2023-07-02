@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duel-service
+  labels:
+    app: duel-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: duel-service
+  template:
+    metadata:
+      labels:
+        app: duel-service
+    spec:
+      containers:
+        - name: duel-service
+          image: maeljamin/ton-yugi-duel-service:{{VERSION}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: duel-service-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: duel-service
+spec:
+  selector:
+    app: duel-service # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8000
+  type: ClusterIP # Can be accessed only inside the cluster
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: duel-service-config
+data:
+  DUEL_SERVICE_PORT: "8000"
+  DUEL_SERVICE_POSTGRES_HOST: "duel-service-db"
+  DUEL_SERVICE_POSTGRES_PORT: "5432"
+  DUEL_SERVICE_POSTGRES_DB: "duel_service"
+  DUEL_SERVICE_POSTGRES_USER: "postgres"
+  DUEL_SERVICE_POSTGRES_PASSWORD: "postgres"

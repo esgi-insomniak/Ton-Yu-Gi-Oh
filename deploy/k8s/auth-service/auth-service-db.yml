@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-db
+  labels:
+    app: auth-service-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service-db
+  template:
+    metadata:
+      labels:
+        app: auth-service-db
+    spec:
+      containers:
+        - name: auth-service-db
+          image: postgres:13.2-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+              - configMapRef:
+                  name: auth-service-db-config
+          volumeMounts:
+            - name: auth-service-db
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: auth-service-db
+          persistentVolumeClaim:
+            claimName: auth-service-db-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-db
+spec:
+  selector:
+    app: auth-service-db # which pods will receive the traffic
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP # Can be accessed from other pods in the cluster
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-db-config
+data:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: auth_service
+  PGDATA: /var/lib/postgresql/data/pgdata
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-service-db-data
+spec:
+  accessModes:
+      - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

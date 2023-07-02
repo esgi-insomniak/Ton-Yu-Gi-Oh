@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+  labels:
+    app: user-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-pod
+  template:
+    metadata:
+      labels:
+        app: user-service-pod
+    spec:
+      containers:
+        - name: user-service
+          image: maeljamin/ton-yugi-user-service:{{VERSION}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: user-service-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-svc
+  labels:
+    app: user-service-svc
+spec:
+  selector:
+    app: user-service-pod # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP # Can be accessed from other pods in the cluster
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+data:
+  USER_SERVICE_PORT: "8000"
+  USER_SERVICE_POSTGRES_HOST: "user-service-db"
+  USER_SERVICE_POSTGRES_PORT: "5432"
+  USER_SERVICE_POSTGRES_USER: "postgres"
+  USER_SERVICE_POSTGRES_PASSWORD: "postgres"
+  USER_SERVICE_POSTGRES_DB: "user_service"

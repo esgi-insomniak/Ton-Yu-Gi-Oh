@@ -1,0 +1,19 @@
+@import 'base.css';
+@import 'cards.css';
+
+@import 'super-rare.css';
+@import 'ultra-rare.css';
+@import 'secret-rare.css';
+@import 'starlight-rare.css';
+@import 'ultimate-rare';
+@import 'ghost-rare.css';
+@import 'gold-rare.css';
+@import 'premium-gold-rare.css';
+@import 'platinum-rare.css';
+@import 'prismatic-secret-rare.css';
+@import 'collector-s-rare.css';
+@import 'parallel-rare.css';
+@import 'starfoil-rare.css';
+@import 'mosaic-rare.css';
+@import 'shatterfoil-rare.css';
+@import 'ghost-gold-rare.css';

@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deck-service-db
+  labels:
+    app: user-deck-service-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-deck-service-db
+  template:
+    metadata:
+      labels:
+        app: user-deck-service-db
+    spec:
+      containers:
+        - name: user-deck-service-db
+          image: postgres:13.2-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: user-deck-service-db-config
+          volumeMounts:
+            - name: user-deck-service-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: user-deck-service-db-data
+          persistentVolumeClaim:
+            claimName: user-deck-service-db-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-deck-service-db
+spec:
+  selector:
+    app: user-deck-service-db # which pods will receive the traffic
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP # Can be accessed from other pods in the cluster
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-deck-service-db-config
+data:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: user_deck_service
+  PGDATA: /var/lib/postgresql/data/pgdata
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-deck-service-db-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

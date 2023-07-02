@@ -1,0 +1,38 @@
+#
+# Publishes a Docker image.
+#
+# Environment variables:
+#
+#   CONTAINER_REGISTRY - The hostname of your container registry.
+#   REGISTRY_UN - User name for your container registry.
+#   REGISTRY_PW - Password for your container registry.
+#   VERSION - The version number to tag the images with.
+#
+# Parameters:
+#
+#   1 - The path to the code for the image and the name of the image.
+#
+# Usage:
+#
+#       .deploy/scripts/push-image.sh <image-name>
+#
+# Example command line usage:
+#
+#       .deploy/scripts/push-image.sh service
+#
+# This script will push the image to the container registry.
+# #################################################################################################
+
+set -u # or set -o nounset
+: "$1"
+: "$CONTAINER_REGISTRY"
+: "$VERSION"
+: "$REGISTRY_UN"
+: "$REGISTRY_PW"
+
+export DIR=$1
+echo $REGISTRY_PW | docker login --username $REGISTRY_UN --password-stdin
+docker push $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION
+docker tag $CONTAINER_REGISTRY/ton-yugi-$DIR:$VERSION $CONTAINER_REGISTRY/ton-yugi-$DIR:latest
+docker push $CONTAINER_REGISTRY/ton-yugi-$DIR:latest
+docker logout $CONTAINER_REGISTRY

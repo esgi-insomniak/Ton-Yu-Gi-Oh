@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  labels:
+    app: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: duel-service
+          image: maeljamin/ton-yugi-client:{{VERSION}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: client-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: client
+spec:
+  selector:
+    app: client # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8080
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client-config
+data:
+  VITE_CLIENT_PORT: "8080"
+  VITE_CLIENT_HOST: "client-node"
+  VITE_BASE_API_URL: "http://localhost:8000/"
+  VITE_SOCKET_URL: "ws://localhost:8000"
