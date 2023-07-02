@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
 import { ConfigService } from './services/config/config.service';
 import { SocketIoAdapter } from './socket-io-adapter';
+import helmet from 'helmet';
 import * as compression from 'compression';
 import * as requestIp from 'request-ip';
 
@@ -23,6 +24,7 @@ async function bootstrap() {
     }),
   );
   app.use(compression());
+  app.use(helmet());
   app.use(requestIp.mw());
   app.enableCors({ origin: [new ConfigService().get('corsOrigin')] });
   app.useWebSocketAdapter(new SocketIoAdapter(app));
