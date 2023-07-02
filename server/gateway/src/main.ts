@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
 import { ConfigService } from './services/config/config.service';
 import { SocketIoAdapter } from './socket-io-adapter';
+import * as compression from 'compression';
 import * as requestIp from 'request-ip';
 
 async function bootstrap() {
@@ -21,8 +22,9 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.use(compression());
   app.use(requestIp.mw());
-  app.enableCors({ origin: '*' });
+  app.enableCors({ origin: [new ConfigService().get('corsOrigin')] });
   app.useWebSocketAdapter(new SocketIoAdapter(app));
   await app.listen(new ConfigService().get('port'));
 }

@@ -6,6 +6,7 @@ export class ConfigService {
   constructor() {
     this.envConfig = {};
     this.envConfig.port = process.env.API_GATEWAY_PORT;
+    this.envConfig.corsOrigin = process.env.API_CORS_ORIGIN_REGEX;
     this.envConfig.cardService = {
       options: {
         port: process.env.CARD_SERVICE_PORT,
