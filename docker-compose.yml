@@ -1,9 +1,28 @@
 version: "3.4"
 services:
 
+    ### CLIENT ###
+    client-node:
+      build:
+        context: ./app/client
+        dockerfile: ../../deploy/docker/Dockerfile
+        target: dev
+        args:
+          - SERVICE_NAME=client
+      hostname: client
+      container_name: client
+      command: sh -c "yarn install && yarn dev --host"
+      env_file:
+        - .env.dev
+      volumes:
+        - ./app/client:/usr/src/client
+      stdin_open: true
+      tty: true
+      ports:
+        - ${VITE_CLIENT_PORT}:${VITE_CLIENT_PORT}
 
     ### FRONTEND GATEWAY ###
-    gateway:
+    gateway-node:
       build:
         context: ./server/gateway
         dockerfile: ../../deploy/docker/Dockerfile
@@ -11,8 +30,7 @@ services:
         args:
           - SERVICE_NAME=gateway
       hostname: gateway
-      command: >
-        sh -c "yarn install && yarn start:dev"
+      container_name: gateway
       env_file:
         - .env.dev
       volumes:
@@ -33,10 +51,8 @@ services:
         args:
           - SERVICE_NAME=card-service
       hostname: card-service-node
-      command: >
-        sh -c "yarn install &&
-        yarn typeorm:migrate &&
-        yarn start:dev"
+      container_name: card-service-node
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
       env_file:
@@ -71,10 +87,8 @@ services:
         args:
           - SERVICE_NAME=user-service
       hostname: user-service-node
-      command: >
-        sh -c "yarn install &&
-        yarn typeorm:migrate &&
-        yarn start:dev"
+      container_name: user-service-node
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
       env_file:
@@ -88,6 +102,7 @@ services:
     user-service-postgres:
       image: postgres:13.2-alpine
       hostname: user-service-postgres
+      container_name: user-service-postgres
       networks:
         - backend-dev
       env_file:
@@ -109,10 +124,7 @@ services:
         args:
           - SERVICE_NAME=payment-service
       hostname: payment-service-node
-      command: >
-        sh -c "yarn install &&
-        yarn typeorm:migrate &&
-        yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
       env_file:
@@ -147,10 +159,7 @@ services:
         args:
           - SERVICE_NAME=auth-service
       hostname: auth-service-node
-      command: >
-        sh -c "yarn install &&
-        yarn typeorm:migrate &&
-        yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
       env_file:
@@ -184,10 +193,7 @@ services:
         args:
           - SERVICE_NAME=user-deck-service
       hostname: user-deck-service-node
-      command: >
-        sh -c "yarn install &&
-        yarn typeorm:migrate &&
-        yarn start:dev"
+      command: sh -c "yarn install && yarn typeorm:migrate && yarn start:dev"
       networks:
         - backend-dev
       env_file:
@@ -332,7 +338,10 @@ networks:
   backend-dev:
     driver: bridge
   frontend-dev:
-    external: true
+    driver: bridge
+  react_app_network:
+    driver: bridge
+
 
 volumes:
     card-service-postgres-dev:

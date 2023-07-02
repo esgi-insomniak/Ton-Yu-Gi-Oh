@@ -31,7 +31,7 @@ package-lock.json
 # Envs 
 
 .env
-.env.local
+.env.dev
 
 pnpm-lock.yaml
 /test-results/

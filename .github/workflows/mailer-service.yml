@@ -3,33 +3,74 @@ name: Deploy "mailer-service"
 on:
   push:
     branches:
-      - feature/ci-cd
-    paths:
-      - "server/mailer-service/**"
-      - ".github/workflows/mailer-service.yml"
+      - main
+
+    # paths:
+      # - "server/mailer-service/**"
+      # - ".github/workflows/mailer-service.yml"
+      # - "deploy/k8s/mailer-service/**"
+      # - "deploy/scripts/**"
+      # - "deploy/docker/**"
 
 env:
+  ## Docker Hub
   CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
   REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
   REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
+  VERSION: ${{ github.sha }}
+  LOCATION: ./server/mailer-service
+
+  ## Google Cloud Platform
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+  GKE_REGION: ${{ secrets.GKE_REGION }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
-  VERSION: ${{ github.sha }}
-
 
 jobs:
-  build-publish-deploy:
-    name: Build, Publish, Deploy
+
+  test-build-publish-deploy:
+    name: Test, Build, Publish, Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment: production
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
+        #
+        # Tests the Service.
+        #
+      - name: Testing
+        run: deploy/scripts/test-service.sh mailer-service
+
+
+        #
+        # Authenticates with the Google Cloud Platform.
+        #
+      - id: auth
+        name: Authenticate
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+        #
+        # Sets up the Google Cloud SDK (gcloud).
+        #
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          install_components: kubectl
+
+        #
+        # Configures the Kubernetes cluster.
+        #
+      - name: Configure Kubernetes cluster
+        run: |
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region ${{ secrets.GKE_REGION }} --project ${{ secrets.PROJECT_ID }}
+            gcloud auth --quiet configure-docker
+            kubectl config current-context
 
         #
         # Builds the Docker image.
@@ -44,41 +85,17 @@ jobs:
         run: deploy/scripts/push-image.sh mailer-service
 
         #
-        # Authenticates with the Google Cloud Platform.
+        # Deploys the Docker image to the Kubernetes cluster.
         #
-      - id: auth
-        name: Authenticate
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
-
-
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ secrets.PROJECT_ID }}
-          install_components: kubectl
+      - name: Deploy Image
+        run: deploy/scripts/deploy-image.sh mailer-service
 
         #
-        # Configures the Kubernetes cluster.
-        #
-      - name: Configure Kubernetes cluster
-        run: |
-            gcloud config set project ${{ secrets.PROJECT_ID }}
-            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
-            kubectl config current-context
-
-        #
-        # Applies the Kubernetes files.
+        # Applies the Kubernetes files (test if a db.yml exists).
         #
       - name: Apply Kubernetes files
         run: |
-            kubectl apply -f deploy/k8s/mailer-service/mailer-service.yml                        
-
-        #
-        # Deploys the Docker image to the Kubernetes cluster.
-        #
-      - name: Deploy
-        run: deploy/scripts/deploy-image.sh mailer-service
-
+          kubectl apply -f deploy/k8s/mailer-service/mailer-service.yml
+          if [ -f deploy/k8s/mailer-service/mailer-service-db.yml ]; then
+            kubectl apply -f deploy/k8s/mailer-service/mailer-service-db.yml
+          fi

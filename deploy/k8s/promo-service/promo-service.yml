@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: promo-service
+  labels:
+    app: promo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: promo-service
+  template:
+    metadata:
+      labels:
+        app: promo-service
+    spec:
+      containers:
+        - name: promo-service
+          image: maeljamin/ton-yugi-promo-service:{{VERSION}}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: promo-service-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: promo-service
+spec:
+  selector:
+    app: promo-service # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8000
+  type: ClusterIP # Can be accessed from outside the cluster
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: promo-service-config
+data:
+  PROMO_SERVICE_PORT: "8000"
+  PROMO_SERVICE_POSTGRES_HOST: "promo-service-db"
+  PROMO_SERVICE_POSTGRES_PORT: "5432"
+  PROMO_SERVICE_POSTGRES_DB: "promo_service"
+  PROMO_SERVICE_POSTGRES_USER: "postgres"
+  PROMO_SERVICE_POSTGRES_PASSWORD: "postgres"

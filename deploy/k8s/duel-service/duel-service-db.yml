@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: duel-service-db
+  labels:
+    app: duel-service-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: duel-service-db
+  template:
+    metadata:
+      labels:
+        app: duel-service-db
+    spec:
+      containers:
+        - name: duel-service-db
+          image: postgres:13.2-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: duel-service-db-config
+          volumeMounts:
+            - name: duel-service-db
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: duel-service-db
+          persistentVolumeClaim:
+            claimName: duel-service-db-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: duel-service-db
+spec:
+  selector:
+    app: duel-service-db # which pods will receive the traffic
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP # Can be accessed from other pods in the cluster
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: duel-service-db-config
+data:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: duel_service
+  PGDATA: /var/lib/postgresql/data/pgdata
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: duel-service-db-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

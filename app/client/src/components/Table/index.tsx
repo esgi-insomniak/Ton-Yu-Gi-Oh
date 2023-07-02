@@ -17,7 +17,7 @@ export const TableRow = <T extends object>({ data, columns, evenRow }: TableRowP
                     key={column.key as string}
                     className="px-4 py-2 border-b border-gray-200"
                 >
-                    {data[column.key]}
+                    {data[column.key] as React.ReactNode}
                 </td>
             ))}
         </tr>

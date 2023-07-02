@@ -15,6 +15,7 @@ import { WebsocketModule } from './websoket.module';
 import { PromoModule } from './promo.module';
 import { DuelModule } from './duel.module';
 import { MeToIdGuard } from 'src/services/guard/me-to-id.guard';
+import {PingModule} from "./ping.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MeToIdGuard } from 'src/services/guard/me-to-id.guard';
     DuelModule,
     MailerModule,
     WebsocketModule,
+    PingModule
   ],
   providers: [
     ConfigService,

@@ -25,7 +25,7 @@ export class UserController {
   }
 
   @MessagePattern('get_user_by_id')
-  public async getCardById(
+  public async getUserById(
     params: ParamGetItemById,
   ): Promise<GetResponseOne<User>> {
     const user = await this.userService.getUserById(params);
@@ -95,7 +95,6 @@ export class UserController {
     username: string;
     email: string;
     phone: string;
-    password: string;
   }): Promise<GetResponseOne<User>> {
     let result: GetResponseOne<User> = {
       status: HttpStatus.CONFLICT,

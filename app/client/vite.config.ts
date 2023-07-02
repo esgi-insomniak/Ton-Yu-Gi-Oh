@@ -9,7 +9,10 @@ export default defineConfig({
         watch: {
             usePolling: true,
         },
-        port: 8080,
+        port: process.env.VITE_CLIENT_PORT as number,
+    },
+    preview: {
+        port: process.env.VITE_CLIENT_PORT as number,
     },
     resolve: {
         alias: { '@': resolve(__dirname, 'src') },

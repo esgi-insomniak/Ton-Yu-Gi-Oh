@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Duel service for the yugioh game. This service will be used to manage duels between players. It will also be used to manage the cards in the duel.
 
 ## Installation
 
