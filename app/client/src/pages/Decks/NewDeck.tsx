@@ -1,50 +1,56 @@
 import React from "react";
-import { useGetAllMyGroupedUserCardSets, useGetAllMyUserCardSets, } from "@/helpers/api/hooks/users";
+import { useGetAllMyGroupedUserCardSets } from "@/helpers/api/hooks/users";
 import { usePostUserDeck } from "@/helpers/api/hooks/decks";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { BiCheckCircle } from "react-icons/bi";
 import { MdArrowBack } from "react-icons/md";
 import Loader from "@/components/Loader";
 import { UserDeckCards } from "@/components/Decks/Deck";
-import { groupedUserCardSetType } from "@/helpers/utils/schema/User";
-import { userCardSetsType } from "@/helpers/utils/schema/cards/card-set.schema";
+import { groupedUserCardSetType, userCardSetType } from "@/helpers/utils/schema/User";
 
 const NewDecks = () => {
     const [pageNumber, setPageNumber] = React.useState(0);
     const { data: groupedCards, isLoading } = useGetAllMyGroupedUserCardSets(24, pageNumber);
     const postDeck = usePostUserDeck();
-    const navigate = useNavigate();
     const alert = useAlert();
 
     const [deckName, setDeckName] = React.useState("");
     const [userCardSets, setUserCardSets] = React.useState<groupedUserCardSetType[]>([]);
-    const [selectedCards, setSelectedCards] = React.useState<userCardSetsType[]>([]);
+    const [selectedCards, setSelectedCards] = React.useState<userCardSetType[]>([]);
 
-    const handleCardClick = (cardId: string) => {
-        const foundedCardSet = userCardSets.find(cardSet => cardSet.cardSetId === cardId);
-        const myCardSet = foundedCardSet?.userCardSets[0]
-        // setSelectedCards(prevSelectedCards => [...prevSelectedCards, myCardSet])
+    const handleCardClick = (tamerCardSet: userCardSetType[]) => {
+        setSelectedCards(prevSelectedCardIds => [...prevSelectedCardIds, tamerCardSet[0]]);
+    };
 
+    const handleCardRemove = (cardId: string, cardCount: number) => {
+        // if (cardCount === 1) {
+        //     setSelectedCards(prevSelectedCardIds => {
+        //         const { [cardId]: removedCard, ...rest } = prevSelectedCardIds;
+        //         return rest;
+        //     });
+        // } else {
+        //     setSelectedCards(prevSelectedCardIds => ({
+        //         ...prevSelectedCardIds,
+        //         [cardId]: cardCount - 1
+        //     }));
+        // }
     };
 
     React.useEffect(() => {
         console.log(selectedCards)
     }, [selectedCards])
 
-    const handleCardRemove = (cardId: string, cardCount: number) => {
-        // if (cardCount === 1) {
-        //     setSelectedCardIds(prevSelectedCardIds => {
-        //         const { [cardId]: removedCard, ...rest } = prevSelectedCardIds;
-        //         return rest;
-        //     });
-        // } else {
-        //     setSelectedCardIds(prevSelectedCardIds => ({
-        //         ...prevSelectedCardIds,
-        //         [cardId]: cardCount - 1
-        //     }));
-        // }
-    };
+    React.useEffect(() => {
+        const unloadCallback = (event: { preventDefault: () => void; returnValue: string; }) => {
+            event.preventDefault();
+            event.returnValue = "";
+            return "";
+        };
+
+        window.addEventListener("beforeunload", unloadCallback);
+        return () => window.removeEventListener("beforeunload", unloadCallback);
+    }, []);
 
     React.useEffect(() => {
         if (isLoading) return
@@ -67,7 +73,7 @@ const NewDecks = () => {
                                 key={groupedCard.cardSetId}
                                 count={groupedCard.userCardSets.length}
                                 imageUrl={groupedCard.userCardSets[0].cardSet.card.imageUrl}
-                                addFunction={handleCardClick}
+                                addFunction={() => handleCardClick(groupedCard.userCardSets)}
                                 cardId={groupedCard.cardSetId}
                             />
                         ))}
@@ -94,7 +100,33 @@ const NewDecks = () => {
                     </div>
                     <div className="flex flex-col space-y-2">
                         <React.Fragment>
-
+                            <span className={`${Object.keys(selectedCards).length < 40 || selectedCards.length > 60 ? 'text-red-500' : 'text-green-500'}`}>
+                                {Object.keys(selectedCards).length} / 40 (min) - 60 (max)
+                            </span>
+                            {/* {Object.keys(selectedCards).map((cardId) => {
+                                const cardCount = selectedCards[cardId];
+                                return (
+                                    <div
+                                        className="h-14 w-full p-2 bg-gray-300/20 rounded-md flex items-center justify-between shadow-inner shadow-white"
+                                        key={cardId}
+                                        onClick={handleCardRemove.bind(null, cardId, cardCount)}
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <img
+                                                src={``}
+                                                alt=""
+                                                className="w-7 h-10"
+                                            />
+                                            <span>
+                                                { }
+                                            </span>
+                                        </div>
+                                        <div className="indicator-item badge">
+                                            {cardCount}
+                                        </div>
+                                    </div>
+                                );
+                            })} */}
                         </React.Fragment>
                     </div>
                 </div>

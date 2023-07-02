@@ -1,6 +1,5 @@
 import { apiRequest, getToken } from "@/helpers/api";
 import { ApiGetItemResponse } from "@/helpers/types/common";
-import { Card, MyCards, MyObj, SameCards } from "@/helpers/types/decks";
 import { UserMe } from "@/helpers/types/users";
 import { userSchemaType } from "@/helpers/utils/schema/Admin";
 import { responseRegisterSchema } from "@/helpers/utils/schema/Auth";

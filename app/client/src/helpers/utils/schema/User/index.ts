@@ -27,3 +27,4 @@ export const groupedUserCardSetPartialResponseSchema = zod.object({
 });
 
 export type groupedUserCardSetType = zod.infer<typeof groupedUserCardSetSchema>;
+export type userCardSetType = zod.infer<typeof userCardSetSchema>;

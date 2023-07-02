@@ -125,3 +125,9 @@ export interface CardSet {
   price: number;
   card: ICard;
 }
+
+export interface IUserCardSets {
+  id: string;
+  userId: string;
+  cardSet: CardSet[];
+}
