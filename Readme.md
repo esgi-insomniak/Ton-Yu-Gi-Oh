@@ -60,7 +60,7 @@
 A la racine du projet lancer la commande suivante pour installer les dépendances de l'API Gateway et des microservices:
 ```bash
 make copy-env
-make start
+make start (petite pause ☕️)
 ```
 
 Cette commande permet de charger les données de bdd

@@ -9,7 +9,9 @@ export class UserExchange {
   @ManyToOne(() => User, (user) => user.ownedExchanges, { onDelete: 'CASCADE' })
   exchangeOwner: User;
 
-  @ManyToOne(() => User, (user) => user.proposedExchanges, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.proposedExchanges, {
+    onDelete: 'CASCADE',
+  })
   exchangeTarget: User;
 
   @Column({ type: 'boolean', default: false })
