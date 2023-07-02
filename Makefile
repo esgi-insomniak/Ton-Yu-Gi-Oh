@@ -16,6 +16,9 @@ build-and-publish:
 feed-db:
 	docker compose exec gateway-node yarn command feed-db
 
+local-test:
+	docker compose exec $(service) yarn test
+
 test:
 	deploy/scripts/test-service.sh $(service)
 

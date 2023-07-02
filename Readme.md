@@ -20,14 +20,18 @@
         - (postgres)
     ✅ Validation des données reçues depuis l’extérieur
         - (class-validator)
-    ❌ Versionning de toutes les routes
+    ✅ Versionning de toutes les routes
+        - (server/gateway/src/controllers/test/test.controllers.ts)
     ❌ Sauvegarde de la base de données à intervalle régulier
     ❌ Logging des erreurs
     ✅ Compression des réponses
+        - (server/gateway/src/main.ts)
     ✅ En-têtes de sécurité
+        - (server/gateway/src/main.ts)
     ✅ Gestion des CORS
+        - (server/gateway/src/main.ts)
+    ✅ Rate-limit
         - (server/gateway/src/modules/app.module.ts)
-    ❌ Rate-limit
 ## Bonnes Pratiques (pour le calcul de la note de 15/20)
     ✅ Base de données conteneurisée
         - (docker-compose.yml)
@@ -67,7 +71,7 @@ make feed-db
 Pour lancer les tests d'un service
 Remplacer le nom du service par le service que vous voulez tester
 ```bash
-make test service=user-service
+make local-test service=user-service-node
 ```
 ### Authentification
 Lors du register, un mail est envoyé avec un lien pour valider le compte

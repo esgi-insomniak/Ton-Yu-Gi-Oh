@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
@@ -15,6 +15,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth(undefined, 'defaultBearerAuth')
     .build();
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(
