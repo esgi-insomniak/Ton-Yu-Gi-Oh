@@ -2,12 +2,15 @@ name: Deploy "promo-service"
 
 on:
   push:
-    paths:
-      - "server/promo-service/**"
-      - ".github/workflows/promo-service.yml"
-      - "deploy/k8s/promo-service/**"
-      - "deploy/scripts/**"
-      - "deploy/docker/**"
+    branches:
+      - main
+
+    # paths:
+      # - "server/promo-service/**"
+      # - ".github/workflows/promo-service.yml"
+      # - "deploy/k8s/promo-service/**"
+      # - "deploy/scripts/**"
+      # - "deploy/docker/**"
 
 env:
   ## Docker Hub

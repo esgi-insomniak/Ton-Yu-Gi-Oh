@@ -2,12 +2,15 @@ name: Deploy "payment-service"
 
 on:
   push:
-    paths:
-      - "server/payment-service/**"
-      - ".github/workflows/payment-service.yml"
-      - "deploy/k8s/payment-service/**"
-      - "deploy/scripts/**"
-      - "deploy/docker/**"
+    branches:
+      - main
+
+    # paths:
+      # - "server/payment-service/**"
+      # - ".github/workflows/payment-service.yml"
+      # - "deploy/k8s/payment-service/**"
+      # - "deploy/scripts/**"
+      # - "deploy/docker/**"
 
 env:
   ## Docker Hub

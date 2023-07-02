@@ -2,12 +2,15 @@ name: Deploy "{{ROUTE}}"
 
 on:
   push:
-    paths:
-      - "server/{{ROUTE}}/**"
-      - ".github/workflows/{{ROUTE}}.yml"
-      - "deploy/k8s/{{ROUTE}}/**"
-      - "deploy/scripts/**"
-      - "deploy/docker/**"
+    branches:
+      - main
+
+    # paths:
+      # - "server/{{ROUTE}}/**"
+      # - ".github/workflows/{{ROUTE}}.yml"
+      # - "deploy/k8s/{{ROUTE}}/**"
+      # - "deploy/scripts/**"
+      # - "deploy/docker/**"
 
 env:
   ## Docker Hub

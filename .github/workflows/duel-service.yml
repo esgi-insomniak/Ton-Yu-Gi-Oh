@@ -2,12 +2,15 @@ name: Deploy "duel-service"
 
 on:
   push:
-    paths:
-      - "server/duel-service/**"
-      - ".github/workflows/duel-service.yml"
-      - "deploy/k8s/duel-service/**"
-      - "deploy/scripts/**"
-      - "deploy/docker/**"
+    branches:
+      - main
+
+    # paths:
+      # - "server/duel-service/**"
+      # - ".github/workflows/duel-service.yml"
+      # - "deploy/k8s/duel-service/**"
+      # - "deploy/scripts/**"
+      # - "deploy/docker/**"
 
 env:
   ## Docker Hub

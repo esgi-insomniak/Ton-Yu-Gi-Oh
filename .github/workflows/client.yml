@@ -2,9 +2,11 @@ name: Deploy Client Frontend
 
 on:
   push:
-    paths:
-      - app/client/** # Path to the client folder
-      - .github/workflows/client.yml
+    branches:
+      - main
+    # paths:
+      # - app/client/** # Path to the client folder
+      # - .github/workflows/client.yml
 
 env:
   ## Docker Hub
