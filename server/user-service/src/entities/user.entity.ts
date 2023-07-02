@@ -2,7 +2,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  BeforeInsert,
   OneToMany,
   ManyToOne,
 } from 'typeorm';
@@ -24,7 +23,7 @@ export class User {
   @Column({ unique: true, nullable: true })
   phone: string;
 
-  @Column('text', { array: true })
+  @Column('text', { array: true, default: ['user'] })
   roles: string[];
 
   @Column({ default: 0 })
@@ -44,13 +43,6 @@ export class User {
 
   @OneToMany(() => UserExchange, (userExchange) => userExchange.exchangeTarget)
   proposedExchanges: UserExchange[];
-
-  @BeforeInsert()
-  setDefaultRoles() {
-    if (!this.roles) {
-      this.roles = ['user'];
-    }
-  }
 
   addRole(role: string) {
     if (!this.roles.includes(role)) {

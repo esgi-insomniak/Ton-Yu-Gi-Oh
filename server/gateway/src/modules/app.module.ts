@@ -15,7 +15,9 @@ import { WebsocketModule } from './websoket.module';
 import { PromoModule } from './promo.module';
 import { DuelModule } from './duel.module';
 import { MeToIdGuard } from 'src/services/guard/me-to-id.guard';
-import {PingModule} from "./ping.module";
+import { PingModule } from './ping.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { TestModule } from './test.module';
 
 @Module({
   imports: [
@@ -27,7 +29,12 @@ import {PingModule} from "./ping.module";
     DuelModule,
     MailerModule,
     WebsocketModule,
-    PingModule
+    PingModule,
+    TestModule,
+    ThrottlerModule.forRoot({
+      ttl: 5,
+      limit: 15,
+    }),
   ],
   providers: [
     ConfigService,
@@ -107,6 +114,10 @@ import {PingModule} from "./ping.module";
     {
       provide: APP_GUARD,
       useClass: MeToIdGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
   exports: [
