@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserCardSet } from 'src/entities/user-card-set.entity';
 import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
+import { GroupedUserCardSet } from 'src/interfaces/user-card-set.interface';
 import { DataSource, DeepPartial, In } from 'typeorm';
 
 @Injectable()
@@ -28,6 +29,32 @@ export class UserCardSetService {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
       where: { userId },
     });
+    return userCardSets;
+  }
+
+  async getGroupedUserCardSetsByUserId(
+    userId: string,
+    query: QueryGetItems,
+  ): Promise<GroupedUserCardSet[]> {
+    const userCardSetsPartial = await this.dataSource
+      .getRepository(UserCardSet)
+      .createQueryBuilder('userCardSet')
+      .select('userCardSet.cardSetId, COUNT(*) count')
+      .where('userCardSet.userId = :userId', { userId })
+      .groupBy('userCardSet.cardSetId')
+      .take(query.limit || 10)
+      .skip(query.offset * query.limit || 0)
+      .getRawMany();
+
+    const userCardSets: GroupedUserCardSet[] = await Promise.all(
+      userCardSetsPartial.map(async (userCardSet) => ({
+        cardSetId: userCardSet.cardSetId,
+        userCardSets: await this.dataSource.getRepository(UserCardSet).find({
+          where: { userId, cardSetId: userCardSet.cardSetId },
+        }),
+      })),
+    );
+
     return userCardSets;
   }
 
