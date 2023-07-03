@@ -3,14 +3,13 @@ name: Deploy "auth-service"
 on:
   push:
     branches:
-      - main
-
-    # paths:
-      # - "server/auth-service/**"
-      # - ".github/workflows/auth-service.yml"
-      # - "deploy/k8s/auth-service/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+      - develop
+    paths:
+      - "server/auth-service/**"
+      - ".github/workflows/auth-service.yml"
+      - "deploy/k8s/auth-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
 env:
   ## Docker Hub

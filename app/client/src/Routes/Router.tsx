@@ -115,6 +115,11 @@ const Router: React.FC = () => {
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     <Route path="/decks/edit/:deckId" element={<EditDeckPage />} />
                     <Route path="/duel/:roomId" element={<DuelPage />} />
+                    <Route path="/duel/:roomId" element={
+                        <DndProvider backend={HTML5Backend}>
+                            <DuelPage />
+                        </DndProvider>
+                    } />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
                     <Route path="/me" element={<UserProfilPage />} />

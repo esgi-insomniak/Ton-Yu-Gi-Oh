@@ -3,14 +3,13 @@ name: Deploy "gateway"
 on:
   push:
     branches:
-      - main
-
-    # paths:
-      # - "server/gateway/**"
-      # - ".github/workflows/gateway.yml"
-      # - "deploy/k8s/gateway/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+      - develop
+    paths:
+      - "server/gateway/**"
+      - ".github/workflows/gateway.yml"
+      - "deploy/k8s/gateway/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
 env:
   ## Docker Hub

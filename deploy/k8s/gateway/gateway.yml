@@ -76,6 +76,7 @@ metadata:
   annotations:
       kubernetes.io/ingress.class: "gce"
       kubernetes.io/ingress.allow-http: "true"
+      kubernetes.io/ingress.global-static-ip-name: "gateway-ip"
 spec:
   rules:
   - http:
