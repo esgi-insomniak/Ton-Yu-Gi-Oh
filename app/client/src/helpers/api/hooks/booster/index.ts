@@ -24,11 +24,11 @@ const requestBoosterOpening = (boosterUserId: string) =>
   });
 
 export const useGetUserBooster = (userId: string) => {
-  const userDecks = useQuery(["userDecks", userId], () =>
+  const userBoosters = useQuery(["userBoosters", userId], () =>
     requestUserBooster(userId)
   );
 
-  return userDecks;
+  return React.useMemo(() => ({ ...userBoosters }), [userBoosters]);
 };
 
 export const useOpeningBooster = () => {
