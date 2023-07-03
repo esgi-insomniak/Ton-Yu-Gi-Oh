@@ -29,6 +29,27 @@ export class UserDeckController {
     return result;
   }
 
+  @MessagePattern('update_userdeck_by_id')
+  public async updateUserDeck(request: {
+    params: ParamGetItemById;
+    body: {
+      name: string;
+      userCardSetIds: string[];
+    };
+  }): Promise<GetResponseOne<UserDeck>> {
+    const userDeck = await this.userDeckService.updateUserDeckById(
+      request.params.id,
+      request.body,
+    );
+    const result: GetResponseOne<UserDeck> = {
+      status: userDeck ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: userDeck ? null : 'UserDeck not updated',
+      item: userDeck,
+    };
+
+    return result;
+  }
+
   @MessagePattern('delete_userdeck_by_id')
   public async deleteUserDeck(params: ParamGetItemById): Promise<boolean> {
     return await this.userDeckService.deleteUserDeckById(params.id);

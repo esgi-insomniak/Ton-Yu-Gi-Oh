@@ -47,7 +47,7 @@ const CollectionPage = React.lazy(() => import('@/pages/Collection'));
 const ShopPage = React.lazy(() => import('@/pages/Shop'));
 const DecksPage = React.lazy(() => import('@/pages/Decks'));
 const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
-//const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
+const EditDeckPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
 const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
 const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
 const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
@@ -113,7 +113,7 @@ const Router: React.FC = () => {
                         </GameCardProvider>
                     } />
                     <Route path="/decks/new" element={<NewDecksPage />} />
-                    {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
+                    <Route path="/decks/edit/:deckId" element={<EditDeckPage />} />
                     <Route path="/duel/:roomId" element={<DuelPage />} />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />

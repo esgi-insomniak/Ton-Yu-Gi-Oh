@@ -99,6 +99,32 @@ export class UserDeckService {
     return this.dataSource.getRepository(UserDeck).save(userDeck);
   }
 
+  async updateUserDeckById(
+    id: string,
+    body: {
+      name?: string;
+      userCardSetIds?: string[];
+    },
+  ): Promise<UserDeck> {
+    try {
+      const userDeck = await this.dataSource.getRepository(UserDeck).findOne({
+        where: { id },
+      });
+      const userCardSets = await this.dataSource
+        .getRepository(UserCardSet)
+        .find({
+          where: { id: In(body.userCardSetIds) },
+        });
+
+      userDeck.name = body.name;
+      userDeck.cardSets = userCardSets;
+
+      return await this.dataSource.getRepository(UserDeck).save(userDeck);
+    } catch {
+      return null;
+    }
+  }
+
   async createUserDeck(query: {
     userId: string;
     name: string;

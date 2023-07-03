@@ -1,7 +1,7 @@
 import React from "react";
-import { useGetAllMyGroupedUserCardSets } from "@/helpers/api/hooks/users";
-import { usePostUserDeck } from "@/helpers/api/hooks/decks";
-import { Link, useNavigate } from "react-router-dom";
+import { useGetAllMyGroupedUserCardSets, useMe } from "@/helpers/api/hooks/users";
+import { useGetUserDeckById, usePatchUserDeck } from "@/helpers/api/hooks/decks";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { BiCheckCircle } from "react-icons/bi";
 import { MdArrowBack } from "react-icons/md";
@@ -9,15 +9,18 @@ import Loader from "@/components/Loader";
 import { UserDeckCards } from "@/components/Decks/Deck";
 import { groupedUserCardSetType, userCardSetType } from "@/helpers/utils/schema/User";
 
-const NewDecks = () => {
+const EditDecks = () => {
     const maxItemsPerPage = 24;
     const deckMaxSameCardSets = 3;
     const deckMinCardSets = 40;
     const deckMaxCardSets = 60;
+    const { me } = useMe();
+    const { deckId } = useParams<{ deckId: string }>()
     const [pageNumber, setPageNumber] = React.useState(0);
     const { data: groupedCardsResponse, isLoading } = useGetAllMyGroupedUserCardSets(maxItemsPerPage, pageNumber);
+    const { data: currentUserDeck, isLoading: currentDeckLoading, isError: currentDeckLoadingError } = useGetUserDeckById(deckId || "");
     const navigate = useNavigate();
-    const postDeck = usePostUserDeck();
+    const patchDeck = usePatchUserDeck();
     const alert = useAlert();
 
     const [deckName, setDeckName] = React.useState("");
@@ -46,20 +49,38 @@ const NewDecks = () => {
     };
 
     const handleSubmitDeck = () => {
+        if (!currentUserDeck?.data) return;
         if (selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets) return;
         if (!deckName) return alert?.error('Veuillez renseigner un nom pour votre deck');
         const selectedCardSetsIds = selectedCardSets.map((selectedCardSet) => selectedCardSet.id)
-        postDeck.mutate({
+
+        patchDeck.mutate({
+            userDeckId: currentUserDeck.data.id,
             userCardSetIds: selectedCardSetsIds,
             name: deckName.replace(/[^a-z0-9]/gi, '')
         }, {
             onSuccess: () => {
                 navigate(-1);
-                alert?.success('Deck créé avec succès !');
+                alert?.success('Deck édité avec succès !');
             },
-            onError: () => alert?.error('Erreur lors de la création du deck')
+            onError: () => alert?.error('Erreur lors de la modification du deck')
         })
     }
+
+    React.useEffect(() => {
+        if (!currentDeckLoadingError) {
+            if (!currentUserDeck?.data) return;
+            if (currentUserDeck.data.userId === me?.id) return;
+        };
+        navigate('/decks');
+    }, [currentDeckLoadingError, currentUserDeck])
+
+    React.useEffect(() => {
+        if (!currentUserDeck?.data) return;
+        const userCardSets: userCardSetType[] = currentUserDeck.data.cardSets
+        setSelectedCardSets(userCardSets);
+        setDeckName(currentUserDeck.data.name);
+    }, [currentUserDeck])
 
     React.useEffect(() => {
         // get all userCardSets in the response and add them to the state
@@ -117,7 +138,7 @@ const NewDecks = () => {
                 </div>
                 <div className="w-3/12 h-full border p-2 rounded-md space-y-2 overflow-scroll">
                     <div className="flex gap-2 h-12">
-                        <input className="w-full glass rounded-md focus:outline-none p-2 text-white" type="text" placeholder="Nom du deck" onChange={(e) => setDeckName(e.target.value)} />
+                        <input className="w-full glass rounded-md focus:outline-none p-2 text-white" type="text" placeholder="Nom du deck" value={deckName} onChange={(e) => setDeckName(e.target.value)} />
                         <div className={`btn hover:btn-error group tooltip tooltip-up flex justify-center items-center`}
                             data-tip="Revenir en arrière">
                             <MdArrowBack className="text-red-500 group-hover:text-white" />
@@ -130,7 +151,7 @@ const NewDecks = () => {
                     <div className="flex flex-col space-y-2">
                         <React.Fragment>
                             <span className={`${selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets ? 'text-red-500' : 'text-green-500'}`}>
-                                {selectedCardSets.length} / ${deckMinCardSets} (min) - ${deckMaxCardSets} (max)
+                                {selectedCardSets.length} / {deckMinCardSets} (min) - {deckMaxCardSets} (max)
                             </span>
                             {selectedCardSets.reduce((acc: userCardSetType[], userCardSet: userCardSetType) => {
                                 if (!acc.find((accUserCardSet: userCardSetType) => accUserCardSet.cardSet.id === userCardSet.cardSet.id)) {
@@ -169,4 +190,4 @@ const NewDecks = () => {
     );
 };
 
-export default NewDecks;
+export default EditDecks;
