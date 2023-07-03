@@ -13,6 +13,18 @@ export const userCardSetSchemaPartial = zod.object({
     cardSetId: zod.string(),
 });
 
+export const groupedUserCardSetSchema = zod.object({
+    cardSetId: zod.string(),
+    userCardSets: zod.array(userCardSetSchema),
+});
+
 export const userCardSetPartialResponseSchema = zod.object({
     data: zod.array(userCardSetSchemaPartial),
 });
+
+export const groupedUserCardSetPartialResponseSchema = zod.object({
+    data: zod.array(groupedUserCardSetSchema),
+});
+
+export type groupedUserCardSetType = zod.infer<typeof groupedUserCardSetSchema>;
+export type userCardSetType = zod.infer<typeof userCardSetSchema>;

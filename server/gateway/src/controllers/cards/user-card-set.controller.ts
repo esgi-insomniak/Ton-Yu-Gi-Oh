@@ -19,10 +19,13 @@ import {
 } from '../../interfaces/common/common.response';
 import { GetItemByIdDto } from '../../interfaces/common/common.params.dto';
 import {
+  IGroupedUserCardSet,
+  IGroupedUserCardSetPartial,
   IUserCardSet,
   IUserCardSetPartial,
 } from '../../interfaces/user-deck-service/userCardSet/user-card-set.interface';
 import {
+  GetGroupedUserCardSetsResponseDto,
   GetUserCardSetByIdResponseDto,
   GetUserCardSetsResponseDto,
   ScrapUserCardSetByIdResponseDto,
@@ -380,6 +383,91 @@ export class UserController {
           cardSet: cardSetsResponse.items.find(
             (item) => item.id === userCardSetPartial.cardSetId,
           ),
+        };
+        return userCardSet;
+      }),
+    };
+
+    return result;
+  }
+
+  @Get(':id/grouped_user_card_sets')
+  @Authorization(true)
+  @MeToId()
+  @ApiOkResponse({
+    type: GetUserCardSetsResponseDto,
+  })
+  public async getGroupedUserCardSetsByUserId(
+    @Param() params: GetItemByIdDto,
+    @Query() query: GetUserCardSetsQuery,
+  ): Promise<GetGroupedUserCardSetsResponseDto> {
+    const userResponse = await firstValueFrom(
+      this.userServiceClient.send('get_user_by_id', {
+        id: params.id,
+      }),
+    );
+
+    if (userResponse.status !== HttpStatus.OK) {
+      throw new HttpException(userResponse.message, userResponse.status);
+    }
+
+    // get grouped userCardSets
+    const userCardSetResponse: GetResponseArray<IGroupedUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_grouped_usercardsets_by_user_id', {
+          params: {
+            id: params.id,
+          },
+          query: {
+            limit: query.limit,
+            offset: query.offset,
+          },
+        }),
+      );
+
+    if (userCardSetResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetResponse.message,
+        userCardSetResponse.status,
+      );
+    }
+
+    // get all unique cardSetIds
+    const cardSetIds = userCardSetResponse.items
+      .map((item) => item.cardSetId)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    // get cardSets
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: cardSetIds,
+          query,
+        }),
+      );
+
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    // create response with combined data of cardSets and userCardSets
+    const result: GetGroupedUserCardSetsResponseDto = {
+      data: userCardSetResponse.items.map((userCardSetPartial) => {
+        const userCardSet: IGroupedUserCardSet = {
+          cardSetId: userCardSetPartial.cardSetId,
+          userCardSets: userCardSetPartial.userCardSets.map((item) => {
+            const userCardSet: IUserCardSet = {
+              id: item.id,
+              userId: item.userId,
+              cardSet: cardSetsResponse.items.find(
+                (item) => item.id === userCardSetPartial.cardSetId,
+              ),
+            };
+            return userCardSet;
+          }),
         };
         return userCardSet;
       }),

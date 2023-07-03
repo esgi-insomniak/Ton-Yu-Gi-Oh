@@ -13,3 +13,13 @@ export interface IUserCardSet {
   cardSet: ICardCardSet;
   decks?: IUserDeck[];
 }
+
+export interface IGroupedUserCardSet {
+  cardSetId: string;
+  userCardSets: IUserCardSet[];
+}
+
+export interface IGroupedUserCardSetPartial {
+  cardSetId: string;
+  userCardSets: IUserCardSetPartial[];
+}
