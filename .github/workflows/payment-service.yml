@@ -2,8 +2,8 @@ name: Deploy "payment-service"
 
 on:
   push:
-    branches:
-      - develop
+    # branches:
+      # - develop
     paths:
       - "server/payment-service/**"
       - ".github/workflows/payment-service.yml"
