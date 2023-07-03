@@ -1,7 +1,7 @@
 import React from "react";
 import { useGetAllMyGroupedUserCardSets } from "@/helpers/api/hooks/users";
 import { usePostUserDeck } from "@/helpers/api/hooks/decks";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { BiCheckCircle } from "react-icons/bi";
 import { MdArrowBack } from "react-icons/md";
@@ -11,8 +11,12 @@ import { groupedUserCardSetType, userCardSetType } from "@/helpers/utils/schema/
 
 const NewDecks = () => {
     const maxItemsPerPage = 24;
+    const deckMaxSameCardSets = 3;
+    const deckMinCardSets = 40;
+    const deckMaxCardSets = 60;
     const [pageNumber, setPageNumber] = React.useState(0);
     const { data: groupedCardsResponse, isLoading } = useGetAllMyGroupedUserCardSets(maxItemsPerPage, pageNumber);
+    const navigate = useNavigate();
     const postDeck = usePostUserDeck();
     const alert = useAlert();
 
@@ -23,10 +27,9 @@ const NewDecks = () => {
     const handleCardClick = (cardSetId: string) => {
         // check the number of userCardSets in the selectedCards state
         // cannot add more than 3 userCardSets per deck
-
-        // not working, (cadeau pour toi Loan :D)
-        // const count = selectedCardSets.filter((userCardSet: userCardSetType) => userCardSet.id === cardSetId).length;
-        // if (count >= 3) return;
+        if (selectedCardSets.length >= deckMaxCardSets) return;
+        const count = selectedCardSets.filter((userCardSet: userCardSetType) => userCardSet.cardSet.id === cardSetId).length;
+        if (count >= deckMaxSameCardSets) return;
         const firstUserCardSet = allUserCardSets.find((userCardSet: userCardSetType) => userCardSet.cardSet.id === cardSetId);
         if (!firstUserCardSet) return;
         setSelectedCardSets(prevSelectedCardSets => [...prevSelectedCardSets, firstUserCardSet]);
@@ -41,6 +44,22 @@ const NewDecks = () => {
         setSelectedCardSets(prevSelectedCardSets => prevSelectedCardSets.filter((userCardSet: userCardSetType) => userCardSet.id !== firstUserCardSet.id));
         setAllUserCardSets(prevUserCardSets => [...prevUserCardSets, firstUserCardSet]);
     };
+
+    const handleSubmitDeck = () => {
+        if (selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets) return;
+        if (!deckName) return alert?.error('Veuillez renseigner un nom pour votre deck');
+        const selectedCardSetsIds = selectedCardSets.map((selectedCardSet) => selectedCardSet.id)
+        postDeck.mutate({
+            userCardSetIds: selectedCardSetsIds,
+            name: deckName.replace(/[^a-z0-9]/gi, '')
+        }, {
+            onSuccess: () => {
+                navigate(-1);
+                alert?.success('Deck créé avec succès !');
+            },
+            onError: () => alert?.error('Erreur lors de la création du deck')
+        })
+    }
 
     React.useEffect(() => {
         // get all userCardSets in the response and add them to the state
@@ -81,6 +100,7 @@ const NewDecks = () => {
                             <UserDeckCards
                                 key={groupedCard.cardSetId}
                                 count={allUserCardSets.filter((userCardSet: userCardSetType) => userCardSet.cardSet.id === groupedCard.cardSetId).length}
+                                deactivate={selectedCardSets.filter((userCardSet: userCardSetType) => userCardSet.cardSet.id === groupedCard.cardSetId).length >= deckMaxSameCardSets || !allUserCardSets.find((userCardSet: userCardSetType) => userCardSet.cardSet.id === groupedCard.cardSetId)}
                                 imageUrl={groupedCard.userCardSets[0].cardSet.card.imageUrl}
                                 addFunction={() => handleCardClick(groupedCard.cardSetId)}
                                 cardId={groupedCard.cardSetId}
@@ -102,14 +122,14 @@ const NewDecks = () => {
                             data-tip="Revenir en arrière">
                             <MdArrowBack className="text-red-500 group-hover:text-white" />
                         </div>
-                        <div className={`btn hover:btn-success group tooltip tooltip-left flex justify-center items-center`}
-                            data-tip="Sauvegarder le deck">
-                            <BiCheckCircle className="text-green-500 group-hover:text-white" />
+                        <div className={`btn ${selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets ? 'hover:btn-error' : 'hover:btn-success'} group tooltip tooltip-left flex justify-center items-center`}
+                            data-tip="Sauvegarder le deck" onClick={handleSubmitDeck}>
+                            <BiCheckCircle className={`${selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets ? 'text-red-500' : 'text-green-500'} group-hover:text-white`} />
                         </div>
                     </div>
                     <div className="flex flex-col space-y-2">
                         <React.Fragment>
-                            <span className={`${selectedCardSets.length < 40 || selectedCardSets.length > 60 ? 'text-red-500' : 'text-green-500'}`}>
+                            <span className={`${selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets ? 'text-red-500' : 'text-green-500'}`}>
                                 {selectedCardSets.length} / 40 (min) - 60 (max)
                             </span>
                             {selectedCardSets.reduce((acc: userCardSetType[], userCardSet: userCardSetType) => {

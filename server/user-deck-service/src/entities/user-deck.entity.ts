@@ -4,10 +4,12 @@ import {
   ManyToMany,
   JoinTable,
   Column,
+  Index,
 } from 'typeorm';
 import { UserCardSet } from './user-card-set.entity';
 
 @Entity()
+@Index(['userId', 'name'], { unique: true })
 export class UserDeck {
   @PrimaryGeneratedColumn('uuid')
   id: string;
