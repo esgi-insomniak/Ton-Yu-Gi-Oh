@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: maeljamin/ton-yugi-gateway:{{VERSION}}
+          image: maeljamin/ton-yugi-gateway:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -35,13 +35,6 @@ spec:
               port: 8000
             initialDelaySeconds: 30
             periodSeconds: 20
-          resources:
-            limits:
-              cpu: 500m
-              memory: 512Mi
-            requests:
-              cpu: 250m
-              memory: 256Mi
           env:
             - name: API_GATEWAY_PORT
               value: "8000"
@@ -104,11 +97,11 @@ data:
   AUTH_SERVICE_PORT: "8000"
   PAYMENT_SERVICE_PORT: "8000"
   MAILER_SERVICE_PORT: "8000"
-  AUTH_SERVICE_HOST: "auth-service"
+  AUTH_SERVICE_HOST: "auth-service-svc"
   CARD_SERVICE_HOST: "card-service"
   DUEL_SERVICE_HOST: "duel-service"
   MAILER_SERVICE_HOST: "mailer-service"
   PAYMENT_SERVICE_HOST: "payment-service"
   PROMO_SERVICE_HOST: "promo-service"
   USER_DECK_SERVICE_HOST: "user-deck-service"
-  USER_SERVICE_HOST: "user-service"
+  USER_SERVICE_HOST: "user-service-svc"
