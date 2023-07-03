@@ -18,7 +18,7 @@ const Home = () => {
     const opponentSearch = React.useCallback(() => {
         ioClient?.off('duel__queue');
         ioClient?.off('duel__found');
-        
+
         ioClient?.emit('duel__join_queue');
 
         ioClient?.on('duel__queue', (event: ISocketEvent) => {
@@ -48,6 +48,9 @@ const Home = () => {
 
     return (
         <div className="hero items-center min-h-screen text-gray-300">
+            <div className="absolute top-5 right-5 z-10 gradient-border">
+                <button className="btn z-20 text-white">Rejoindre l'enchère !</button>
+            </div>
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
                 <source src="/bg-home.mp4" type="video/mp4" />
             </video>

@@ -15,8 +15,8 @@ const BoosterItem = ({ booster }: { booster: BoosterData }) => {
   );
 
   return (
-    <div className="indicator my-5" key={booster.id}>
-      <span className="indicator-item badge badge-secondary">
+    <div className="indicator rounded-md" key={booster.id}>
+      <span className="indicator-item badge badge-secondary absolute right-10 top-3">
         {booster.count}
       </span>
       <img
@@ -26,7 +26,7 @@ const BoosterItem = ({ booster }: { booster: BoosterData }) => {
           opacity: isDragging ? 0.5 : 1,
           cursor: "move",
         }}
-        className="w-52 h-80 rounded-sm"
+        className="h-96 w-72 rounded-sm object-contain"
         alt=""
       />
     </div>

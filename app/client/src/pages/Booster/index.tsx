@@ -14,9 +14,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 
-export const itemTypes = {
-    BOOSTER: "booster",
-};
+export const itemTypes = { BOOSTER: "booster" };
 
 const Booster = () => {
     const { me } = useMe();
@@ -104,10 +102,10 @@ const Booster = () => {
 
     return (
         <div className="flex w-full h-full">
-            <div className="flex flex-col w-1/3 overflow-scroll items-center space-y-3">
+            <div className="flex flex-col w-1/3 overflow-scroll items-center space-y-3 py-5">
                 {boosterData.length > 0 ? (
                     boosterData.map((booster: BoosterData) => (
-                        <div key={booster.id} className="w-64 h-80 animate-spin">
+                        <div key={booster.id} className="h-96 w-72 hover:scale-105 duration-150 transition-all relative">
                             {booster.count > 0 && <BoosterItem booster={booster} />}
                         </div>
                     ))
@@ -163,9 +161,9 @@ const Booster = () => {
 
                 {!droppedBooster && !openedBooster && (
                     <div
-                        className={`${canDrop && isOver && "animate-pulse"} h-96 w-72 shadow-inner shadow-black flex justify-center items-center rounded-md`}
+                        className={`${canDrop && isOver && "animate-pulse bg-white transition-colors duration-200"} h-96 w-64 shadow-inner shadow-black flex justify-center items-center rounded-md`}
                     >
-                        <div className="drop-zone-content">
+                        <div className="text-center">
                             <h1>Déposez votre booster ici pour l'ouvrir</h1>
                         </div>
                     </div>
