@@ -26,6 +26,7 @@ const BoosterItem = ({ booster }: { booster: BoosterData }) => {
           opacity: isDragging ? 0.5 : 1,
           cursor: "move",
         }}
+        className="w-52 h-80 rounded-sm"
         alt=""
       />
     </div>

@@ -25,7 +25,9 @@ const requestBoosterOpening = (boosterUserId: string) =>
 
 export const useGetUserBooster = (userId: string) => {
   const userBoosters = useQuery(["userBoosters", userId], () =>
-    requestUserBooster(userId)
+    requestUserBooster(userId), {
+    refetchOnWindowFocus: true,
+  }
   );
 
   return React.useMemo(() => ({ ...userBoosters }), [userBoosters]);
