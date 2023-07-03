@@ -8,6 +8,7 @@ import { MdArrowBack } from "react-icons/md";
 import Loader from "@/components/Loader";
 import { UserDeckCards } from "@/components/Decks/Deck";
 import { groupedUserCardSetType, userCardSetType } from "@/helpers/utils/schema/User";
+import { Pagination } from "@/components/Pagination";
 
 const NewDecks = () => {
     const maxItemsPerPage = 24;
@@ -107,13 +108,8 @@ const NewDecks = () => {
                             />
                         ))}
                     </div>
-                    <div className="join w-full flex justify-center items-center">
-                        <button className="join-item btn" onClick={() => setPageNumber(pageNumber - 1)}
-                            disabled={pageNumber <= 0}>«</button>
-                        <button className="join-item btn">{pageNumber + 1}</button>
-                        <button className="join-item btn" onClick={() => setPageNumber(pageNumber + 1)}
-                            disabled={groupedCardsResponse?.data.length! < maxItemsPerPage}>»</button>
-                    </div>
+                    <Pagination page={pageNumber} setter={setPageNumber} arr={groupedCardsResponse?.data.length} maxItemsPerPage={24} />
+
                 </div>
                 <div className="w-3/12 h-full border p-2 rounded-md space-y-2 overflow-scroll">
                     <div className="flex gap-2 h-12">

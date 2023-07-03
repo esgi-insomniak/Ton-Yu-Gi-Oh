@@ -27,7 +27,8 @@ const columns: TableColumn<TableUserProps>[] = [
 ];
 
 const UserAdmin = () => {
-    const { data, refetch } = useGetAllUsers(10, 0)
+    const [page, setPage] = React.useState<number>(0);
+    const { data, refetch } = useGetAllUsers(10, page)
     const patchUser = usePatchUser()
     const alert = useAlert()
     const { isShowing, toggle } = useModal()
@@ -93,6 +94,10 @@ const UserAdmin = () => {
             <Table<TableUserProps>
                 data={formatedData || []}
                 columns={columns}
+                page={page}
+                setter={setPage}
+                arr={formatedData?.length || 0}
+                maxItemsPerPage={10}
             />
             <Modal
                 isShowing={isShowing}

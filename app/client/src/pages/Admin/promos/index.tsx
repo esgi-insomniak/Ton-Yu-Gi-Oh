@@ -28,8 +28,8 @@ const columns: TableColumn<TablePromoProps>[] = [
 ]
 
 const PromoAdmin = () => {
-
-    const { data, refetch } = useGetAllPromos(10, 0)
+    const [page, setPage] = React.useState<number>(0);
+    const { data, refetch } = useGetAllPromos(10, page)
     const { isShowing: addIsShowing, toggle: addToggle } = useModal()
     const { isShowing: patchIsShowing, toggle: patchToggle } = useModal()
     const { isShowing: deleteIsShowing, toggle: deleteToggle } = useModal()
@@ -144,6 +144,10 @@ const PromoAdmin = () => {
             <Table<TablePromoProps>
                 data={formatedData || []}
                 columns={columns}
+                page={page}
+                setter={setPage}
+                arr={formatedData?.length || 0}
+                maxItemsPerPage={10}
             />
 
             <Modal
