@@ -4,6 +4,7 @@ import { ReportCard } from "../Layout";
 import { useGetAllExchanges } from "@/helpers/api/hooks/admin/exchange";
 import { ExchangeSchemaType } from "@/helpers/utils/schema/Admin";
 import { GiCardExchange } from "react-icons/gi";
+import React from "react";
 
 interface ExchangeAdminProps extends Omit<ExchangeSchemaType,
     'isClosed' | 'ownerCardSetsProposed' | 'targetCardSetsProposed' | 'exchangeOwner' | 'exchangeTarget'
@@ -24,8 +25,9 @@ const columns: TableColumn<ExchangeAdminProps>[] = [
 ]
 
 const ExchangeAdmin = () => {
+    const [page, setPage] = React.useState<number>(0)
 
-    const { data: exchange } = useGetAllExchanges();
+    const { data: exchange } = useGetAllExchanges(10, page);
 
     const formatedData = exchange?.data.map((item) => {
         return {
@@ -46,6 +48,10 @@ const ExchangeAdmin = () => {
             <Table<ExchangeAdminProps>
                 data={formatedData || []}
                 columns={columns}
+                page={page}
+                setter={setPage}
+                arr={formatedData?.length || 0}
+                maxItemsPerPage={10}
             />
         </div>
     )

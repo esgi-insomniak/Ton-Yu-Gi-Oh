@@ -4,14 +4,14 @@ import React from "react";
 import { useQuery } from "react-query";
 
 const QUERY_URL = {
-    getAllPayements: () => `/payment_histories`,
+    getAllPayements: (limit: number, page: number) => `/payment_histories?limit=${limit}&offset=${page}`,
     getPayementById: (id: string) => `/users/${id}/payment_histories`,
 } as const
 
 const token = localStorage.getItem('token')
 
-const requestAllPayements = () => apiRequest({
-    url: QUERY_URL.getAllPayements(),
+const requestAllPayements = (limit: number, page: number) => apiRequest({
+    url: QUERY_URL.getAllPayements(limit, page),
     method: 'GET',
     token: !!token ? token : undefined
 }, responseGetAllPromoCodesSchema)
@@ -22,8 +22,8 @@ const requestPayementById = (id: string) => apiRequest({
     token: !!token ? token : undefined
 }, responseGetAllPromoCodesSchema)
 
-export const useGetAllPayements = () => {
-    const { data, isLoading, error, refetch } = useQuery<responseGetAllPromoCodesSchemaType>(['getAllPayements'], () => requestAllPayements())
+export const useGetAllPayements = (limit?: number, page?: number) => {
+    const { data, isLoading, error, refetch } = useQuery<responseGetAllPromoCodesSchemaType>(['getAllPayements', limit, page], () => requestAllPayements(limit!, page!))
 
     return React.useMemo(() => ({ data, isLoading, error, refetch }), [data, isLoading, error])
 }
