@@ -5,7 +5,7 @@ import { Modal } from "@/components/Modal";
 import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider";
 import useModal from "@/helpers/api/hooks/modal";
 import { BsFillTrashFill } from "react-icons/bs";
-import { AiFillEye } from "react-icons/ai";
+import { AiFillEdit, AiFillEye } from "react-icons/ai";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { useMe } from "@/helpers/api/hooks/users";
 import { PreviewSets } from "../Shop/previewSets";
@@ -52,10 +52,15 @@ const Decks = () => {
                                         <h2 className="card-title">{deck.name}</h2>
                                         <p>{deck.cardSets.length} cartes</p>
                                         <div className="card-actions justify-end">
-                                            <div className="flex w-full justify-between">
+                                            <div className="flex w-full justify-center gap-3">
                                                 <div className="btn btn-accent" onClick={() => handlePreviewBooster(deck)}>
                                                     <AiFillEye className="text-white" />
                                                 </div>
+                                                <Link to={`/decks/edit/${deck.id}`} className="text-white">
+                                                    <div className="btn btn-warning">
+                                                        <AiFillEdit className="text-white" />
+                                                    </div>
+                                                </Link>
                                                 <div className="btn btn-error" onClick={() => { setSelectedDeck(deck), previewDeleteToggle() }}>
                                                     <BsFillTrashFill className=" text-white" />
                                                 </div>
@@ -108,7 +113,7 @@ const Decks = () => {
                     { text: "Supprimer", action: () => handleDeleteDeck(), type: 'yes' }
                 ]}
             />
-        </div>
+        </div >
     );
 };
 

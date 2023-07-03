@@ -224,7 +224,118 @@ export class UserDeckController {
     @Body() body: UpdateUserDeckBodyDto,
     @Req() request: IAuthorizedRequest,
   ): Promise<GetUserDeckByIdResponseDto> {
-    return;
+    const userDeckResponse: GetResponseOne<IUserDeckPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_userdeck_by_id', {
+          id: params.id,
+        }),
+      );
+
+    if (userDeckResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userDeckResponse.message,
+        userDeckResponse.status,
+      );
+    }
+
+    if (
+      userDeckResponse.item.userId !== request.user.id &&
+      !request.user.roles.includes('admin')
+    ) {
+      throw new HttpException(
+        'You can not update userDeck that do not belong to you',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const userCardSetsResponse: GetResponseArray<IUserCardSetPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_usercardsets_by_ids', {
+          ids: body.userCardSetIds,
+        }),
+      );
+
+    if (userCardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        userCardSetsResponse.message,
+        userCardSetsResponse.status,
+      );
+    }
+
+    if (userCardSetsResponse.items.length !== body.userCardSetIds.length) {
+      throw new HttpException(
+        'Some of userCardSetIds are not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // check all userCardSets belongs to the same user
+    userCardSetsResponse.items.forEach((item) => {
+      if (item.userId !== request.user.id) {
+        throw new HttpException(
+          'You can not update userDeck with userCardSets that do not belong to you',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    });
+
+    // update userDeck
+    const updatedUserDeckResponse: GetResponseOne<IUserDeckPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('update_userdeck_by_id', {
+          params: {
+            id: params.id,
+          },
+          body,
+        }),
+      );
+
+    if (updatedUserDeckResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        updatedUserDeckResponse.message,
+        updatedUserDeckResponse.status,
+      );
+    }
+
+    // get cardSets by cardSetIds
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: updatedUserDeckResponse.item.cardSets.map(
+            (item) => item.cardSetId,
+          ),
+        }),
+      );
+
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    // create response with combined data of userDecks and cardSets
+    const result: GetUserDeckByIdResponseDto = {
+      data: {
+        id: updatedUserDeckResponse.item.id,
+        userId: updatedUserDeckResponse.item.userId,
+        name: updatedUserDeckResponse.item.name,
+        cardSets: updatedUserDeckResponse.item.cardSets.map(
+          (partialCardSet) => {
+            const cardSet: IUserCardSet = {
+              id: partialCardSet.id,
+              userId: partialCardSet.userId,
+              cardSet: cardSetsResponse.items.find(
+                (item) => item.id === partialCardSet.cardSetId,
+              ),
+            };
+            return cardSet;
+          },
+        ),
+      },
+    };
+
+    return result;
   }
 
   @Delete(':id')
