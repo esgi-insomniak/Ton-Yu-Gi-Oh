@@ -3,14 +3,13 @@ name: Deploy "user-service"
 on:
   push:
     branches:
-      - main
-
-    # paths:
-      # - "server/user-service/**"
-      # - ".github/workflows/user-service.yml"
-      # - "deploy/k8s/user-service/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+      - develop
+    paths:
+      - "server/user-service/**"
+      - ".github/workflows/user-service.yml"
+      - "deploy/k8s/user-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
 env:
   ## Docker Hub

@@ -3,14 +3,13 @@ name: Deploy "card-service"
 on:
   push:
     branches:
-      - main
-
-    # paths:
-      # - "server/card-service/**"
-      # - ".github/workflows/card-service.yml"
-      # - "deploy/k8s/card-service/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+      - develop
+    paths:
+      - "server/card-service/**"
+      - ".github/workflows/card-service.yml"
+      - "deploy/k8s/card-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
 env:
   ## Docker Hub
