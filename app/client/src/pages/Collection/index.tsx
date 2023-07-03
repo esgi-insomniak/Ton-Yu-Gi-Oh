@@ -6,6 +6,7 @@ import { IGameCard } from "@/helpers/types/cards";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useGetAllAttributes, useGetAllRarities } from "@/helpers/api/hooks/cards/attribute.hook";
 import { Input, Select } from "@/components/Input";
+import { Pagination } from "@/components/Pagination";
 
 interface FiltersProps {
     search: string;
@@ -102,13 +103,7 @@ const Collection = () => {
                         ))}
                 </div>
             )}
-            <div className="w-full flex items-end justify-center h-fit">
-                <div className="btn-group">
-                    <button className="btn" onClick={() => setPage((prev) => prev - 1)} disabled={page - 1 < 0}>«</button>
-                    <button className="btn">{page + 1}</button>
-                    <button className="btn" onClick={() => setPage((prev) => prev + 1)}>»</button>
-                </div>
-            </div>
+            <Pagination page={page} setter={setPage} />
         </div>
     )
 }
