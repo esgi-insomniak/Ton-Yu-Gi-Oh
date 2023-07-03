@@ -11,6 +11,13 @@ on:
       - "deploy/scripts/**"
       - "deploy/docker/**"
 
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
+
 env:
   ## Docker Hub
   CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
