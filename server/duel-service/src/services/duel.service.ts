@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Duel } from 'src/entities/duel.entity';
-import { DataSource, DeepPartial } from 'typeorm';
+import { DuelPlayer } from 'src/entities/duelPlayer.entity';
+import { DataSource, DeepPartial, In } from 'typeorm';
 
 @Injectable()
 export class DuelService {
@@ -38,6 +39,12 @@ export class DuelService {
     duel: DeepPartial<Duel>,
   ): Promise<Duel> {
     try {
+      duel.players.forEach(async (player) => {
+        await this.dataSource
+          .getRepository(DuelPlayer)
+          .update({ id: player.id }, player);
+      });
+      delete duel.players;
       await this.dataSource.getRepository(Duel).update({ roomId }, duel);
       return await this.getDuelByRoomId(roomId);
     } catch {

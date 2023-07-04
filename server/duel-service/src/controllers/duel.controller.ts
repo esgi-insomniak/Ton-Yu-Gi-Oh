@@ -57,11 +57,14 @@ export class DuelController {
   }
 
   @MessagePattern('update_duel_by_room_id')
-  public async updateDuelByRoomId(
-    params: { roomId: string },
-    body: Duel,
-  ): Promise<GetResponseOne<Duel>> {
-    const duel = await this.duelService.updateDuelByRoomId(params.roomId, body);
+  public async updateDuelByRoomId(request: {
+    params: { roomId: string };
+    body: Duel;
+  }): Promise<GetResponseOne<Duel>> {
+    const duel = await this.duelService.updateDuelByRoomId(
+      request.params.roomId,
+      request.body,
+    );
     const result: GetResponseOne<Duel> = {
       status: duel ? HttpStatus.OK : HttpStatus.BAD_REQUEST,
       message: duel ? null : 'Duel not updated',

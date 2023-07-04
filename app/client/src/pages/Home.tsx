@@ -32,24 +32,24 @@ const Home = () => {
             alert?.success("Adversaire trouvé !")
             ioClient?.off('duel__queue');
             ioClient?.off('duel__found');
-            router(`/duel/${event.data.roomId}`)
+            router(`/duel/select-deck/${event.data.roomId}`)
         })
         alert?.custom('Recherche d\'un adversaire en cours...')
     }, [ioClient, alert])
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
-        { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-deck.gif", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-collection.gif", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/yugi-bg-duel.gif", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
+        { animatedBackground: "/opening.gif", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-shop.gif", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-admin.gif", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },
     ], [me?.roles])
 
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <div className="absolute top-5 right-5 z-10 gradient-border">
-                <button className="btn z-20 text-white">Rejoindre l'enchère !</button>
+                <button className="btn z-20 text-white" onClick={() => router('/auction')}>Rejoindre l'enchère !</button>
             </div>
             <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
                 <source src="/bg-home.mp4" type="video/mp4" />

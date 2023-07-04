@@ -6,6 +6,8 @@ export interface IDuel {
   hasStarted: boolean;
   isOver: boolean;
   timePerTurn: number;
-  winnerId: string;
+  timeToSelectDeck: number;
+  playerToPlay: string;
+  winner: string;
   players: IDuelPlayer[] | Partial<IDuelPlayer>[];
 }
