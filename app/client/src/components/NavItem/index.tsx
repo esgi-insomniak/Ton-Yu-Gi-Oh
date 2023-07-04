@@ -29,14 +29,14 @@ export const NavItem: React.FC<NavItemProps> = ({
 
     return (
         <div
-            className="relative rounded-lg overflow-hidden w-96 h-64 cursor-pointer hover:scale-105 transition-all duration-300 drop-shadow-2xl shadow-2xl bg-slate-50/20 backdrop:opacity-70 hover:border-4 hover:border-white"
+            className="lg:w-96 lg:h-64 w-60 h-40 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-all duration-300 drop-shadow-2xl shadow-2xl bg-slate-50/20 backdrop:opacity-70 hover:border-4 hover:border-white"
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
         >
             {isButton ?
                 <div onClick={action} className="flex justify-center items-center relative h-full">
                     <div className="relative z-10 flex justify-center items-center h-full">
-                        <h2 className="text-4xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
+                        <h2 className="lg:text-4xl text-xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
                     </div>
                     <div className="absolute inset-0 z-0">
                         <video
@@ -53,7 +53,7 @@ export const NavItem: React.FC<NavItemProps> = ({
                 :
                 <Link to={linkUrl}>
                     <div className="relative z-10 flex justify-center items-center h-full">
-                        <h2 className="text-4xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
+                        <h2 className="lg:text-4xl text-xl font-bold uppercase tracking-[0.5rem] text-slate-200">{title}</h2>
                     </div>
                     <div className="absolute inset-0 z-0">
                         <video

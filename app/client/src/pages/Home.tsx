@@ -55,13 +55,13 @@ const Home = () => {
                 <source src="/bg-home.mp4" type="video/mp4" />
             </video>
             <div className="hero-overlay bg-gray-900 opacity-60" />
-            <div className="hero-content text-center flex flex-col max-h-[500px] overflow-y-auto">
+            <div className="hero-content text-center flex flex-col">
                 <div className="max-w-md">
                     <h1 className="mb-5 text-5xl font-bold">
                         Welcome <span className="text-yellow-500">{me?.username}</span>
                     </h1>
                 </div>
-                <div className="grid xl:grid-cols-3 lg:grid-cols-1 grid-flow-dense gap-8">
+                <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-3 grid-flow-dense gap-8">
                     {navs.filter(auth => auth.condition === true).map((nav, index) => (
                         <NavItem
                             key={index}
