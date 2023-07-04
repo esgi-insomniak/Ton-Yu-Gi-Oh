@@ -254,6 +254,19 @@ const Duel = () => {
           />
         )}
       </div>
+      <div id="data-card" className="w-1/5 mx-auto">
+        <p>Data des cartes</p>
+        {hoveredCard && (
+          <img
+            src={hoveredCard.imageUrl}
+            alt={hoveredCard.name}
+            style={{
+              width: "80%",
+              height: "50%",
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
