@@ -3,7 +3,7 @@ import { useDrop } from "react-dnd";
 import { Dispatch, SetStateAction } from "react";
 import { itemTypes } from "@/pages/Duels";
 
-interface Card {
+export interface Card {
   id: string;
   name: string;
   type?: string;

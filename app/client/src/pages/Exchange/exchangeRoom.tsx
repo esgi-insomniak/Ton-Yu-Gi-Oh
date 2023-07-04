@@ -15,7 +15,7 @@ import { useNavigate, useParams } from "react-router-dom"
 const ExchangeRoom = () => {
     const { me } = useMe()
     const { roomId } = useParams<{ roomId: string }>()
-    const { data: cardSetsResponse } = useGetUserCardSets(me?.id!, 0, 100, "", "", "", "")
+    const { data: cardSetsResponse } = useGetUserCardSets(0, 100, "", "", "", "")
     const { data: exchangeResponse } = useGetExchangeById(roomId || "")
     const { toggle, isShowing } = useModal()
     const router = useNavigate()
