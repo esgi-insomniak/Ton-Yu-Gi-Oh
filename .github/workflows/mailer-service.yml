@@ -2,14 +2,21 @@ name: Deploy "mailer-service"
 
 on:
   push:
-    branches:
-      - develop
+    # branches:
+      # - develop
     paths:
       - "server/mailer-service/**"
       - ".github/workflows/mailer-service.yml"
       - "deploy/k8s/mailer-service/**"
       - "deploy/scripts/**"
       - "deploy/docker/**"
+
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
 
 env:
   ## Docker Hub

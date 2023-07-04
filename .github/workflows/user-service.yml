@@ -2,14 +2,21 @@ name: Deploy "user-service"
 
 on:
   push:
-    branches:
-      - develop
+    # branches:
+      # - develop
     paths:
       - "server/user-service/**"
       - ".github/workflows/user-service.yml"
       - "deploy/k8s/user-service/**"
       - "deploy/scripts/**"
       - "deploy/docker/**"
+
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
 
 env:
   ## Docker Hub

@@ -2,14 +2,21 @@ name: Deploy "gateway"
 
 on:
   push:
-    branches:
-      - develop
+    # branches:
+      # - develop
     paths:
       - "server/gateway/**"
       - ".github/workflows/gateway.yml"
       - "deploy/k8s/gateway/**"
       - "deploy/scripts/**"
       - "deploy/docker/**"
+
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
 
 env:
   ## Docker Hub

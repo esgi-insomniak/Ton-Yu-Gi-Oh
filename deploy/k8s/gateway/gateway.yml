@@ -35,16 +35,16 @@ spec:
               port: 8000
             initialDelaySeconds: 30
             periodSeconds: 20
+          envFrom:
+            - configMapRef:
+                name: gateway-config
           resources:
-            limits:
-              cpu: 500m
-              memory: 512Mi
             requests:
-              cpu: 250m
-              memory: 256Mi
-          env:
-            - name: API_GATEWAY_PORT
-              value: "8000"
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
 
 ---
 
@@ -104,11 +104,11 @@ data:
   AUTH_SERVICE_PORT: "8000"
   PAYMENT_SERVICE_PORT: "8000"
   MAILER_SERVICE_PORT: "8000"
-  AUTH_SERVICE_HOST: "auth-service"
+  AUTH_SERVICE_HOST: "auth-service-svc"
   CARD_SERVICE_HOST: "card-service"
   DUEL_SERVICE_HOST: "duel-service"
   MAILER_SERVICE_HOST: "mailer-service"
   PAYMENT_SERVICE_HOST: "payment-service"
   PROMO_SERVICE_HOST: "promo-service"
   USER_DECK_SERVICE_HOST: "user-deck-service"
-  USER_SERVICE_HOST: "user-service"
+  USER_SERVICE_HOST: "user-service-svc"
