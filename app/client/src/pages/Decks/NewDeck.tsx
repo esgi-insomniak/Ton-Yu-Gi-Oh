@@ -96,20 +96,20 @@ const NewDecks = () => {
             </div>
             <div className="flex gap-2 overflow-scroll h-full">
                 <div className="w-9/12 h-full border rounded-md flex flex-col space-y-2 py-2">
-                    <div className="w-full h-full grid grid-cols-8 gap-2 px-2 overflow-scroll">
+                    <div className="w-full h-full grid xl:grid-cols-6 lg:grid-cols-5 md:grid-cols-2 gap-2 px-2 overflow-scroll">
                         {isLoading ? <Loader /> : groupedCardsResponse?.data?.map((groupedCard) => (
                             <UserDeckCards
                                 key={groupedCard.cardSetId}
                                 count={allUserCardSets.filter((userCardSet: userCardSetType) => userCardSet.cardSet.id === groupedCard.cardSetId).length}
                                 deactivate={selectedCardSets.filter((userCardSet: userCardSetType) => userCardSet.cardSet.id === groupedCard.cardSetId).length >= deckMaxSameCardSets || !allUserCardSets.find((userCardSet: userCardSetType) => userCardSet.cardSet.id === groupedCard.cardSetId)}
+                                banned={groupedCard.userCardSets[0].cardSet.card.atk === null && groupedCard.userCardSets[0].cardSet.card.def === null}
                                 imageUrl={groupedCard.userCardSets[0].cardSet.card.imageUrl}
                                 addFunction={() => handleCardClick(groupedCard.cardSetId)}
                                 cardId={groupedCard.cardSetId}
                             />
                         ))}
                     </div>
-                    <Pagination page={pageNumber} setter={setPageNumber} arr={groupedCardsResponse?.data.length} maxItemsPerPage={24} />
-
+                    <Pagination page={pageNumber} setter={setPageNumber} arr={groupedCardsResponse?.data?.length!} maxItemsPerPage={maxItemsPerPage} />
                 </div>
                 <div className="w-3/12 h-full border p-2 rounded-md space-y-2 overflow-scroll">
                     <div className="flex gap-2 h-12">
