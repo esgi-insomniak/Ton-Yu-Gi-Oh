@@ -41,8 +41,6 @@ const EditDecks = () => {
     };
 
     const handleCardRemove = (cardSetId: string) => {
-        // remove first userCardSet with the cardSetId from the selectedCards state
-        // add it to the allUserCardSets state
         const firstUserCardSet = selectedCardSets.find((userCardSet: userCardSetType) => userCardSet.cardSet.id === cardSetId);
         if (!firstUserCardSet) return;
         setSelectedCardSets(prevSelectedCardSets => prevSelectedCardSets.filter((userCardSet: userCardSetType) => userCardSet.id !== firstUserCardSet.id));
@@ -113,6 +111,7 @@ const EditDecks = () => {
                 <ul>
                     <li><Link to={'/decks'}>Crafting zone</Link></li>
                     <li><Link to={'/decks/create'}>Mes decks</Link></li>
+                    <li>{currentUserDeck?.data?.name}</li>
                 </ul>
             </div>
             <div className="flex gap-2 overflow-scroll h-full">
@@ -158,7 +157,7 @@ const EditDecks = () => {
                                 const cardCount = selectedCardSets.filter((selectedCardSet: userCardSetType) => selectedCardSet.cardSet.id === userCardSet.cardSet.id).length;
                                 return (
                                     <div
-                                        className="h-14 w-full p-2 bg-gray-300/20 rounded-md flex items-center justify-between shadow-inner shadow-white"
+                                        className="h-14 w-full p-2 bg-gray-300/20 rounded-md flex items-center justify-between shadow-inner shadow-white cursor-pointer hover:shadow-lg"
                                         key={userCardSet.cardSet.id}
                                         onClick={handleCardRemove.bind(null, userCardSet.cardSet.id)}
                                     >

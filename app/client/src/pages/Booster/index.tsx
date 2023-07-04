@@ -113,17 +113,18 @@ const Booster = () => {
                     <p className="text-center my-auto font-bold text-xl">Pas de booster disponible</p>
                 )}
             </div>
-
+            <div className="divider divider-horizontal w-2" />
             <div
                 className="flex justify-center items-center w-1/2 mx-auto my-3"
                 ref={dropRef}
             >
                 {droppedBooster && !openedBooster && (
-                    <div className="drop-zone">
+                    <div className="drop-zone cursor-grab">
                         <img
                             src={droppedBooster.set.image}
                             style={{ width: "100%", height: "100%", objectFit: "contain" }}
                             alt=""
+                            className="cursor-grab"
                         />
                     </div>
                 )}
