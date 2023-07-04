@@ -157,6 +157,41 @@ export class UserDeckController {
       }
     });
 
+    // check if userCardSets are banned or if same cardSets are used more than 3 times
+    const checkBannedCardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: userCardSetsResponse.items.map((item) => item.cardSetId),
+        }),
+      );
+
+    if (checkBannedCardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        checkBannedCardSetsResponse.message,
+        checkBannedCardSetsResponse.status,
+      );
+    }
+
+    checkBannedCardSetsResponse.items.reduce((acc, item) => {
+      if (item.card.atk === null && item.card.def === null) {
+        throw new HttpException(
+          'You can not create userDeck with banned cardSets',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else if (acc[item.id]) {
+        acc[item.id] += 1;
+        if (acc[item.id] > 3) {
+          throw new HttpException(
+            'You can not create userDeck with more than 3 same cardSets',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      } else {
+        acc[item.id] = 1;
+      }
+      return acc;
+    }, {});
+
     // create userDeck
     const userDeckResponse: GetResponseOne<IUserDeckPartial> =
       await firstValueFrom(
@@ -278,6 +313,41 @@ export class UserDeckController {
         );
       }
     });
+
+    // check if userCardSets are banned or if same cardSets are used more than 3 times
+    const checkBannedCardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: userCardSetsResponse.items.map((item) => item.cardSetId),
+        }),
+      );
+
+    if (checkBannedCardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        checkBannedCardSetsResponse.message,
+        checkBannedCardSetsResponse.status,
+      );
+    }
+
+    checkBannedCardSetsResponse.items.reduce((acc, item) => {
+      if (item.card.atk === null && item.card.def === null) {
+        throw new HttpException(
+          'You can not create userDeck with banned cardSets',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else if (acc[item.id]) {
+        acc[item.id] += 1;
+        if (acc[item.id] > 3) {
+          throw new HttpException(
+            'You can not create userDeck with more than 3 same cardSets',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      } else {
+        acc[item.id] = 1;
+      }
+      return acc;
+    }, {});
 
     // update userDeck
     const updatedUserDeckResponse: GetResponseOne<IUserDeckPartial> =
