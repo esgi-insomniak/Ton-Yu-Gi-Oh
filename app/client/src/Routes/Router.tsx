@@ -69,7 +69,7 @@ const Router: React.FC = () => {
     const { me, isLoading } = useMe()
     const router = useLocation().pathname
 
-    const routesWithoutLayout = React.useMemo(() => ['/', '/admin'], [])
+    const routesWithoutLayout = React.useMemo(() => ['/', '/admin', '/decks'], [])
 
     React.useEffect(() => {
         if (isLoading) return

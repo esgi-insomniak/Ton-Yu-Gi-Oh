@@ -61,7 +61,7 @@ const CardCollection = () => {
 
     React.useEffect(() => {
         if (cardSetsResponse?.data === undefined) return;
-        const apiCardSets = cardSetsResponse.data.map<IGameCard>((userCardSet: CardIUserCardSet) => {
+        const apiCardSets = cardSetsResponse.data.map<IGameCard>((userCardSet) => {
             return {
                 ...userCardSet.cardSet,
                 userCardSetId: userCardSet.id,
@@ -82,7 +82,7 @@ const CardCollection = () => {
     }, [cardSetsResponse])
 
     return (
-        <div className={`w-full h-full px-20 py-10 flex flex-col space-y-10`}>
+        <div className={`w-full h-full px-20 py-5 flex flex-col space-y-5`}>
             <div className="flex w-full justify-between">
                 <div className="text-md breadcrumbs">
                     <ul>
@@ -103,7 +103,7 @@ const CardCollection = () => {
                     </div>
                 ))}
             </div>
-            <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length!} maxItemsPerPage={itemsPerPage} />
+            <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length!} maxItemsPerPage={24} />
             <Modal
                 isShowing={isShowing}
                 toggle={toggle}

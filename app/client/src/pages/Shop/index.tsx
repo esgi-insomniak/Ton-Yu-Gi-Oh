@@ -110,17 +110,20 @@ const Shop = () => {
                                     <div onClick={() => handlePreviewBooster(booster.id)} className="btn glass btn-sm text-white">
                                         Voir les cartes
                                     </div>
-                                    <div className="flex space-x-1">
-                                        <button className="btn btn-error btn-sm" onClick={
-                                            () => setAmount({ ...amount, [booster.id]: amount[booster.id] ? amount[booster.id] - 1 : 1 })
-                                        } disabled={amount[booster.id] ? amount[booster.id] < 1 : false}>- 1</button>
+                                    <div className="flex flex-col space-y-2">
                                         <div
-                                            onClick={() => handleConfirmBuyBooster(booster)} className="btn glass btn-sm hover:bg-yellow-500 flex space-x-2"
+                                            onClick={() => handleConfirmBuyBooster(booster)} className="btn glass btn-sm hover:bg-yellow-600 flex space-x-2"
                                         >
-                                            <span className="font-bold text-red-500">{amount[booster.id] ? amount[booster.id] * 100 : 1 * 100}</span>
-                                            <img src="/InsomniakCoins.png" alt="" className="h-5 w-5" />
+                                            <span className="font-bold text-slate-200 text-xs">
+                                                Acheter {amount[booster.id] ? amount[booster.id] : 1} pacquets
+                                            </span>
                                         </div>
-                                        <button className="btn btn-success btn-sm" onClick={() => setAmount({ ...amount, [booster.id]: amount[booster.id] ? amount[booster.id] + 1 : 1 })}>+ 1</button>
+                                        <div className="flex space-x-1 w-full">
+                                            <button className="btn hover:btn-error text-red-500 hover:text-white btn-sm min-w-[50%]" onClick={() => setAmount({ ...amount, [booster.id]: amount[booster.id] ? amount[booster.id] - 1 : 1 })} disabled={amount[booster.id] ? amount[booster.id] <= 0 : false}>- 1</button>
+                                            <button className="btn hover:btn-success text-green-500 hover:text-white btn-sm min-w-[50%]" onClick={() => setAmount({ ...amount, [booster.id]: amount[booster.id] ? amount[booster.id] + 1 : 1 })} disabled={
+                                                amount[booster.id] ? amount[booster.id] >= 100 : false
+                                            }>+ 1</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -160,7 +163,7 @@ const Shop = () => {
                 isShowing={confirmBuyBoosterShowing}
                 toggle={confirmBuyBoosterToggle}
                 title="Confirmation d'achat"
-                text={`Êtes-vous sûr de vouloir acheter ${amount[selectedBooster?.id!]} ${selectedBooster?.name} ?`}
+                text={`Êtes-vous sûr de vouloir acheter ${amount[selectedBooster?.id!]} ${selectedBooster?.name} pour ${amount[selectedBooster?.id!] * 100} Insomniak Coins ?`}
                 yesNo
                 yesNoAction={[
                     { text: 'Annuler', action: confirmBuyBoosterToggle, type: 'no' },
