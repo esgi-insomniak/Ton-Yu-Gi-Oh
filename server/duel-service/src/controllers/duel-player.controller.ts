@@ -30,6 +30,22 @@ export class DuelPlayerController {
     return result;
   }
 
+  @MessagePattern('get_duel_player_by_user_id')
+  public async getDuelPlayerByUserId(
+    params: ParamGetItemById,
+  ): Promise<GetResponseOne<DuelPlayer>> {
+    const duelPlayer = await this.duelPlayerService.getDuelPlayerByUserId(
+      params.id,
+    );
+    const result: GetResponseOne<DuelPlayer> = {
+      status: duelPlayer ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: duelPlayer ? null : 'DuelPlayer not found',
+      item: duelPlayer,
+    };
+
+    return result;
+  }
+
   @MessagePattern('create_duel_player')
   public async updateDuelPlayerById(
     duelPlayer: DeepPartial<DuelPlayer>,
