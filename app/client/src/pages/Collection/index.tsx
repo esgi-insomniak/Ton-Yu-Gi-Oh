@@ -103,7 +103,7 @@ const Collection = () => {
                         ))}
                 </div>
             )}
-            <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length} maxItemsPerPage={24} />
+            <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length!} maxItemsPerPage={24} />
         </div>
     )
 }
