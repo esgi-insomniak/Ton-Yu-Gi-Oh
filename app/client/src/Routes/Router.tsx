@@ -53,6 +53,7 @@ const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
 const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
 const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
 const AdminPromoPage = React.lazy(() => import('@/pages/Admin/promos'));
+const DuelSelectDeckPage = React.lazy(() => import('@/pages/Duels/selectDeck'));
 const DuelPage = React.lazy(() => import('@/pages/Duels'));
 const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
 const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
@@ -114,6 +115,7 @@ const Router: React.FC = () => {
                     } />
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     <Route path="/decks/edit/:deckId" element={<EditDeckPage />} />
+                    <Route path="/duel/select-deck/:roomId" element={<DuelSelectDeckPage />} />
                     <Route path="/duel/:roomId" element={
                         <DndProvider backend={HTML5Backend}>
                             <DuelPage />

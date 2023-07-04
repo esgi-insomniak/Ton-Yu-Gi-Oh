@@ -41,3 +41,13 @@ export class UpdateUserDeckBodyDto {
   @MaxLength(30)
   name: string;
 }
+
+export class SelectedDeckBodyDto {
+  @ApiProperty({ type: String, format: 'uuid' })
+  @IsUUID(4)
+  userDeckId: string;
+
+  @ApiProperty({ type: String, format: 'uuid' })
+  @IsUUID(4)
+  duelRoomId: string;
+}

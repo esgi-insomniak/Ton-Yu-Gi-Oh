@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { DuelPlayer } from './duelPlayer.entity';
 
 @Entity()
@@ -18,8 +24,14 @@ export class Duel {
   @Column({ default: 90 })
   timePerTurn: number;
 
+  @Column({ default: 90 })
+  timeToSelectDeck: number;
+
   @Column({ type: 'uuid', nullable: true })
-  winnerId: string;
+  playerToPlay: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  winner: string;
 
   @OneToMany(() => DuelPlayer, (duelPlayer) => duelPlayer.duel, {
     cascade: true,

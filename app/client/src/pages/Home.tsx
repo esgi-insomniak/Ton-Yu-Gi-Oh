@@ -32,7 +32,7 @@ const Home = () => {
             alert?.success("Adversaire trouvé !")
             ioClient?.off('duel__queue');
             ioClient?.off('duel__found');
-            router(`/duel/${event.data.roomId}`)
+            router(`/duel/select-deck/${event.data.roomId}`)
         })
         alert?.custom('Recherche d\'un adversaire en cours...')
     }, [ioClient, alert])

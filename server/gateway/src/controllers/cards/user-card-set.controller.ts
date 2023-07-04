@@ -343,9 +343,9 @@ export class UserController {
           params: {
             id: params.id,
           },
+          query,
         }),
       );
-
     if (userCardSetResponse.status !== HttpStatus.OK) {
       throw new HttpException(
         userCardSetResponse.message,

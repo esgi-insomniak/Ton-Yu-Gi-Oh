@@ -66,6 +66,7 @@ export class UserCardSetController {
   }): Promise<GetResponseArray<UserCardSet>> {
     const userCardSets = await this.userCardSetService.getUserCardSetsByUserId(
       request.params.id,
+      request.query,
     );
     const result: GetResponseArray<UserCardSet> = {
       status: userCardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
