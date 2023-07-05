@@ -1,4 +1,5 @@
 import { NavItem } from "@/components/NavItem";
+import { apiRequest } from "@/helpers/api";
 import { useSocket } from "@/helpers/api/hooks";
 import { useLogout } from "@/helpers/api/hooks/auth";
 import { useMe } from "@/helpers/api/hooks/users";
@@ -73,6 +74,12 @@ const Home = () => {
                         />
                     ))}
                 </div>
+                <button onClick={() =>
+                    apiRequest({
+                        url: '/v1/foo',
+                        method: 'GET',
+                    })
+                }>Test</button>
             </div>
             <div className="h-20 w-full bottom-0 fixed flex px-5 items-center">
                 <div className="dropdown dropdown-right dropdown-end">

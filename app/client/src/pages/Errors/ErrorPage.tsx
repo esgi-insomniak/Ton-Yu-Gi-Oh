@@ -1,5 +1,6 @@
 
-const ErrorPage = () => {
+
+const ErrorPage = ({ error }: { error: 401 | 403 | 404 | 500 }) => {
 
     return (
         <div id="error-page" className="flex justify-center items-center h-screen">

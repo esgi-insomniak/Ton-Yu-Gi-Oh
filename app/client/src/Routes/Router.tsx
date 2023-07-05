@@ -162,9 +162,6 @@ const Router: React.FC = () => {
                     <Route path='/password-reset/:token' element={<ResetPwdPage />} />
                 </Route>
 
-
-                <Route path="/error" element={<ErrorPage />} />
-
             </Routes>
         </React.Suspense>
     );
