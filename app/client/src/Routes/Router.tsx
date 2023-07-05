@@ -57,8 +57,8 @@ const DuelPage = React.lazy(() => import('@/pages/Duels'));
 const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
 const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
 const ExchangePage = React.lazy(() => import('@/pages/Exchange'));
-const UserProfilPage = React.lazy(() => import('@/pages/User'));
 const ExchangeRoomPage = React.lazy(() => import('@/pages/Exchange/exchangeRoom'));
+const ExchangeHistoryPage = React.lazy(() => import('@/pages/Exchange/ExchangeHistory'));
 const AuctionRoomPage = React.lazy(() => import('@/pages/Auction'));
 
 /**
@@ -121,7 +121,7 @@ const Router: React.FC = () => {
                     } />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
-                    <Route path="/me" element={<UserProfilPage />} />
+                    <Route path="/exchange-history" element={<ExchangeHistoryPage />} />
                     <Route path="/auction" element={<AuctionRoomPage />} />
                 </Route>
 
