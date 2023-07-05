@@ -115,6 +115,11 @@ export class WebsocketGateway
     interval?: NodeJS.Timeout;
   }> = [];
 
+  protected duelSelectedDeckCountdown: Array<{
+    roomId: string;
+    timeout?: NodeJS.Timeout;
+  }> = [];
+
   constructor(
     @Inject('USER_SERVICE') protected readonly userServiceClient: ClientProxy,
     @Inject('DUEL_SERVICE') protected readonly duelServiceClient: ClientProxy,
@@ -145,6 +150,26 @@ export class WebsocketGateway
     });
 
     client.join(client.userId);
+
+    // check if user is in duel
+    const currentDuelPlayerResponse: GetResponseOne<IDuelPlayer> =
+      await firstValueFrom(
+        this.duelServiceClient.send('get_duel_player_by_user_id', {
+          id: client.userId,
+        }),
+      );
+
+    if (currentDuelPlayerResponse.status === 200) {
+      client.join(currentDuelPlayerResponse.item.duel.roomId);
+      client.emit('duel__is_started', {
+        event: 'duel__is_started',
+        type: ISocketEventType.INFO,
+        data: {
+          roomId: currentDuelPlayerResponse.item.duel.roomId,
+          hasStarted: currentDuelPlayerResponse.item.duel.hasStarted,
+        },
+      } as ISocketEvent);
+    }
 
     this.io.emit('user__is_online', {
       event: 'user__is_online',
@@ -318,6 +343,41 @@ export class WebsocketGateway
           type: ISocketEventType.INFO,
           data: newDuelResponse.item,
         } as ISocketEvent);
+
+        // start the duel countdown for selecting deck
+        let deckSelectionCountdown = 60;
+        const deckSelectionInterval = setInterval(async () => {
+          deckSelectionCountdown -= 1;
+          this.io.to(newDuelResponse.item.roomId).emit('duel__deck_selected', {
+            event: 'duel__deck_selected_countdown',
+            type: ISocketEventType.INFO,
+            data: {
+              countDown: deckSelectionCountdown,
+            },
+          });
+          if (deckSelectionCountdown === 0)
+            clearInterval(deckSelectionInterval);
+        }, 1000);
+
+        const deckSelectionTimeout = setTimeout(() => {
+          // delete the duel
+          this.duelServiceClient.emit('delete_duel_by_room_id', {
+            roomId: newDuelResponse.item.roomId,
+          });
+          this.io.to(newDuelResponse.item.roomId).emit('duel__deck_selected', {
+            event: 'duel__deck_selected',
+            type: ISocketEventType.DELETE,
+            data: {
+              statusCode: HttpStatus.REQUEST_TIMEOUT,
+              message: 'Deck selection timed out.',
+            } as ISocketMessage,
+          } as ISocketEvent);
+        }, 60000);
+
+        this.duelSelectedDeckCountdown.push({
+          roomId: newDuelResponse.item.roomId,
+          timeout: deckSelectionTimeout,
+        });
       }
     }, 5000);
 
