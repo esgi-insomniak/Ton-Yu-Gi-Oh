@@ -13,6 +13,13 @@ export class DuelPlayerService {
     return duelPlayer;
   }
 
+  async getDuelPlayerByUserId(userId: string): Promise<DuelPlayer> {
+    const duelPlayer = await this.dataSource.getRepository(DuelPlayer).findOne({
+      where: { userId },
+    });
+    return duelPlayer;
+  }
+
   async createDuelPlayer(
     duelPlayerPartial: DeepPartial<DuelPlayer>,
   ): Promise<DuelPlayer> {

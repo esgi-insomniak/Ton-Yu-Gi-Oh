@@ -23,7 +23,7 @@ import {
   BaseWsExceptionFilter,
   WsException,
 } from '@nestjs/websockets';
-import { Namespace, RemoteSocket } from 'socket.io';
+import { Namespace } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
@@ -59,6 +59,9 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { IUserRelation } from './interfaces/user-service/userRelation/user-relation.interface';
 import { GetItemByIdDto } from './interfaces/common/common.params.dto';
 import { ICardCardSet } from './interfaces/card-service/cardSet/card-set.interface';
+import { IUserDeckPartial } from './interfaces/user-deck-service/userDeck/user-deck.interface';
+import { SelectedDeckBodyDto } from './interfaces/user-deck-service/userDeck/user-deck.body.dto';
+import { IDuelPlayer } from './interfaces/duel-service/duelPlayer/duel-player.interface';
 
 @Catch()
 export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
@@ -195,6 +198,7 @@ export class WebsocketGateway
 
   // Duel Queues routes
   @SubscribeMessage('duel__join_queue')
+  @UseFilters(new WebsocketExceptionsFilter('duel__queue'))
   async duelJoinQueue(@ConnectedSocket() client: IAuthorizedSocket) {
     const eventName = 'duel__queue';
 
@@ -208,6 +212,50 @@ export class WebsocketGateway
         } as ISocketMessage,
       } as ISocketEvent);
       return;
+    }
+
+    // check if user is already in a duel
+    const duelResponse: GetResponseArray<IDuelPlayer> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_player_by_user_id', {
+        params: {
+          id: client.userId,
+        },
+      }),
+    );
+
+    if (duelResponse.status === HttpStatus.OK) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You are already in a duel.',
+      } as ISocketMessage);
+    }
+
+    // check if user has a deck
+    const userDeckResponse: GetResponseArray<IUserDeckPartial> =
+      await firstValueFrom(
+        this.userDeckServiceClient.send('get_userdecks_by_user_id', {
+          params: {
+            id: client.userId,
+          },
+          query: {
+            limit: 100,
+            offset: 0,
+          },
+        }),
+      );
+
+    if (userDeckResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: userDeckResponse.status,
+        message: userDeckResponse.message,
+      } as ISocketMessage);
+    }
+
+    if (userDeckResponse.items.length === 0) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You need to create a deck first.',
+      } as ISocketMessage);
     }
 
     const searchInterval = setInterval(async () => {
@@ -237,7 +285,6 @@ export class WebsocketGateway
             {
               userId: client.userId,
               username: client.username,
-              turnToPlay: true,
             },
             {
               userId: userFound.socket.userId,
@@ -346,6 +393,110 @@ export class WebsocketGateway
         message: 'You are not in the queue.',
       } as ISocketMessage,
     } as ISocketEvent);
+  }
+
+  // Duel routes
+  @SubscribeMessage('duel__select_deck')
+  @UseFilters(new WebsocketExceptionsFilter('duel__deck_selected'))
+  async duelSelectDeck(
+    @ConnectedSocket() client: IAuthorizedSocket,
+    @MessageBody() body: SelectedDeckBodyDto,
+  ) {
+    const eventName = 'duel__deck_selected';
+    // find duel room
+    const duelRoomResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_by_room_id', {
+        id: body.duelRoomId,
+      }),
+    );
+
+    if (duelRoomResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: duelRoomResponse.status,
+        message: duelRoomResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is in the duel room
+    const userFound = duelRoomResponse.item.players.find(
+      (user) => user.userId === client.userId,
+    );
+
+    if (!userFound) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You are not in the duel room.',
+      } as ISocketMessage);
+    }
+
+    // check if duel is not started and if user not already selected a deck
+    if (duelRoomResponse.item.hasStarted || userFound.deckId !== null) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Duel has already started.',
+      } as ISocketMessage);
+    }
+
+    // check if deck exists
+    const deckResponse: GetResponseOne<IUserDeckPartial> = await firstValueFrom(
+      this.userDeckServiceClient.send('get_userdeck_by_id', {
+        id: body.userDeckId,
+      }),
+    );
+
+    if (deckResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: deckResponse.status,
+        message: deckResponse.message,
+      } as ISocketMessage);
+    }
+
+    const duelUpdated: IDuel = {
+      ...duelRoomResponse.item,
+      hasStarted: duelRoomResponse.item.players.every((user) => {
+        if (user.userId === client.userId) return true;
+        return user.deckId === null ? false : true;
+      }),
+      playerToPlay: duelRoomResponse.item.players[0].userId,
+      players: duelRoomResponse.item.players.map((user: IDuelPlayer) => {
+        if (user.userId === client.userId) {
+          return {
+            ...user,
+            deckId: body.userDeckId,
+          };
+        }
+        return user;
+      }),
+    };
+
+    const updatedDuelResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('update_duel_by_room_id', {
+        params: {
+          roomId: body.duelRoomId,
+        },
+        body: duelUpdated,
+      }),
+    );
+
+    if (updatedDuelResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updatedDuelResponse.status,
+        message: updatedDuelResponse.message,
+      } as ISocketMessage);
+    }
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.INFO,
+      data: updatedDuelResponse.item,
+    };
+
+    const opponent = updatedDuelResponse.item.players.filter((user) => {
+      return user.userId !== client.userId;
+    })[0];
+
+    client.emit(eventName, socketEventResponse);
+    this.io.to(opponent.userId).emit(eventName, socketEventResponse);
   }
 
   // Exchange routes

@@ -53,12 +53,14 @@ const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
 const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
 const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
 const AdminPromoPage = React.lazy(() => import('@/pages/Admin/promos'));
+const DuelSelectDeckPage = React.lazy(() => import('@/pages/Duels/selectDeck'));
 const DuelPage = React.lazy(() => import('@/pages/Duels'));
 const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
 const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
 const ExchangePage = React.lazy(() => import('@/pages/Exchange'));
 const UserProfilPage = React.lazy(() => import('@/pages/User'));
 const ExchangeRoomPage = React.lazy(() => import('@/pages/Exchange/exchangeRoom'));
+const AuctionRoomPage = React.lazy(() => import('@/pages/Auction'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -67,7 +69,7 @@ const Router: React.FC = () => {
     const { me, isLoading } = useMe()
     const router = useLocation().pathname
 
-    const routesWithoutLayout = React.useMemo(() => ['/', '/admin'], [])
+    const routesWithoutLayout = React.useMemo(() => ['/', '/admin', '/decks'], [])
 
     React.useEffect(() => {
         if (isLoading) return
@@ -114,7 +116,7 @@ const Router: React.FC = () => {
                     } />
                     <Route path="/decks/new" element={<NewDecksPage />} />
                     <Route path="/decks/edit/:deckId" element={<EditDeckPage />} />
-                    <Route path="/duel/:roomId" element={<DuelPage />} />
+                    <Route path="/duel/select-deck/:roomId" element={<DuelSelectDeckPage />} />
                     <Route path="/duel/:roomId" element={
                         <DndProvider backend={HTML5Backend}>
                             <DuelPage />
@@ -123,6 +125,7 @@ const Router: React.FC = () => {
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
                     <Route path="/me" element={<UserProfilPage />} />
+                    <Route path="/auction" element={<AuctionRoomPage />} />
                 </Route>
 
                 {/* Admin routes */}

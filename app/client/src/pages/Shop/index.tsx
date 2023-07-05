@@ -13,7 +13,7 @@ import { GameCardProvider } from "@/helpers/providers/cards/cardsProvider"
 import { Input } from "@/components/Input"
 
 const Shop = () => {
-    const { refetch, me } = useMe()
+    const { refetch } = useMe()
     const { toggle: buyCoinsToggle, isShowing: buyCoinsShowing } = useModal()
     const { toggle: previewBoosterToggle, isShowing: previewBoosterShowing } = useModal()
     const { toggle: confirmBuyBoosterToggle, isShowing: confirmBuyBoosterShowing } = useModal()
@@ -28,6 +28,7 @@ const Shop = () => {
     const redeemCode = useRedeemPromoCode()
 
     const [selectedBooster, setSelectedBooster] = React.useState<BoosterApiResponse | null>(null)
+    const [amount, setAmount] = React.useState<{ [boosterId: string]: number }>({})
 
     const Coins = React.useMemo(() => {
         return [
@@ -40,11 +41,12 @@ const Shop = () => {
     }, [])
 
     const handleBuyBooster = (booster: BoosterApiResponse) => {
-        buyBooster.mutate({ amount: 1, boosterId: booster.id }, {
+        buyBooster.mutate({ amount: amount[booster.id] !== undefined ? amount[booster.id] : 1, boosterId: booster.id }, {
             onSuccess: (res) => {
                 alert?.success(`Vous avez bien acheté le booster ${booster.name} !`)
                 confirmBuyBoosterToggle()
                 refetch()
+                amount[booster.id] = 1
             },
             onError: (err) => {
                 alert?.error('Une erreur est survenue lors de l\'achat')
@@ -104,15 +106,24 @@ const Shop = () => {
                         boosters?.data?.map((booster) => (
                             <div key={booster.code} className="h-full flex flex-col w-full relative group">
                                 <img src={booster.image} alt={booster.name} className="h-full w-full rounded drop-shadow-lg shadow-lg " />
-                                <div className="hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/20">
-                                    <div onClick={() => handlePreviewBooster(booster.id)} className="t-btn min-w-[10rem]">
+                                <div className="hidden group-hover:flex justify-center items-center flex-col w-full h-full group-hover:absolute bg-black/50 space-y-5">
+                                    <div onClick={() => handlePreviewBooster(booster.id)} className="btn glass btn-sm text-white">
                                         Voir les cartes
                                     </div>
-                                    <div
-                                        onClick={() => handleConfirmBuyBooster(booster)} className="t-btn min-w-[10rem] hover:bg-yellow-500"
-                                    >
-                                        <span className="font-bold text-red-500">- 100</span>
-                                        <img src="/InsomniakCoins.png" alt="" className="h-5 w-5" />
+                                    <div className="flex flex-col space-y-2">
+                                        <div
+                                            onClick={() => handleConfirmBuyBooster(booster)} className="btn glass btn-sm hover:bg-yellow-600 flex space-x-2"
+                                        >
+                                            <span className="font-bold text-slate-200 text-xs">
+                                                Acheter {amount[booster.id] ? amount[booster.id] : 1} pacquets
+                                            </span>
+                                        </div>
+                                        <div className="flex space-x-1 w-full">
+                                            <button className="btn hover:btn-error text-red-500 hover:text-white btn-sm min-w-[50%]" onClick={() => setAmount({ ...amount, [booster.id]: amount[booster.id] ? amount[booster.id] - 1 : 1 })} disabled={amount[booster.id] ? amount[booster.id] <= 0 : false}>- 1</button>
+                                            <button className="btn hover:btn-success text-green-500 hover:text-white btn-sm min-w-[50%]" onClick={() => setAmount({ ...amount, [booster.id]: amount[booster.id] ? amount[booster.id] + 1 : 1 })} disabled={
+                                                amount[booster.id] ? amount[booster.id] >= 100 : false
+                                            }>+ 1</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -152,6 +163,7 @@ const Shop = () => {
                 isShowing={confirmBuyBoosterShowing}
                 toggle={confirmBuyBoosterToggle}
                 title="Confirmation d'achat"
+                text={`Êtes-vous sûr de vouloir acheter ${amount[selectedBooster?.id!]} ${selectedBooster?.name} pour ${amount[selectedBooster?.id!] * 100} Insomniak Coins ?`}
                 yesNo
                 yesNoAction={[
                     { text: 'Annuler', action: confirmBuyBoosterToggle, type: 'no' },

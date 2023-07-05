@@ -92,6 +92,7 @@ const NewDecks = () => {
                 <ul>
                     <li><Link to={'/decks'}>Crafting zone</Link></li>
                     <li><Link to={'/decks/create'}>Mes decks</Link></li>
+                    <li><span className="text-gray-400">Nouveau deck</span></li>
                 </ul>
             </div>
             <div className="flex gap-2 overflow-scroll h-full">
@@ -126,7 +127,7 @@ const NewDecks = () => {
                     <div className="flex flex-col space-y-2">
                         <React.Fragment>
                             <span className={`${selectedCardSets.length < deckMinCardSets || selectedCardSets.length > deckMaxCardSets ? 'text-red-500' : 'text-green-500'}`}>
-                                {selectedCardSets.length} / ${deckMinCardSets} (min) - ${deckMaxCardSets} (max)
+                                {selectedCardSets.length} / {deckMinCardSets} (min) - {deckMaxCardSets} (max)
                             </span>
                             {selectedCardSets.reduce((acc: userCardSetType[], userCardSet: userCardSetType) => {
                                 if (!acc.find((accUserCardSet: userCardSetType) => accUserCardSet.cardSet.id === userCardSet.cardSet.id)) {
@@ -137,7 +138,7 @@ const NewDecks = () => {
                                 const cardCount = selectedCardSets.filter((selectedCardSet: userCardSetType) => selectedCardSet.cardSet.id === userCardSet.cardSet.id).length;
                                 return (
                                     <div
-                                        className="h-14 w-full p-2 bg-gray-300/20 rounded-md flex items-center justify-between shadow-inner shadow-white"
+                                        className="h-14 w-full p-2 bg-gray-300/20 rounded-md flex items-center justify-between shadow-inner shadow-white cursor-pointer hover:shadow-lg"
                                         key={userCardSet.cardSet.id}
                                         onClick={handleCardRemove.bind(null, userCardSet.cardSet.id)}
                                     >

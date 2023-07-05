@@ -1,5 +1,6 @@
 import GameCard from "@/components/GameCard/GameCard";
 import { Modal } from "@/components/Modal";
+import { Pagination } from "@/components/Pagination";
 import { useGetUserCardSets, useScrapCards } from "@/helpers/api/hooks/cards/card-set.hook";
 import useModal from "@/helpers/api/hooks/modal";
 import { useMe } from "@/helpers/api/hooks/users";
@@ -7,10 +8,13 @@ import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { CardIPrice, CardIUserCardSet, IGameCard } from "@/helpers/types/cards";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const CardCollection = () => {
     const { me, refetch: refetchUser } = useMe()
-    const { data: cardSetsResponse, refetch } = useGetUserCardSets(me?.id!, 0, 24, "", "", "", "")
+    const [page, setPage] = React.useState<number>(0)
+    const [itemsPerPage, setItemsPerPage] = React.useState<number>(24)
+    const { data: cardSetsResponse, refetch } = useGetUserCardSets(page, itemsPerPage, "", "", "", "")
     const { cardSets, setCardSets } = useGameCard()
     const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<string[]>([])
     const [coinsEarned, setCoinsEarned] = React.useState<number>(0)
@@ -57,7 +61,7 @@ const CardCollection = () => {
 
     React.useEffect(() => {
         if (cardSetsResponse?.data === undefined) return;
-        const apiCardSets = cardSetsResponse.data.map<IGameCard>((userCardSet: CardIUserCardSet) => {
+        const apiCardSets = cardSetsResponse.data.map<IGameCard>((userCardSet) => {
             return {
                 ...userCardSet.cardSet,
                 userCardSetId: userCardSet.id,
@@ -78,8 +82,14 @@ const CardCollection = () => {
     }, [cardSetsResponse])
 
     return (
-        <div className={`w-full h-full px-20 py-10 flex flex-col space-y-10`}>
-            <div className="flex w-full justify-end space-x-5">
+        <div className={`w-full h-full px-20 py-5 flex flex-col space-y-5`}>
+            <div className="flex w-full justify-between">
+                <div className="text-md breadcrumbs">
+                    <ul>
+                        <li><Link to={'/decks'}>Crafting zone</Link></li>
+                        <li><span>Mes cartes</span></li>
+                    </ul>
+                </div>
                 <button className="btn" onClick={toggle} disabled={arrayOfCardDismantle.length <= 0}>Démanteler les cartes contres des coins</button>
             </div>
             <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
@@ -93,6 +103,7 @@ const CardCollection = () => {
                     </div>
                 ))}
             </div>
+            <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length!} maxItemsPerPage={24} />
             <Modal
                 isShowing={isShowing}
                 toggle={toggle}
