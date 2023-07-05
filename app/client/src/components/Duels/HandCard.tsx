@@ -1,8 +1,8 @@
-import { BoosterData } from "@/helpers/types/booster";
 import { itemTypes } from "@/pages/Duels";
 import { useDrag } from "react-dnd";
+import { Card } from "./MonsterZone";
 
-const HandCard = ({ card }) => {
+export const HandCard = ({ card }: { card: Card }) => {
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: itemTypes.CARD,
@@ -18,11 +18,9 @@ const HandCard = ({ card }) => {
     <div
       key={card.id}
       ref={dragRef}
-      className="h-1/2 w-1/4 bg-white rounded-md shadow-md p-4 m-4"
+      className="my-3"
     >
-      {card.name}
+      <img src={card.imageUrl} alt={card.name} />
     </div>
   );
 };
-
-export default HandCard;
