@@ -21,6 +21,9 @@ export class DuelPlayer {
   @Column({ nullable: false, default: 8000 })
   lifePoints: number;
 
+  @Column({ type: 'jsonb', nullable: true, default: {} })
+  deckUserCardSets: string;
+
   @Column({ type: 'uuid', array: true, default: [] })
   cardsInHand: string[];
 

@@ -23,6 +23,14 @@ export class DuelService {
     return duel;
   }
 
+  async getDuelByUserId(userId: string): Promise<Duel> {
+    const duel = await this.dataSource.getRepository(Duel).findOne({
+      where: { players: { userId } },
+    });
+    if (!duel) return null;
+    return this.getDuelById(duel.id);
+  }
+
   async createDuel(duelPartial: DeepPartial<Duel>): Promise<Duel> {
     try {
       const newDuel = await this.dataSource
@@ -39,6 +47,7 @@ export class DuelService {
     duel: DeepPartial<Duel>,
   ): Promise<Duel> {
     try {
+      console.log('test1', duel.players);
       duel.players.forEach(async (player) => {
         await this.dataSource
           .getRepository(DuelPlayer)
@@ -47,7 +56,8 @@ export class DuelService {
       delete duel.players;
       await this.dataSource.getRepository(Duel).update({ roomId }, duel);
       return await this.getDuelByRoomId(roomId);
-    } catch {
+    } catch (error) {
+      console.log(error);
       return null;
     }
   }

@@ -2,6 +2,8 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { HandCard } from "@/components/Duels/HandCard";
 import { MonsterZone } from "@/components/Duels/MonsterZone";
+import { useSocket } from "@/helpers/api/hooks";
+import { ISocketEvent } from "@/helpers/types/socket";
 
 interface Card {
   id: string;
@@ -18,6 +20,7 @@ export const itemTypes = {
 
 const Duel = () => {
   const { roomId } = useParams<{ roomId: string }>();
+  const { ioClient } = useSocket();
   const [hoveredCard, setHoveredCard] = React.useState<Card>();
   const [lifePoints, setLifePoints] = React.useState<number>(8000);
   const [adversaryLifePoints, setAdversaryLifePoints] =
@@ -63,6 +66,14 @@ const Duel = () => {
   const handleCardHover = (card: Card) => {
     setHoveredCard(card);
   };
+
+  React.useEffect(() => {
+    ioClient?.off("duel__current");
+    ioClient?.on("duel__current", (event: ISocketEvent) => {
+      console.log("event", event);
+    });
+    ioClient?.emit("duel__get_current_game");
+  }, []);
 
   return (
     <div className="flex">
