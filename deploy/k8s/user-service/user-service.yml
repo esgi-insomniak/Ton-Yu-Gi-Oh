@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: maeljamin/ton-yugi-user-service:{{VERSION}}
+          image: maeljamin/ton-yugi-user-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -26,11 +26,11 @@ spec:
                 name: user-service-config
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "150m"
+              memory: "126Mi"
+              cpu: "30m"
             limits:
-              memory: "128Mi"
-              cpu: "250m"
+              memory: "126Mi"
+              cpu: "30m"
 ---
 
 apiVersion: v1

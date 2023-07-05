@@ -26,11 +26,11 @@ spec:
                 name: mailer-service-config
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "150m"
+              memory: "126Mi"
+              cpu: "10m"
             limits:
-              memory: "128Mi"
-              cpu: "250m"
+              memory: "126Mi"
+              cpu: "10m"
 ---
 
 apiVersion: v1

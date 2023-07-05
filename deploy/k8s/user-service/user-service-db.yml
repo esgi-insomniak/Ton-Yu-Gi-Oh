@@ -27,6 +27,13 @@ spec:
           volumeMounts:
             - name: user-service-db-data
               mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "126Mi"
+              cpu: "10m"
+            limits:
+              memory: "126Mi"
+              cpu: "10m"
       volumes:
         - name: user-service-db-data
           persistentVolumeClaim:
