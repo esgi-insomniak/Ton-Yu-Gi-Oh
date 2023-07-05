@@ -18,6 +18,7 @@ export const SocketContextProvider = ({ children }: SocketContextProps) => {
                 const socket = io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${token}` } });
                 socket.off('exchange__request')
                 socket.on('exchange__request', (event: ISocketEvent) => {
+                    console.log(event)
                     if (event.type === ISocketEventType.INFO) {
                         alert?.success(`${event.data.exchangeOwner.username} vous propose un échange !`)
                     }
@@ -36,8 +37,12 @@ export const SocketContextProvider = ({ children }: SocketContextProps) => {
         }
     }, [token, ioClient])
 
+    const getIoClient = () => {
+        return ioClient.current;
+    }
+
     return (
-        <SocketContext.Provider value={{ ioClient: ioClient.current }}>
+        <SocketContext.Provider value={{ ioClient: ioClient.current, getIoClient }}>
             {children}
         </SocketContext.Provider>
     )

@@ -20,7 +20,7 @@ export const itemTypes = {
 
 const Duel = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const { ioClient } = useSocket();
+  const { getIoClient } = useSocket();
   const [hoveredCard, setHoveredCard] = React.useState<Card>();
   const [lifePoints, setLifePoints] = React.useState<number>(8000);
   const [adversaryLifePoints, setAdversaryLifePoints] =
@@ -68,11 +68,11 @@ const Duel = () => {
   };
 
   React.useEffect(() => {
-    ioClient?.off("duel__current");
-    ioClient?.on("duel__current", (event: ISocketEvent) => {
+    getIoClient()?.off("duel__current");
+    getIoClient()?.on("duel__current", (event: ISocketEvent) => {
       console.log("event", event);
     });
-    ioClient?.emit("duel__get_current_game");
+    getIoClient()?.emit("duel__get_current_game");
   }, []);
 
   return (

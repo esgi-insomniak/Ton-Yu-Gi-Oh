@@ -23,7 +23,7 @@ import {
   BaseWsExceptionFilter,
   WsException,
 } from '@nestjs/websockets';
-import { Namespace } from 'socket.io';
+import { Namespace, RemoteSocket } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
@@ -61,6 +61,7 @@ import { ICardCardSet } from './interfaces/card-service/cardSet/card-set.interfa
 import { IUserDeckPartial } from './interfaces/user-deck-service/userDeck/user-deck.interface';
 import { SelectedDeckBodyDto } from './interfaces/user-deck-service/userDeck/user-deck.body.dto';
 import { IDuelPlayer } from './interfaces/duel-service/duelPlayer/duel-player.interface';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 @Catch()
 export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
@@ -138,18 +139,19 @@ export class WebsocketGateway
     // disconnect if user is already connected
     // if (
     //   (await this.io.fetchSockets()).filter(
-    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) => s.userId === client.userId,
+    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) =>
+    //       s.userId === client.userId,
     //   ).length > 1
     // ) {
     //   return client.disconnect();
     // }
 
+    client.join(client.userId);
+
     this.userServiceClient.emit('set_user_is_online', {
       id: client.userId,
       isOnline: true,
     });
-
-    client.join(client.userId);
 
     // check if user is in duel
     const currentDuelResponse: GetResponseOne<IDuel> = await firstValueFrom(
@@ -197,7 +199,8 @@ export class WebsocketGateway
     // not update user isOnline if user is still connected
     // if (
     //   (await this.io.fetchSockets()).filter(
-    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) => s.userId === client.userId,
+    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) =>
+    //       s.userId === client.userId,
     //   ).length > 0
     // ) {
     //   return;
@@ -733,7 +736,7 @@ export class WebsocketGateway
       type: ISocketEventType.INFO,
       data: createdExchangeResponse.item,
     };
-
+    console.log('socketEventResponse', body.userId);
     client.emit(eventName, socketEventResponse);
     this.io.to(body.userId).emit('exchange__request', socketEventResponse);
   }
