@@ -63,8 +63,8 @@ const Duel = () => {
     },
   ];
 
-  const handleCardHover = (card: Card) => {
-    setHoveredCard(card);
+  const handleCardHover = (card: Card | null) => {
+    setHoveredCard(card!);
   };
 
   React.useEffect(() => {
@@ -85,7 +85,7 @@ const Duel = () => {
                 <HandCard
                   key={card.id}
                   card={card}
-                  onCardHover={handleCardHover}
+                  onCardHover={() => handleCardHover(card)}
                 />
               ))}
             </div>
@@ -168,7 +168,7 @@ const Duel = () => {
                 id="monster-zone-player"
                 className="flex justify-around items-center w-4/5"
               >
-                {Array.from({ length: 5 }, (_, index) => (
+                {Array.from({ length: 5 }, (card, index) => (
                   <MonsterZone
                     key={index}
                     setter={setCards}
@@ -222,7 +222,7 @@ const Duel = () => {
                 <HandCard
                   key={card.id}
                   card={card}
-                  onCardHover={handleCardHover}
+                  onCardHover={() => handleCardHover(card)}
                 />
               ))}
             </div>
