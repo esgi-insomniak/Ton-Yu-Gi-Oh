@@ -1,3 +1,5 @@
+import { IUserCardSets } from "../cards";
+
 export interface IDuel {
   id: string;
   roomId: string;
@@ -15,8 +17,9 @@ export interface IDuelPlayer {
   duel: IDuel | Partial<IDuel>;
   lifePoints: number;
   turnToPlay: boolean;
-  cardsInHand: string[];
-  cardsInDeck: string[];
+  cardsInHand: string[] | number;
+  cardsInDeck: number;
   cardsInGraveyard: string[];
   cardsInField: string[];
+  deckUserCardSets: IUserCardSets[];
 }

@@ -162,13 +162,7 @@ export class WebsocketGateway
 
     if (currentDuelResponse.status === 200) {
       client.join(currentDuelResponse.item.roomId);
-      if (currentDuelResponse.item.hasStarted) {
-        client.emit('duel__current', {
-          event: 'duel__current',
-          type: ISocketEventType.INFO,
-          data: currentDuelResponse.item,
-        } as ISocketEvent);
-      } else {
+      if (!currentDuelResponse.item.hasStarted) {
         client.emit('duel__deck_selected', {
           event: 'duel__deck_selected',
           type: ISocketEventType.INFO,
@@ -605,12 +599,112 @@ export class WebsocketGateway
       data: updatedDuelResponse.item,
     };
 
+    // for the 2 players, shuffle the deck and draw 5 cards
+    // store the userCardSetIds in cardsInDeck
+    const playersUpdated: IDuelPlayer[] = updatedDuelResponse.item.players.map(
+      (player: IDuelPlayer) => {
+        const updPlayer: IDuelPlayer = {
+          ...player,
+          // randomize the player userCardSets and put in deck
+          cardsInDeck: player.deckUserCardSets
+            .map((value) => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value.id),
+        };
+        // get the first 5 cards and put in hand and remove from deck
+        updPlayer.cardsInHand = (updPlayer.cardsInDeck as string[]).splice(
+          0,
+          5,
+        );
+        updPlayer.cardsInDeck = (updPlayer.cardsInDeck as string[]).filter(
+          (cardId) => !(updPlayer.cardsInHand as string[]).includes(cardId),
+        );
+
+        return updPlayer;
+      },
+    );
+
+    this.duelServiceClient.emit('update_duel_by_room_id', {
+      params: {
+        roomId: body.duelRoomId,
+      },
+      body: {
+        ...updatedDuelResponse.item,
+        players: playersUpdated,
+      },
+    });
+
     const opponent = updatedDuelResponse.item.players.filter((user) => {
       return user.userId !== client.userId;
     })[0];
 
     client.emit(eventName, socketEventResponse);
     this.io.to(opponent.userId).emit(eventName, socketEventResponse);
+  }
+
+  // Duel routes
+  @SubscribeMessage('duel__get_current_game')
+  @UseFilters(new WebsocketExceptionsFilter('duel__current'))
+  async duelGetCurrentGame(@ConnectedSocket() client: IAuthorizedSocket) {
+    const eventName = 'duel__current';
+    // find duel room
+    const duelRoomResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_by_user_id', {
+        id: client.userId,
+      }),
+    );
+
+    if (duelRoomResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: duelRoomResponse.status,
+        message: duelRoomResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is in the duel room
+    const userFound = duelRoomResponse.item.players.find(
+      (user) => user.userId === client.userId,
+    );
+
+    if (!userFound) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You are not in the duel room.',
+      } as ISocketMessage);
+    }
+
+    // check if duel is started
+    if (!duelRoomResponse.item.hasStarted) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Duel has not started yet.',
+      } as ISocketMessage);
+    }
+
+    // replace cardsInDeck by the number of cards
+    // replace the opponent cardsInHand by the number of cards
+    const filteredDuel: IDuel = {
+      ...duelRoomResponse.item,
+      players: duelRoomResponse.item.players.map((user: IDuelPlayer) => {
+        const updUser: IDuelPlayer = {
+          ...user,
+          cardsInDeck: (user.cardsInDeck as string[]).length,
+          cardsInHand:
+            user.userId === client.userId
+              ? user.cardsInHand
+              : (user.cardsInHand as string[]).length,
+        };
+        return updUser;
+      }),
+    };
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.INFO,
+      data: filteredDuel,
+    };
+
+    client.emit(eventName, socketEventResponse);
   }
 
   // Exchange routes
