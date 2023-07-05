@@ -82,25 +82,25 @@ const Collection = () => {
     }
 
     return (
-        <div className="flex gap-5 w-full overflow-scroll p-5 flex-col h-full">
-            <form className="flex w-full space-x-2 items-center justify-center" onSubmit={handleSearch}>
-                <input type="text" className="input input-bordered" name="searchBar" placeholder="Rechercher" />
+        <div className="lg:flex-col md:flex-row flex-row flex gap-5 w-full overflow-scroll p-5 h-full">
+            <form className="lg:flex-row md:flex-col flex-col flex w-full lg:space-x-2 md:space-x-0 space-x-0 lg:space-y-0 md:space-y-2 space-y-2 items-center justify-center" onSubmit={handleSearch}>
+                <input type="text" className="input input-bordered lg:w-auto md:w-full w-full" name="searchBar" placeholder="Rechercher" />
                 <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" theme="dark" />
                 <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" theme="dark" />
                 <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" theme="dark" />
-                <button className="btn" type="submit">Rechercher</button>
-                <button className="btn" onClick={handleClear}>Vider</button>
+                <button className="btn lg:w-auto md:w-full w-full" type="submit">Rechercher</button>
+                <button className="btn lg:w-auto md:w-full w-full" onClick={handleClear}>Vider</button>
             </form>
             {cardSets.length === 0 ? (
                 <div className="flex items-center justify-center w-full h-full">
                     <iframe allow="fullscreen" frameBorder="0" height="370" src="https://giphy.com/embed/Z8Py9bJGWHhCBtmjJk/video" width="480"></iframe>
                 </div>
             ) : (
-                <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
-                    {cardSets
-                        .map((cardSet, i) => (
+                <div className="grid xl:grid-cols-8 lg:grid-cols-5 md:grid-cols-4 grid-cols-3 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
+                    {cardSets.map((cardSet, i) => (
                             <GameCard key={i} {...cardSet} />
-                        ))}
+                        )
+                    )}
                 </div>
             )}
             <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length!} maxItemsPerPage={24} />

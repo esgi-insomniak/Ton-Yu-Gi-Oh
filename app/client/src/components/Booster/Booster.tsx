@@ -16,7 +16,7 @@ const BoosterItem = ({ booster }: { booster: BoosterData }) => {
 
   return (
     <div className="indicator rounded-md" key={booster.id}>
-      <span className="indicator-item badge badge-secondary absolute right-10 top-3">
+      <span className="indicator-item z-0 badge badge-secondary absolute right-10 top-3">
         {booster.count}
       </span>
       <img
@@ -27,7 +27,7 @@ const BoosterItem = ({ booster }: { booster: BoosterData }) => {
           cursor: "move",
         }}
         className="h-96 w-72 rounded-sm object-contain"
-        alt=""
+        alt="booster"
       />
     </div>
   );

@@ -84,7 +84,7 @@ const CardCollection = () => {
     return (
         <div className={`w-full h-full px-20 py-5 flex flex-col space-y-5`}>
             <div className="flex w-full justify-between">
-                <div className="text-md breadcrumbs">
+                <div className="text-md breadcrumbs hidden lg:block">
                     <ul>
                         <li><Link to={'/decks'}>Crafting zone</Link></li>
                         <li><span>Mes cartes</span></li>
@@ -92,7 +92,7 @@ const CardCollection = () => {
                 </div>
                 <button className="btn" onClick={toggle} disabled={arrayOfCardDismantle.length <= 0}>Démanteler les cartes contres des coins</button>
             </div>
-            <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
+            <div className="grid xl:grid-cols-8 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-1 px-3 w-full gap-2 scrollbar-none container mx-auto h-auto overflow-y-auto">
                 {cardSets.map((cardSet) => (
                     <div
                         className={`${arrayOfCardDismantle.includes(cardSet.userCardSetId as string) && "border-[3px] border-yellow-500 h-fit p-0.5 rounded-md"}`}

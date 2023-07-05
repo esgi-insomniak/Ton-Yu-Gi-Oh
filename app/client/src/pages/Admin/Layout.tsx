@@ -18,7 +18,7 @@ export const LayoutAdmin = ({ children }: { children: React.ReactNode }) => {
                 <input id="my-drawer" type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content">
                     <div className="h-full flex justify-center">
-                        <div className="w-20 bg-white flex p-3 flex-col justify-between">
+                        <div className="w-20 bg-white/10 flex p-3 flex-col justify-between">
                             <div className="space-y-3 flex flex-col">
                                 <label htmlFor="my-drawer" className="btn drawer-button mt-3">
                                     <RxHamburgerMenu />

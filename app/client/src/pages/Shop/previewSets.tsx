@@ -28,14 +28,14 @@ const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | u
     }, [cardSetsProps])
 
     return (
-        <div className="h-[calc(100vh-15rem)] flex flex-col  w-full overflow-scroll">
+        <div className="h-[calc(100vh-15rem)] flex flex-col w-full overflow-scroll">
             {Object.values(CardRarity).map((rarity) => {
                 const cardSetsByRarity = cardSets?.filter((cardSet) => cardSet.rarity.name === rarity)
                 if (!cardSetsByRarity?.length) return null
                 return (
                     <div key={rarity} className="flex flex-col space-y-2 my-1">
                         <span className="text-2xl font-bold">{rarity}</span>
-                        <div className="grid grid-cols-10 gap-2">
+                        <div className="grid xl:grid-cols-10 lg:grid-cols-6 md:grid-cols-4 grid-cols-3 gap-2">
                             {cardSetsByRarity?.map((cardSet, i) => (
                                 <GameCard key={i} {...cardSet} />
                             ))}
