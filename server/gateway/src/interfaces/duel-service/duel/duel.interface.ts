@@ -5,6 +5,7 @@ export interface IDuel {
   roomId: string;
   hasStarted: boolean;
   isOver: boolean;
+  turn: number;
   timePerTurn: number;
   timeToSelectDeck: number;
   playerToPlay: string;

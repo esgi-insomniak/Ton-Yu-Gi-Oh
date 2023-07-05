@@ -1,16 +1,16 @@
 import { itemTypes } from "@/pages/Duels";
 import { useDrag } from "react-dnd";
-import React, { useState } from "react";
-import { Card } from "./MonsterZone";
+import { ICard } from "@/helpers/types/cards";
 
-export const HandCard = ({ card, onCardHover }: { card: Card | null, onCardHover: (card: Card | null) => void }) => {
-  const [{ isDragging }, dragRef] = useDrag(
+export const HandCard = ({ card, onCardHover, playerTurn = false }: { card: ICard, onCardHover: (card: ICard | null) => void, playerTurn: boolean }) => {
+  const [{}, dragRef] = useDrag(
     () => ({
       type: itemTypes.CARD,
       item: card,
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
+      canDrag: playerTurn,
     }),
     [card]
   );
@@ -28,8 +28,8 @@ export const HandCard = ({ card, onCardHover }: { card: Card | null, onCardHover
       onMouseLeave={handleMouseLeave}
     >
       <img
-        src={card?.imageUrl}
-        alt={card?.name}
+        src={card?.cardSet.card.imageUrlSmall}
+        alt={card?.cardSet.card.imageUrlSmall}
         style={{
           width: "92px",
           height: "124px",

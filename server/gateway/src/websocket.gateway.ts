@@ -62,6 +62,7 @@ import { IUserDeckPartial } from './interfaces/user-deck-service/userDeck/user-d
 import { SelectedDeckBodyDto } from './interfaces/user-deck-service/userDeck/user-deck.body.dto';
 import { IDuelPlayer } from './interfaces/duel-service/duelPlayer/duel-player.interface';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { DuelSendActionDataBodyDto } from './interfaces/duel-service/duel/duel.body.dto';
 
 @Catch()
 export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
@@ -121,6 +122,12 @@ export class WebsocketGateway
     interval?: NodeJS.Timeout;
   }> = [];
 
+  protected duelCountdown: Array<{
+    roomId: string;
+    timeout?: NodeJS.Timeout;
+    interval?: NodeJS.Timeout;
+  }> = [];
+
   constructor(
     @Inject('USER_SERVICE') protected readonly userServiceClient: ClientProxy,
     @Inject('DUEL_SERVICE') protected readonly duelServiceClient: ClientProxy,
@@ -160,7 +167,7 @@ export class WebsocketGateway
       }),
     );
 
-    if (currentDuelResponse.status === 200) {
+    if (currentDuelResponse.status === HttpStatus.OK) {
       client.join(currentDuelResponse.item.roomId);
       if (!currentDuelResponse.item.hasStarted) {
         client.emit('duel__deck_selected', {
@@ -230,7 +237,7 @@ export class WebsocketGateway
     } as ISocketMessage);
   }
 
-  // Duel Queues routes
+  // Duel Join Queue routes
   @SubscribeMessage('duel__join_queue')
   @UseFilters(new WebsocketExceptionsFilter('duel__queue'))
   async duelJoinQueue(@ConnectedSocket() client: IAuthorizedSocket) {
@@ -373,6 +380,12 @@ export class WebsocketGateway
           this.duelServiceClient.emit('delete_duel_by_room_id', {
             roomId: newDuelResponse.item.roomId,
           });
+          // remove the countdown from the array
+          this.duelSelectedDeckCountdown =
+            this.duelSelectedDeckCountdown.filter(
+              (countdown) => countdown.roomId !== newDuelResponse.item.roomId,
+            );
+          // emit the timeout to the room
           this.io.to(newDuelResponse.item.roomId).emit('duel__deck_selected', {
             event: 'duel__deck_selected',
             type: ISocketEventType.DELETE,
@@ -425,7 +438,7 @@ export class WebsocketGateway
     } as ISocketEvent);
   }
 
-  // Duel Queues routes
+  // Duel Leave Queue routes
   @SubscribeMessage('duel__leave_queue')
   async duelLeaveQueue(@ConnectedSocket() client: IAuthorizedSocket) {
     const eventName = 'duel__queue';
@@ -465,7 +478,7 @@ export class WebsocketGateway
     } as ISocketEvent);
   }
 
-  // Duel routes
+  // Duel Select Deck routes
   @SubscribeMessage('duel__select_deck')
   @UseFilters(new WebsocketExceptionsFilter('duel__deck_selected'))
   async duelSelectDeck(
@@ -634,6 +647,92 @@ export class WebsocketGateway
       },
     });
 
+    // init the duel countDown
+    const duelCountDownTimeout = setTimeout(async () => {
+      clearTimeout(duelCountDownTimeout);
+      const getDuelResponse: GetResponseOne<IDuel> = await firstValueFrom(
+        this.duelServiceClient.send('get_duel_by_room_id', {
+          params: {
+            roomId: body.duelRoomId,
+          },
+        }),
+      );
+
+      if (getDuelResponse.status !== HttpStatus.OK) {
+        throw new WsException({
+          statusCode: getDuelResponse.status,
+          message: getDuelResponse.message,
+        } as ISocketMessage);
+      }
+
+      const duelToUpdate: IDuel = {
+        ...getDuelResponse.item,
+        playerToPlay: getDuelResponse.item.players.find(
+          (player) => player.userId !== getDuelResponse.item.playerToPlay,
+        ).userId,
+      };
+
+      const updatedDuelResponse: GetResponseOne<IDuel> = await firstValueFrom(
+        this.duelServiceClient.send('update_duel_by_room_id', {
+          params: {
+            roomId: body.duelRoomId,
+          },
+          body: duelToUpdate,
+        }),
+      );
+
+      if (updatedDuelResponse.status !== HttpStatus.OK) {
+        throw new WsException({
+          statusCode: updatedDuelResponse.status,
+          message: updatedDuelResponse.message,
+        } as ISocketMessage);
+      }
+
+      // replace cardsInDeck by the number of cards
+      // replace the opponent cardsInHand by the number of cards
+      const filteredDuel: IDuel = {
+        ...updatedDuelResponse.item,
+        players: updatedDuelResponse.item.players.map((user: IDuelPlayer) => {
+          const updUser: IDuelPlayer = {
+            ...user,
+            cardsInDeck: (user.cardsInDeck as string[]).length,
+            cardsInHand:
+              user.userId === client.userId
+                ? user.cardsInHand
+                : (user.cardsInHand as string[]).length,
+          };
+          return updUser;
+        }),
+      };
+
+      const socketEventResponse: ISocketEvent = {
+        event: eventName,
+        type: ISocketEventType.INFO,
+        data: filteredDuel,
+      };
+
+      client.emit(eventName, socketEventResponse);
+    }, updatedDuelResponse.item.timePerTurn * 1000);
+
+    let duelTurnToPlayCountDown = updatedDuelResponse.item.timePerTurn;
+    const duelCountDownInterval = setInterval(() => {
+      duelTurnToPlayCountDown -= 1;
+      this.io.to(updatedDuelResponse.item.roomId).emit('duel__current', {
+        event: 'duel__deck_playtime_countdown',
+        type: ISocketEventType.INFO,
+        data: {
+          countDown: duelTurnToPlayCountDown,
+        },
+      });
+      if (duelTurnToPlayCountDown === 0) clearInterval(duelCountDownInterval);
+    }, 1000);
+
+    this.duelSelectedDeckCountdown.push({
+      roomId: body.duelRoomId,
+      timeout: duelCountDownTimeout,
+      interval: duelCountDownInterval,
+    });
+
     const opponent = updatedDuelResponse.item.players.filter((user) => {
       return user.userId !== client.userId;
     })[0];
@@ -642,7 +741,7 @@ export class WebsocketGateway
     this.io.to(opponent.userId).emit(eventName, socketEventResponse);
   }
 
-  // Duel routes
+  // Duel Get Current Duel routes
   @SubscribeMessage('duel__get_current_game')
   @UseFilters(new WebsocketExceptionsFilter('duel__current'))
   async duelGetCurrentGame(@ConnectedSocket() client: IAuthorizedSocket) {
@@ -705,6 +804,16 @@ export class WebsocketGateway
     };
 
     client.emit(eventName, socketEventResponse);
+  }
+
+  // Duel Send Action routes
+  @SubscribeMessage('duel__send_action')
+  @UseFilters(new WebsocketExceptionsFilter('duel__current'))
+  async duelSendAction(
+    client: IAuthorizedSocket,
+    body: DuelSendActionDataBodyDto,
+  ) {
+    return;
   }
 
   // Exchange routes

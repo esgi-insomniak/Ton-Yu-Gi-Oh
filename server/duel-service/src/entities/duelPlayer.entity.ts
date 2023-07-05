@@ -31,5 +31,11 @@ export class DuelPlayer {
   cardsInDeck: string[];
 
   @Column('jsonb', { nullable: false, default: {} })
-  cardsInField: { position: number; cardId: string }[];
+  cardsInField: {
+    position: number;
+    cardId: string;
+    placedAtTurn: number;
+    lifePoints: number;
+    action: string;
+  }[];
 }

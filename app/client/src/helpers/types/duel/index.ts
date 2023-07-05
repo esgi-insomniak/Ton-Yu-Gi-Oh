@@ -5,6 +5,7 @@ export interface IDuel {
   roomId: string;
   hasStarted: boolean;
   isOver: boolean;
+  turn: number;
   timePerTurn: number;
   winnerId: string;
   players: IDuelPlayer[] | Partial<IDuelPlayer>[];
@@ -20,6 +21,12 @@ export interface IDuelPlayer {
   cardsInHand: string[] | number;
   cardsInDeck: number;
   cardsInGraveyard: string[];
-  cardsInField: string[];
+  cardsInField: {
+    position: number;
+    cardId: string;
+    placedAtTurn: number;
+    lifePoints: number;
+    action: string;
+  }
   deckUserCardSets: IUserCardSets[];
 }

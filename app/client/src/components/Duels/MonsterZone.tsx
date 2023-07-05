@@ -1,48 +1,43 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDrop } from "react-dnd";
 import { Dispatch, SetStateAction } from "react";
 import { itemTypes } from "@/pages/Duels";
-import { BsFillShieldFill } from "react-icons/bs";
-import { TbSwords } from "react-icons/tb";
-
-export interface Card {
-  id: string;
-  name: string;
-  type?: string;
-  imageUrl: string;
-  atk?: number;
-  def?: number;
-}
+import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
+import { ICard } from "@/helpers/types/cards";
 
 export const MonsterZone = ({
-  setter,
   onCardHover,
+  player,
 }: {
-  setter: Dispatch<SetStateAction<Card[]>>;
-  onCardHover: (card: Card | null) => void;
+  onCardHover: (card: ICard | null) => void;
+  player: boolean;
 }) => {
-  const [droppedCard, setDroppedCard] = React.useState<Card | null>(null);
-  const [showModal, setShowModal] = React.useState(false);
+  const [droppedCard, setDroppedCard] = React.useState<ICard | null>(null);
   const [selectedPosition, setSelectedPosition] = React.useState("");
+  const alert = useAlert();
 
-  const [{ }, dropRef] = useDrop({
+  const [{}, dropRef] = useDrop({
     accept: itemTypes.CARD,
-    drop: (item: Card) => handleDrop(item, setter),
+    drop: (item: ICard) => handleDrop(item),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
   });
 
-  const handleDrop = (item: Card, setter: Dispatch<SetStateAction<Card[]>>) => {
-    setDroppedCard(item);
-    setter((prev: Card[]) => prev.filter((card) => card.id !== item.id));
-    setShowModal(true);
+  const handleDrop = (item: ICard) => {
+    if(player) {
+    setDroppedCard(item.cardSet.card);
+    console.log(item)
+    //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
+    setSelectedPosition("ATK");
+    }else{
+      alert?.error("Ce n'est pas votre terrain !");
+    }
   };
 
   const handlePositionSelection = (position: string) => {
     setSelectedPosition(position);
-    setShowModal(false);
   };
 
   const handleMouseEnter = () => {
@@ -69,8 +64,9 @@ export const MonsterZone = ({
 
   return (
     <div
-      className={`${selectedPosition !== "DEF" ? "shadow-inner shadow-black" : ""
-        } w-24 h-32`}
+      className={`${
+        selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
+      } w-24 h-32`}
       ref={dropRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -122,27 +118,6 @@ export const MonsterZone = ({
             </span>
           </div>
         </>
-      )}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded p-4">
-            <p className="text-lg font-bold mb-2">Select Position</p>
-            <div className="flex justify-center space-x-4">
-              <button
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-                onClick={() => handlePositionSelection("ATK")}
-              >
-                <TbSwords />
-              </button>
-              <button
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                onClick={() => handlePositionSelection("DEF")}
-              >
-                <BsFillShieldFill />
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
