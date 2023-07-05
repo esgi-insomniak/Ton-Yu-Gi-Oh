@@ -102,7 +102,6 @@ services:
     user-service-postgres:
       image: postgres:13.2-alpine
       hostname: user-service-postgres
-      container_name: user-service-postgres
       networks:
         - backend-dev
       env_file:

@@ -148,7 +148,7 @@ html {
     background-size: 300% 300%;
     background-position: 0 50%;
     border-radius: calc(2 * var(--border-width));
-    animation: moveGradient 4s alternate infinite;
+    animation: moveGradient 2s alternate infinite;
   }
 }
 

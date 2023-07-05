@@ -38,20 +38,20 @@ const Home = () => {
     }, [ioClient, alert])
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
-        { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-deck.gif", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-collection.gif", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/yugi-bg-duel.gif", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
+        { animatedBackground: "/opening.gif", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-shop.gif", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-admin.gif", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },
     ], [me?.roles])
 
     return (
         <div className="hero items-center min-h-screen text-gray-300">
             <div className="absolute top-5 right-5 z-10 gradient-border">
-                <button className="btn z-20 text-white">Rejoindre l'enchère !</button>
+                <button className="btn z-20 text-white" onClick={() => router('/auction')}>Rejoindre l'enchère !</button>
             </div>
-            <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
+            <video autoPlay muted loop id="myVideo" className="object-fill w-full">
                 <source src="/bg-home.mp4" type="video/mp4" />
             </video>
             <div className="hero-overlay bg-gray-900 opacity-60" />
@@ -61,7 +61,7 @@ const Home = () => {
                         Welcome <span className="text-yellow-500">{me?.username}</span>
                     </h1>
                 </div>
-                <div className="grid grid-cols-3 grid-flow-dense gap-8">
+                <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-3 grid-flow-dense gap-8">
                     {navs.filter(auth => auth.condition === true).map((nav, index) => (
                         <NavItem
                             key={index}
@@ -74,7 +74,7 @@ const Home = () => {
                     ))}
                 </div>
             </div>
-            <div className="h-20 w-full bottom-0 absolute flex px-5 items-center">
+            <div className="h-20 w-full bottom-0 fixed flex px-5 items-center">
                 <div className="dropdown dropdown-right dropdown-end">
                     <label tabIndex={0} className="w-16 h-10 p-2 rounded-full bg-white/20 flex items-center justify-center cursor-pointer text-2xl hover:bg-white/30">⚙️</label>
                     <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 ml-2">
