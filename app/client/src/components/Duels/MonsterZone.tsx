@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useDrop } from "react-dnd";
 import { Dispatch, SetStateAction } from "react";
 import { itemTypes } from "@/pages/Duels";
+import { BsFillShieldFill } from "react-icons/bs";
+import { TbSwords } from "react-icons/tb";
 
-export interface Card {
+interface Card {
   id: string;
   name: string;
   type?: string;
@@ -14,14 +16,16 @@ export interface Card {
 
 export const MonsterZone = ({
   setter,
+  onCardHover,
 }: {
   setter: Dispatch<SetStateAction<Card[]>>;
+  onCardHover: (card: Card | null) => void;
 }) => {
-  const [droppedCard, setDroppedCard] = useState<Card | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState("");
+  const [droppedCard, setDroppedCard] = React.useState<Card | null>(null);
+  const [showModal, setShowModal] = React.useState(false);
+  const [selectedPosition, setSelectedPosition] = React.useState("");
 
-  const [{ canDrop, isOver }, dropRef] = useDrop({
+  const [{}, dropRef] = useDrop({
     accept: itemTypes.CARD,
     drop: (item: Card) => handleDrop(item, setter),
     collect: (monitor) => ({
@@ -31,7 +35,6 @@ export const MonsterZone = ({
   });
 
   const handleDrop = (item: Card, setter: Dispatch<SetStateAction<Card[]>>) => {
-    console.log(item);
     setDroppedCard(item);
     setter((prev: Card[]) => prev.filter((card) => card.id !== item.id));
     setShowModal(true);
@@ -42,24 +45,75 @@ export const MonsterZone = ({
     setShowModal(false);
   };
 
+  const handleMouseEnter = () => {
+    onCardHover(droppedCard);
+  };
+
+  const handleMouseLeave = () => {
+    onCardHover(null);
+  };
+
+  function handleChangePosition(
+    selectedPosition: string
+  ): React.MouseEventHandler<HTMLLIElement> | undefined {
+    if (selectedPosition === "ATK") {
+      return () => handlePositionSelection("DEF");
+    } else {
+      return () => handlePositionSelection("ATK");
+    }
+  }
+
+  const handleAttack = () => {
+    console.log("attack");
+  };
+
   return (
     <div
-      className="border-2 border-sky-500 w-24 h-32"
+      className={`${
+        selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
+      } w-24 h-32`}
       ref={dropRef}
-      style={{
-        transform: selectedPosition === "DEF" ? "rotate(90deg)" : "none",
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {droppedCard && selectedPosition && (
         <>
-          <img
-            src={droppedCard.imageUrl}
+          <div
+            className="flex items-center"
             style={{
               width: "100%",
               height: "100%",
             }}
-            alt={droppedCard.name}
-          />
+          >
+            <div className="dropdown dropdown-right dropdown-end">
+              <label
+                tabIndex={0}
+                className="flex items-center justify-center cursor-pointer text-2xl"
+              >
+                <img
+                  src={droppedCard.imageUrl}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    transform:
+                      selectedPosition === "DEF" ? "rotate(90deg)" : "none",
+                  }}
+                  alt={droppedCard.name}
+                />
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box ml-2 cursor-pointer"
+              >
+                {selectedPosition === "ATK" && (
+                  <li onClick={handleAttack}>Attaquer</li>
+                )}
+                <li onClick={handleChangePosition(selectedPosition)}>
+                  Changer de position
+                </li>
+              </ul>
+            </div>
+          </div>
           <div className="relative">
             <span className="bg-blue-200 text-xs font-medium text-blue-800 text-center p-0.5 leading-none rounded-full px-2 dark:bg-blue-900 dark:text-blue-200 absolute translate-y-1/2 -translate-x-1/2 right-auto bottom-0 left-0">
               {droppedCard.atk}
@@ -79,13 +133,13 @@ export const MonsterZone = ({
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
                 onClick={() => handlePositionSelection("ATK")}
               >
-                ATK
+                <TbSwords />
               </button>
               <button
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
                 onClick={() => handlePositionSelection("DEF")}
               >
-                DEF
+                <BsFillShieldFill />
               </button>
             </div>
           </div>
