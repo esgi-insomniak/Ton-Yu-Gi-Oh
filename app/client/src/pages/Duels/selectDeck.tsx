@@ -29,15 +29,7 @@ const SelectDeck = () => {
     const [userIsWaiting, setUserIsWaiting] = React.useState<boolean>();
     const defaultCountDown = 60;
 
-    interface CountDownStyle extends React.CSSProperties {
-        "--value": number;
-    }
-
     const [countDown, setCountDown] = React.useState<number>(defaultCountDown);
-    const [countDownStyle, setCountDownStyle] = React.useState<CountDownStyle>({
-        "--value": countDown
-    });
-
 
     const handlePreviewBooster = (deck: userCardSetsType) => {
         setSelectedDeck(deck);
@@ -54,12 +46,6 @@ const SelectDeck = () => {
         if (!selectedDeck) return;
         getIoClient()?.emit('duel__select_deck', { userDeckId: selectedDeck.id, duelRoomId: roomId });
     };
-
-    React.useEffect(() => {
-        setCountDownStyle({
-            "--value": countDown
-        });
-    }, [countDown]);
 
     React.useEffect(() => {
         getIoClient()?.off('duel__deck_selected');
@@ -84,7 +70,7 @@ const SelectDeck = () => {
 
     return (
         <div className="px-10 py-10 flex-col">
-            <TimerDuel countDownStyle={countDownStyle} countDown={countDown} defaultCountDown={defaultCountDown} />
+            <TimerDuel countDown={countDown} defaultCountDown={defaultCountDown} />
             <div className="w-full h-full flex flex-col">
                 <div className="flex">
                     <div className="w-full h-[80vh] p-5 rounded-md shadow-inner shadow-black overflow-scroll scrollbar-none">

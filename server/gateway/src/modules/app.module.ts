@@ -16,7 +16,7 @@ import { PromoModule } from './promo.module';
 import { DuelModule } from './duel.module';
 import { MeToIdGuard } from 'src/services/guard/me-to-id.guard';
 import { PingModule } from './ping.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TestModule } from './test.module';
 
 @Module({
@@ -31,10 +31,10 @@ import { TestModule } from './test.module';
     WebsocketModule,
     PingModule,
     TestModule,
-    ThrottlerModule.forRoot({
-      ttl: 5,
-      limit: 15,
-    }),
+    // ThrottlerModule.forRoot({
+    //   ttl: 5,
+    //   limit: 15,
+    // }),
   ],
   providers: [
     ConfigService,
@@ -115,10 +115,10 @@ import { TestModule } from './test.module';
       provide: APP_GUARD,
       useClass: MeToIdGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
   exports: [
     'CARD_SERVICE',

@@ -21,10 +21,13 @@ export class Duel {
   @Column({ type: 'boolean', default: false })
   isOver: boolean;
 
+  @Column({ default: 1 })
+  turn: number;
+
   @Column({ default: 90 })
   timePerTurn: number;
 
-  @Column({ default: 30 })
+  @Column({ default: 60 })
   timeToSelectDeck: number;
 
   @Column({ type: 'uuid', nullable: true })

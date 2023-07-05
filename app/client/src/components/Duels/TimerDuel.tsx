@@ -1,16 +1,25 @@
 import React from "react";
 
 export const TimerDuel = ({
-  countDownStyle = {
-    "--value": 0,
-  },
   countDown,
   defaultCountDown,
 }: {
-  countDownStyle: React.CSSProperties;
   countDown: number;
   defaultCountDown: number;
 }) => {
+  interface CountDownStyle extends React.CSSProperties {
+    "--value": number;
+  }
+  const [countDownStyle, setCountDownStyle] = React.useState<CountDownStyle>({
+    "--value": countDown,
+  });
+
+  React.useEffect(() => {
+    setCountDownStyle({
+      "--value": countDown,
+    });
+  }, [countDown]);
+
   return (
     <React.Fragment>
       <div className="flex justify-center mb-2">

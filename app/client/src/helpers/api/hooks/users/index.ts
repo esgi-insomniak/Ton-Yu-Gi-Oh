@@ -59,7 +59,7 @@ export const useMe = () => {
   })
 
   if (error) {
-    //localStorage.removeItem("token")
+    localStorage.removeItem("token")
     window.location.reload()
   }
 

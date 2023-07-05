@@ -28,7 +28,7 @@ export class DuelService {
       where: { players: { userId } },
     });
     if (!duel) return null;
-    return this.getDuelById(duel.id);
+    return await this.getDuelById(duel.id);
   }
 
   async createDuel(duelPartial: DeepPartial<Duel>): Promise<Duel> {
@@ -36,7 +36,7 @@ export class DuelService {
       const newDuel = await this.dataSource
         .getRepository(Duel)
         .save(duelPartial);
-      return this.getDuelById(newDuel.id);
+      return await this.getDuelById(newDuel.id);
     } catch {
       return null;
     }

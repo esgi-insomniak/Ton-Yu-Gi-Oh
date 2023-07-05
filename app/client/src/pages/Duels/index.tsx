@@ -21,16 +21,11 @@ const Duel = () => {
   const [hoveredCard, setHoveredCard] = React.useState<ICard>();
   const [currentPlayer, setCurrentPlayer] = React.useState<IDuelPlayer>();
   const [opponentPlayer, setOpponentPlayer] = React.useState<IDuelPlayer>();
-  const [allUserCardSets, setAllUserCardSets] = React.useState<IUserCardSets[]>(
-    []
-  );
+  const [allUserCardSets, setAllUserCardSets] = React.useState<IUserCardSets[]>([]);
   const [playerTurn, setPlayerTurn] = React.useState<boolean>(false);
-  interface CountDownStyle extends React.CSSProperties {
-    "--value": number;
-  }
-  const [countDownStyle, setCountDownStyle] = React.useState<CountDownStyle>({
-    "--value": 0,
-  });
+  const defaultCountDown = 90;
+
+  const [countDown, setCountDown] = React.useState<number>(defaultCountDown);
   const handleCardHover = (card: ICard | null) => {
     setHoveredCard(card!);
   };
@@ -39,31 +34,34 @@ const Duel = () => {
     if (allUserCardSets.length > 0) return;
     getIoClient()?.off("duel__current");
     getIoClient()?.on("duel__current", (event: ISocketEvent) => {
-      console.log(event);
-      const userCardSets: IUserCardSets[] = event.data.players.reduce(
-        (acc: IUserCardSets[], player: IDuelPlayer) => {
-          const cardSets = player.deckUserCardSets.map((card) => card.cardSet);
-          return [...acc, ...cardSets];
-        },
-        []
-      );
-      setAllUserCardSets(userCardSets);
-      setOpponentPlayer(
-        event.data.players.find(
-          (player: IUserCardSets) => player.userId != me?.id
-        )
-      );
-      setCurrentPlayer(
-        event.data.players.find(
-          (player: IUserCardSets) => player.userId == me?.id
-        )
-      );
-      if (me?.id == event.data.playerToPlay) {
-        setPlayerTurn(true);
-      } else {
-        setPlayerTurn(false);
+      if (event.event === "duel__current") {
+        const userCardSets: IUserCardSets[] = event.data.players.reduce(
+          (acc: IUserCardSets[], player: IDuelPlayer) => {
+            const cardSets = player.deckUserCardSets.map((card) => card.cardSet);
+            return [...acc, ...cardSets];
+          },
+          []
+        );
+        setAllUserCardSets(userCardSets);
+        setOpponentPlayer(
+          event.data.players.find(
+            (player: IUserCardSets) => player.userId != me?.id
+          )
+        );
+        setCurrentPlayer(
+          event.data.players.find(
+            (player: IUserCardSets) => player.userId == me?.id
+          )
+        );
+        if (me?.id == event.data.playerToPlay) {
+          setPlayerTurn(true);
+        } else {
+          setPlayerTurn(false);
+        }
+      } else if (event.event === "duel__deck_playtime_countdown") {
+        setCountDown(event.data.countDown);
       }
-    });
+    })
     getIoClient()?.emit("duel__get_current_game");
   }, [allUserCardSets]);
 
@@ -129,9 +127,8 @@ const Duel = () => {
           </div>
           <div className="flex justify-between items-center">
             <TimerDuel
-              countDownStyle={countDownStyle}
-              countDown={0}
-              defaultCountDown={0}
+              countDown={countDown}
+              defaultCountDown={defaultCountDown}
             />
             {playerTurn && (
               <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-3 rounded w-1/5">
