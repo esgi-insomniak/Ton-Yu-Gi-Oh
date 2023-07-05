@@ -2,8 +2,8 @@ name: Deploy "gateway"
 
 on:
   push:
-    # branches:
-      # - develop
+    branches:
+      - main
     paths:
       - "server/gateway/**"
       - ".github/workflows/gateway.yml"

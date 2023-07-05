@@ -2,8 +2,8 @@ name: Deploy "{{ROUTE}}"
 
 on:
   push:
-    # branches:
-      # - develop
+    branches:
+      - main
     paths:
       - "server/{{ROUTE}}/**"
       - ".github/workflows/{{ROUTE}}.yml"

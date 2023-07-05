@@ -2,8 +2,8 @@ name: Deploy "mailer-service"
 
 on:
   push:
-    # branches:
-      # - develop
+    branches:
+      - main
     paths:
       - "server/mailer-service/**"
       - ".github/workflows/mailer-service.yml"
