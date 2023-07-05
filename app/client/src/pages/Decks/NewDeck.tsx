@@ -88,7 +88,7 @@ const NewDecks = () => {
 
     return (
         <div className="w-full flex flex-col h-full p-2">
-            <div className="text-md breadcrumbs">
+            <div className="text-md breadcrumbs hidden lg:block">
                 <ul>
                     <li><Link to={'/decks'}>Crafting zone</Link></li>
                     <li><Link to={'/decks/create'}>Mes decks</Link></li>
