@@ -10,10 +10,11 @@ import { useMe } from "@/helpers/api/hooks/users";
 import { PreviewSets } from "../Shop/previewSets";
 import { CardICardSet } from "@/helpers/types/cards";
 import { userCardSetsType } from "@/helpers/utils/schema/cards/card-set.schema";
-import { BiSolidCheckSquare, BiSolidSelectMultiple } from "react-icons/bi";
+import { BiCheckSquare, BiSelectMultiple } from "react-icons/bi";
 import { useSocket } from "@/helpers/api/hooks";
 import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
 import { IDuelPlayer } from "@/helpers/types/duel";
+import { TimerDuel } from "@/components/Duels/TimerDuel";
 
 const SelectDeck = () => {
     const { me } = useMe();
@@ -83,12 +84,7 @@ const SelectDeck = () => {
 
     return (
         <div className="px-10 py-10 flex-col">
-            <div className="flex justify-center mb-2">
-                <span className="countdown font-mono text-6xl">
-                    <span style={{ ...countDownStyle }}></span>
-                </span>
-            </div>
-            <progress className="progress progress-warning w-full mb-2" value={countDown} max={defaultCountDown}></progress>
+            <TimerDuel countDownStyle={countDownStyle} countDown={countDown} defaultCountDown={defaultCountDown} />
             <div className="w-full h-full flex flex-col">
                 <div className="flex">
                     <div className="w-full h-[80vh] p-5 rounded-md shadow-inner shadow-black overflow-scroll scrollbar-none">
@@ -106,7 +102,7 @@ const SelectDeck = () => {
                                                         <AiFillEye className="text-white" />
                                                     </div>
                                                     <div className="btn btn-accent" onClick={() => handleSelectDeck(deck)}>
-                                                        <BiSolidCheckSquare className="text-white" />
+                                                        <BiCheckSquare className="text-white" />
                                                     </div>
                                                 </div>
                                             </div>
