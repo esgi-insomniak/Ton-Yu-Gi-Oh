@@ -38,7 +38,7 @@ const GameCardInfos = (props: IGameCard) => {
           </div>
         )
       }
-      <p className="h-auto overflow-y-auto max-h-[50%]">Description : {props.card.description}</p>
+      <p className="overflow-y-auto max-h-[75px] scrollbar-none">Description : {props.card.description}</p>
       <div className="flex justify-center align-center">
         <button className='btn w-fit' onClick={() => navigate(`/exchange/${props.id}`)}>Trouver un échange</button>
       </div>

@@ -34,7 +34,7 @@ const Auction = () => {
 
     return (
         <div className="w-full h-full flex flex-col p-5">
-            <div className="w-full flex items-center justify-between">
+            <div className="lg:flex-row lg:space-y-0 md:flex-col md:space-y-5 space-y-5 flex-col w-full flex items-center justify-between">
                 <Stats data={AuctionStats} />
                 <div className="h-fit w-fit flex flex-col justify-center">
                     <Timer
@@ -52,7 +52,7 @@ const Auction = () => {
 
                     {/** Laster Bider */}
                     <div className="w-full bg-white/30 h-[32rem] rounded-lg shadow-xl overflow-scroll scrollbar-none p-5 flex space-x-2">
-                        <p className="text-green-500">Frozox :</p>
+                        <p className="text-green-500">Frozoxadazd :</p>
                         <div className="space-x-2 flex">
                             <p className="text-yellow-600">100</p>
                             <p>ISM</p>

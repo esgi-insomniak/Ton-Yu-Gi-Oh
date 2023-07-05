@@ -147,7 +147,7 @@ const GameCard = (props: IGameCard) => {
         }, delay);
     };
 
-    const activate = (e: React.MouseEvent<HTMLElement>) => {
+    const activate = () => {
         if (!currentCardSet.canActivate) {
             return;
         }
@@ -165,7 +165,7 @@ const GameCard = (props: IGameCard) => {
         }
     }
 
-    const deactivate = (e: React.FocusEvent<HTMLDivElement>) => {
+    const deactivate = () => {
         setIsDraggable(currentCardSet, true);
         setIsActive(currentCardSet, false);
         interactEnd();
@@ -248,7 +248,7 @@ const GameCard = (props: IGameCard) => {
         });
     }
 
-    document.addEventListener("visibilitychange", (e) => {
+    document.addEventListener("visibilitychange", () => {
         setIsVisible(document.visibilityState === "visible");
         endShowcase();
         // reset();
