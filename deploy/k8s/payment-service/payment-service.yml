@@ -27,10 +27,10 @@ spec:
           resources:
             requests:
               memory: "126Mi"
-              cpu: "10m"
+              cpu: "30m"
             limits:
               memory: "126Mi"
-              cpu: "10m"
+              cpu: "30m"
 ---
 
 apiVersion: v1

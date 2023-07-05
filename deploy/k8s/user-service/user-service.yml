@@ -26,10 +26,10 @@ spec:
                 name: user-service-config
           resources:
             requests:
-              memory: "126Mi"
+              memory: "270Mi"
               cpu: "30m"
             limits:
-              memory: "126Mi"
+              memory: "270Mi"
               cpu: "30m"
 ---
 

@@ -29,11 +29,11 @@ spec:
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
-              memory: "126Mi"
-              cpu: "10m"
+              memory: "40Mi"
+              cpu: "5m"
             limits:
-              memory: "126Mi"
-              cpu: "10m"
+              memory: "40Mi"
+              cpu: "5m"
       volumes:
         - name: auth-service-db
           persistentVolumeClaim:
