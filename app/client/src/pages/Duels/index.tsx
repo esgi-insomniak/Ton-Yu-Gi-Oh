@@ -4,6 +4,8 @@ import { HandCard } from "@/components/Duels/HandCard";
 import { MonsterZone } from "@/components/Duels/MonsterZone";
 import { useSocket } from "@/helpers/api/hooks";
 import { ISocketEvent } from "@/helpers/types/socket";
+import { IUserCardSets } from "@/helpers/types/cards";
+import { IDuelPlayer } from "@/helpers/types/duel";
 
 interface Card {
   id: string;
@@ -22,9 +24,10 @@ const Duel = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { getIoClient } = useSocket();
   const [hoveredCard, setHoveredCard] = React.useState<Card>();
-  const [lifePoints, setLifePoints] = React.useState<number>(8000);
-  const [adversaryLifePoints, setAdversaryLifePoints] =
-    React.useState<number>(8000);
+  const [currentPlayer, setCurrentPlayer] = React.useState<IDuelPlayer>();
+  const [opponentPlayer, setOpponentPlayer] = React.useState<IDuelPlayer>();
+  const [allUserCardSets, setAllUserCardSets] = React.useState<IUserCardSets[]>([]);
+
   const [cards, setCards] = React.useState<Card[]>([
     {
       id: "card1",
@@ -68,12 +71,18 @@ const Duel = () => {
   };
 
   React.useEffect(() => {
+    if (allUserCardSets.length > 0) return;
     getIoClient()?.off("duel__current");
     getIoClient()?.on("duel__current", (event: ISocketEvent) => {
-      console.log("event", event);
-    });
+      console.log(event);
+      const userCardSets: IUserCardSets[] = event.data.players.reduce((acc: IUserCardSets[], player: IDuelPlayer) => {
+        const cardSets = player.deckUserCardSets.map((card) => card.cardSet);
+        return [...acc, ...cardSets];
+      }, []);
+      setAllUserCardSets(userCardSets);
+    })
     getIoClient()?.emit("duel__get_current_game");
-  }, []);
+  }, [allUserCardSets]);
 
   return (
     <div className="flex">
@@ -216,7 +225,7 @@ const Duel = () => {
             </div>
           </div>
           <div className="w-full flex justify-items-between">
-            <div id="life">{lifePoints}</div>
+            <div id="life">{currentPlayer?.lifePoints}</div>
             <div id="hand-player" className="flex justify-center mx-auto">
               {cards.map((card) => (
                 <HandCard

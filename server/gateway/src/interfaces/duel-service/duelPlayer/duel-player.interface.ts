@@ -9,7 +9,7 @@ export interface IDuelPlayer {
   duel: IDuel | Partial<IDuel>;
   lifePoints: number;
   deckUserCardSets: IUserCardSet[];
-  cardsInHand: string[];
-  cardsInDeck: string[];
+  cardsInHand: string[] | number;
+  cardsInDeck: string[] | number;
   cardsInField: string[];
 }
