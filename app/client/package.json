@@ -12,6 +12,8 @@
     "codegen": "pnpm playwright codegen"
   },
   "dependencies": {
+    "@capacitor/core": "^5.1.1",
+    "@capacitor/ios": "^5.1.1",
     "@hookform/resolvers": "^3.0.0",
     "@react-spring/web": "^9.7.1",
     "@types/node": "^18.15.7",
@@ -48,6 +50,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^5.1.1",
     "@playwright/test": "^1.35.0"
   }
 }
