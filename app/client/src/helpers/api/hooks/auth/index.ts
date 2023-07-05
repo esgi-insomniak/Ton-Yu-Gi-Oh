@@ -53,7 +53,7 @@ const requestLogout = () => apiRequest({
 export const useLogin = () =>
     useMutation<responseLoginSchemaType, Error, { username: string, password: string }>
         ((credentials) => requestLogin(credentials.username, credentials.password), {
-            onSuccess: (data) => localStorage.setItem('token', data.token)
+            onSuccess: (data) => { localStorage.setItem('token', data.token); broadcast(data.token) }
         })
 
 export const useRegister = () =>
@@ -72,8 +72,37 @@ export const useLogout = () => {
     const { refetch } = useMe()
     return useMutation<void, Error, void>(() => requestLogout(), {
         onSuccess: () => {
-            localStorage.removeItem('token')
-            refetch()
+            localStorage.removeItem('token');
+            broadcast(null);
+            refetch();
         }
     })
+}
+
+const eventListeners: Function[] = [];
+
+const broadcast = (token: string | null) => {
+    eventListeners.forEach(listener => listener(token))
+}
+
+const onChangeAuth = (cb: Function) => {
+    eventListeners.push(cb)
+    return () => {
+        eventListeners.slice(eventListeners.indexOf(cb), 1);
+    }
+}
+
+export const useToken = () => {
+    const [token, setToken] = React.useState(getToken())
+    React.useEffect(() => {
+        const listener = (token: string) => {
+            setToken(token)
+        }
+        const sub = onChangeAuth(listener)
+        return () => {
+            sub();
+        }
+    }, []);
+
+    return token;
 }

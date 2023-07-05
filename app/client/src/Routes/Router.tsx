@@ -6,7 +6,6 @@ import { ROLES } from "@/helpers/utils/enum/roles";
 import { LayoutAdmin } from "@/pages/Admin/Layout";
 import { useMe } from "@/helpers/api/hooks/users";
 import Loader from "@/components/Loader";
-import { SocketContextProvider } from "@/helpers/providers/socket/SocketProvider";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -88,9 +87,7 @@ const Router: React.FC = () => {
                             withLayout={!routesWithoutLayout.includes(router)}
                             isLoading={isLoading}
                         >
-                            <SocketContextProvider>
-                                <Outlet />
-                            </SocketContextProvider>
+                            <Outlet />
                         </ProtectedRoute>
                     }
                 >

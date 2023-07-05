@@ -5,7 +5,7 @@ import { itemTypes } from "@/pages/Duels";
 import { BsFillShieldFill } from "react-icons/bs";
 import { TbSwords } from "react-icons/tb";
 
-interface Card {
+export interface Card {
   id: string;
   name: string;
   type?: string;
@@ -25,7 +25,7 @@ export const MonsterZone = ({
   const [showModal, setShowModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState("");
 
-  const [{}, dropRef] = useDrop({
+  const [{ }, dropRef] = useDrop({
     accept: itemTypes.CARD,
     drop: (item: Card) => handleDrop(item, setter),
     collect: (monitor) => ({
@@ -69,9 +69,8 @@ export const MonsterZone = ({
 
   return (
     <div
-      className={`${
-        selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
-      } w-24 h-32`}
+      className={`${selectedPosition !== "DEF" ? "shadow-inner shadow-black" : ""
+        } w-24 h-32`}
       ref={dropRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
