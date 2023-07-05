@@ -9,33 +9,33 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
-    const { ioClient } = useSocket()
+    const { getIoClient } = useSocket()
     const { me } = useMe()
     const logout = useLogout()
     const alert = useAlert()
     const router = useNavigate()
 
     const opponentSearch = React.useCallback(() => {
-        ioClient?.off('duel__queue');
-        ioClient?.off('duel__found');
+        getIoClient()?.off('duel__queue');
+        getIoClient()?.off('duel__found');
 
-        ioClient?.emit('duel__join_queue');
+        getIoClient()?.emit('duel__join_queue');
 
-        ioClient?.on('duel__queue', (event: ISocketEvent) => {
+        getIoClient()?.on('duel__queue', (event: ISocketEvent) => {
             if (event.type === ISocketEventType.ERROR) {
                 alert?.closeAll()
                 alert?.error(event.data.message)
             }
         })
-        ioClient?.on('duel__found', (event: ISocketEvent) => {
+        getIoClient()?.on('duel__found', (event: ISocketEvent) => {
             alert?.closeAll()
             alert?.success("Adversaire trouvé !")
-            ioClient?.off('duel__queue');
-            ioClient?.off('duel__found');
+            getIoClient()?.off('duel__queue');
+            getIoClient()?.off('duel__found');
             router(`/duel/select-deck/${event.data.roomId}`)
         })
         alert?.custom('Recherche d\'un adversaire en cours...')
-    }, [ioClient, alert])
+    }, [alert])
 
     const navs = React.useMemo(() => [
         { animatedBackground: "/bg-deck.gif", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
@@ -78,7 +78,6 @@ const Home = () => {
                 <div className="dropdown dropdown-right dropdown-end">
                     <label tabIndex={0} className="w-16 h-10 p-2 rounded-full bg-white/20 flex items-center justify-center cursor-pointer text-2xl hover:bg-white/30">⚙️</label>
                     <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 ml-2">
-                        <li><Link to={`/me`}>{me?.username}</Link></li>
                         <li onClick={() => logout.mutate()}><p>Se déconnecter</p></li>
                     </ul>
                 </div>

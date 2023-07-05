@@ -24,33 +24,33 @@ const ExchangeRoom = () => {
     const [exchange, setExchange] = React.useState<exchangeType>()
     const [userIsOwner, setUserIsOwner] = React.useState<boolean>(false);
     const [selectedCard, setSelectedCard] = React.useState<string>("")
-    const { ioClient } = useSocket();
+    const { getIoClient } = useSocket();
     const condition = cardSetsResponse?.data.find((item) => item.cardSet.card.name === selectedCard)
 
     const cancelExchange = () => {
-        ioClient?.emit('exchange__cancel', {
+        getIoClient()?.emit('exchange__cancel', {
             id: roomId,
         })
     }
 
     const acceptExchange = () => {
         const alreadyAccepted = userIsOwner ? exchange?.ownerAccepted : exchange?.targetAccepted
-        ioClient?.emit('exchange__accept', {
+        getIoClient()?.emit('exchange__accept', {
             id: roomId,
             accept: !alreadyAccepted
         })
     }
 
     const updateOwnerCardSets = () => {
-        ioClient?.emit('exchange__update', {
+        getIoClient()?.emit('exchange__update', {
             id: roomId,
             ownerCardSetsProposed: [condition?.id!]
         })
     }
 
     React.useEffect(() => {
-        ioClient?.off('exchange__updated')
-        ioClient?.on('exchange__updated', (event) => {
+        getIoClient()?.off('exchange__updated')
+        getIoClient()?.on('exchange__updated', (event) => {
             if (event.type === ISocketEventType.UPDATE) {
                 if (event.data.isClosed && (!event.data.ownerAccepted || !event.data.targetAccepted)) {
                     alert?.error('l\'échange a été annulé')

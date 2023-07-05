@@ -23,7 +23,7 @@ import {
   BaseWsExceptionFilter,
   WsException,
 } from '@nestjs/websockets';
-import { Namespace } from 'socket.io';
+import { Namespace, RemoteSocket } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
@@ -55,13 +55,13 @@ import {
   IUserCardSet,
   IUserCardSetPartial,
 } from './interfaces/user-deck-service/userCardSet/user-card-set.interface';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { IUserRelation } from './interfaces/user-service/userRelation/user-relation.interface';
 import { GetItemByIdDto } from './interfaces/common/common.params.dto';
 import { ICardCardSet } from './interfaces/card-service/cardSet/card-set.interface';
 import { IUserDeckPartial } from './interfaces/user-deck-service/userDeck/user-deck.interface';
 import { SelectedDeckBodyDto } from './interfaces/user-deck-service/userDeck/user-deck.body.dto';
 import { IDuelPlayer } from './interfaces/duel-service/duelPlayer/duel-player.interface';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 @Catch()
 export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
@@ -115,6 +115,12 @@ export class WebsocketGateway
     interval?: NodeJS.Timeout;
   }> = [];
 
+  protected duelSelectedDeckCountdown: Array<{
+    roomId: string;
+    timeout?: NodeJS.Timeout;
+    interval?: NodeJS.Timeout;
+  }> = [];
+
   constructor(
     @Inject('USER_SERVICE') protected readonly userServiceClient: ClientProxy,
     @Inject('DUEL_SERVICE') protected readonly duelServiceClient: ClientProxy,
@@ -133,18 +139,45 @@ export class WebsocketGateway
     // disconnect if user is already connected
     // if (
     //   (await this.io.fetchSockets()).filter(
-    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) => s.userId === client.userId,
+    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) =>
+    //       s.userId === client.userId,
     //   ).length > 1
     // ) {
     //   return client.disconnect();
     // }
+
+    client.join(client.userId);
 
     this.userServiceClient.emit('set_user_is_online', {
       id: client.userId,
       isOnline: true,
     });
 
-    client.join(client.userId);
+    // check if user is in duel
+    const currentDuelResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_by_user_id', {
+        id: client.userId,
+      }),
+    );
+
+    if (currentDuelResponse.status === 200) {
+      client.join(currentDuelResponse.item.roomId);
+      if (!currentDuelResponse.item.hasStarted) {
+        client.emit('duel__deck_selected', {
+          event: 'duel__deck_selected',
+          type: ISocketEventType.INFO,
+          data: currentDuelResponse.item,
+        } as ISocketEvent);
+      }
+      client.emit('duel__is_started', {
+        event: 'duel__is_started',
+        type: ISocketEventType.INFO,
+        data: {
+          roomId: currentDuelResponse.item.roomId,
+          hasStarted: currentDuelResponse.item.hasStarted,
+        },
+      } as ISocketEvent);
+    }
 
     this.io.emit('user__is_online', {
       event: 'user__is_online',
@@ -160,7 +193,8 @@ export class WebsocketGateway
     // not update user isOnline if user is still connected
     // if (
     //   (await this.io.fetchSockets()).filter(
-    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) => s.userId === client.userId,
+    //     (s: RemoteSocket<DefaultEventsMap, any> & IAuthorizedSocket) =>
+    //       s.userId === client.userId,
     //   ).length > 0
     // ) {
     //   return;
@@ -318,6 +352,42 @@ export class WebsocketGateway
           type: ISocketEventType.INFO,
           data: newDuelResponse.item,
         } as ISocketEvent);
+
+        // start the duel countdown for selecting deck
+        let deckSelectionCountdown = newDuelResponse.item.timeToSelectDeck;
+        const deckSelectionInterval = setInterval(async () => {
+          deckSelectionCountdown -= 1;
+          this.io.to(newDuelResponse.item.roomId).emit('duel__deck_selected', {
+            event: 'duel__deck_selected_countdown',
+            type: ISocketEventType.INFO,
+            data: {
+              countDown: deckSelectionCountdown,
+            },
+          });
+          if (deckSelectionCountdown === 0)
+            clearInterval(deckSelectionInterval);
+        }, 1000);
+
+        const deckSelectionTimeout = setTimeout(() => {
+          // delete the duel
+          this.duelServiceClient.emit('delete_duel_by_room_id', {
+            roomId: newDuelResponse.item.roomId,
+          });
+          this.io.to(newDuelResponse.item.roomId).emit('duel__deck_selected', {
+            event: 'duel__deck_selected',
+            type: ISocketEventType.DELETE,
+            data: {
+              statusCode: HttpStatus.REQUEST_TIMEOUT,
+              message: 'Deck selection timed out.',
+            } as ISocketMessage,
+          } as ISocketEvent);
+        }, newDuelResponse.item.timeToSelectDeck * 1000);
+
+        this.duelSelectedDeckCountdown.push({
+          roomId: newDuelResponse.item.roomId,
+          timeout: deckSelectionTimeout,
+          interval: deckSelectionInterval,
+        });
       }
     }, 5000);
 
@@ -451,6 +521,35 @@ export class WebsocketGateway
       } as ISocketMessage);
     }
 
+    // get cardSets by cardSetIds
+    const cardSetsResponse: GetResponseArray<ICardCardSet> =
+      await firstValueFrom(
+        this.cardServiceClient.send('get_cardsets_by_ids', {
+          ids: deckResponse.item.cardSets.map((item) => item.cardSetId),
+        }),
+      );
+
+    if (cardSetsResponse.status !== HttpStatus.OK) {
+      throw new HttpException(
+        cardSetsResponse.message,
+        cardSetsResponse.status,
+      );
+    }
+
+    // create response with combined data of userDecks and cardSets
+    const userCardSets: IUserCardSet[] = deckResponse.item.cardSets.map(
+      (userCardSetPartial) => {
+        const userCardSet: IUserCardSet = {
+          id: userCardSetPartial.id,
+          userId: userCardSetPartial.userId,
+          cardSet: cardSetsResponse.items.find(
+            (cardSet) => cardSet.id === userCardSetPartial.cardSetId,
+          ),
+        };
+        return userCardSet;
+      },
+    );
+
     const duelUpdated: IDuel = {
       ...duelRoomResponse.item,
       hasStarted: duelRoomResponse.item.players.every((user) => {
@@ -463,6 +562,7 @@ export class WebsocketGateway
           return {
             ...user,
             deckId: body.userDeckId,
+            deckUserCardSets: userCardSets,
           };
         }
         return user;
@@ -485,11 +585,54 @@ export class WebsocketGateway
       } as ISocketMessage);
     }
 
+    if (updatedDuelResponse.item.hasStarted) {
+      const countDownTimeout = this.duelSelectedDeckCountdown.find(
+        (countDown) => countDown.roomId === body.duelRoomId,
+      );
+      clearTimeout(countDownTimeout.timeout);
+      clearInterval(countDownTimeout.interval);
+    }
+
     const socketEventResponse: ISocketEvent = {
       event: eventName,
       type: ISocketEventType.INFO,
       data: updatedDuelResponse.item,
     };
+
+    // for the 2 players, shuffle the deck and draw 5 cards
+    // store the userCardSetIds in cardsInDeck
+    const playersUpdated: IDuelPlayer[] = updatedDuelResponse.item.players.map(
+      (player: IDuelPlayer) => {
+        const updPlayer: IDuelPlayer = {
+          ...player,
+          // randomize the player userCardSets and put in deck
+          cardsInDeck: player.deckUserCardSets
+            .map((value) => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value.id),
+        };
+        // get the first 5 cards and put in hand and remove from deck
+        updPlayer.cardsInHand = (updPlayer.cardsInDeck as string[]).splice(
+          0,
+          5,
+        );
+        updPlayer.cardsInDeck = (updPlayer.cardsInDeck as string[]).filter(
+          (cardId) => !(updPlayer.cardsInHand as string[]).includes(cardId),
+        );
+
+        return updPlayer;
+      },
+    );
+
+    this.duelServiceClient.emit('update_duel_by_room_id', {
+      params: {
+        roomId: body.duelRoomId,
+      },
+      body: {
+        ...updatedDuelResponse.item,
+        players: playersUpdated,
+      },
+    });
 
     const opponent = updatedDuelResponse.item.players.filter((user) => {
       return user.userId !== client.userId;
@@ -497,6 +640,71 @@ export class WebsocketGateway
 
     client.emit(eventName, socketEventResponse);
     this.io.to(opponent.userId).emit(eventName, socketEventResponse);
+  }
+
+  // Duel routes
+  @SubscribeMessage('duel__get_current_game')
+  @UseFilters(new WebsocketExceptionsFilter('duel__current'))
+  async duelGetCurrentGame(@ConnectedSocket() client: IAuthorizedSocket) {
+    const eventName = 'duel__current';
+    // find duel room
+    const duelRoomResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_by_user_id', {
+        id: client.userId,
+      }),
+    );
+
+    if (duelRoomResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: duelRoomResponse.status,
+        message: duelRoomResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is in the duel room
+    const userFound = duelRoomResponse.item.players.find(
+      (user) => user.userId === client.userId,
+    );
+
+    if (!userFound) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You are not in the duel room.',
+      } as ISocketMessage);
+    }
+
+    // check if duel is started
+    if (!duelRoomResponse.item.hasStarted) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Duel has not started yet.',
+      } as ISocketMessage);
+    }
+
+    // replace cardsInDeck by the number of cards
+    // replace the opponent cardsInHand by the number of cards
+    const filteredDuel: IDuel = {
+      ...duelRoomResponse.item,
+      players: duelRoomResponse.item.players.map((user: IDuelPlayer) => {
+        const updUser: IDuelPlayer = {
+          ...user,
+          cardsInDeck: (user.cardsInDeck as string[]).length,
+          cardsInHand:
+            user.userId === client.userId
+              ? user.cardsInHand
+              : (user.cardsInHand as string[]).length,
+        };
+        return updUser;
+      }),
+    };
+
+    const socketEventResponse: ISocketEvent = {
+      event: eventName,
+      type: ISocketEventType.INFO,
+      data: filteredDuel,
+    };
+
+    client.emit(eventName, socketEventResponse);
   }
 
   // Exchange routes
@@ -622,7 +830,6 @@ export class WebsocketGateway
       type: ISocketEventType.INFO,
       data: createdExchangeResponse.item,
     };
-
     client.emit(eventName, socketEventResponse);
     this.io.to(body.userId).emit('exchange__request', socketEventResponse);
   }

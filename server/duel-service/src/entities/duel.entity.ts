@@ -24,7 +24,7 @@ export class Duel {
   @Column({ default: 90 })
   timePerTurn: number;
 
-  @Column({ default: 90 })
+  @Column({ default: 30 })
   timeToSelectDeck: number;
 
   @Column({ type: 'uuid', nullable: true })

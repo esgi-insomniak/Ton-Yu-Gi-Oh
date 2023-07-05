@@ -1,3 +1,4 @@
+import { IUserCardSet } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
 import { IDuel } from '../duel/duel.interface';
 
 export interface IDuelPlayer {
@@ -7,7 +8,8 @@ export interface IDuelPlayer {
   deckId: string;
   duel: IDuel | Partial<IDuel>;
   lifePoints: number;
-  cardsInHand: string[];
-  cardsInDeck: string[];
+  deckUserCardSets: IUserCardSet[];
+  cardsInHand: string[] | number;
+  cardsInDeck: string[] | number;
   cardsInField: string[];
 }

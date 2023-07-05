@@ -15,22 +15,22 @@ const Exchange = () => {
     const { users: usersResponse } = useGetUserWithCardSetId(cardId!, 25, 0)
     const [users, setUsers] = React.useState<userSchemaType[] | null>(null)
     const { me } = useMe()
-    const { ioClient } = useSocket()
+    const { getIoClient } = useSocket()
     const alert = useAlert()
     const router = useNavigate()
 
     const makeOffer = (userId: string) => {
-        ioClient?.emit('exchange__create', {
+        getIoClient()?.emit('exchange__create', {
             userId,
             cardSetId: cardId,
         })
     }
 
     React.useEffect(() => {
-        ioClient?.off('exchange__created')
-        ioClient?.on('exchange__created', (event: ISocketEvent) => {
+        getIoClient()?.off('exchange__created')
+        getIoClient()?.on('exchange__created', (event: ISocketEvent) => {
             if (event.type === ISocketEventType.INFO) {
-                ioClient?.off('exchange__created')
+                getIoClient()?.off('exchange__created')
                 return router(`/exchange-room/${event.data.id}`)
             }
             alert?.error(event.data.message)
@@ -38,9 +38,9 @@ const Exchange = () => {
     }, [])
 
     React.useEffect(() => {
-        ioClient?.off('user__is_online')
+        getIoClient()?.off('user__is_online')
         if (!users) return;
-        ioClient?.on('user__is_online', (event: ISocketEvent) => {
+        getIoClient()?.on('user__is_online', (event: ISocketEvent) => {
             setUsers(
                 users.map((user: userSchemaType) => {
                     if (user.id === event.data.userId) {
