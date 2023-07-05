@@ -5,6 +5,7 @@ const navs = [
   { animatedBackground: '/bg-home.gif', path: '/', title: 'Retour', condition: true, isBtn: false, action: () => { } },
   { animatedBackground: '/bg-card.gif', path: '/decks/create', title: 'Mes decks', condition: true, isBtn: false, action: () => { } },
   { animatedBackground: '/bg-decks.gif', path: '/decks/my-cards', title: 'Mes cartes', condition: true, isBtn: false, action: () => { } },
+  { animatedBackground: '/bg-deck.gif', path: '/exchange-history', title: 'Mes échanges', condition: true, isBtn: false, action: () => { } },
 ]
 
 const DeckHome = () => {
