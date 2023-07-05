@@ -47,7 +47,6 @@ export class DuelService {
     duel: DeepPartial<Duel>,
   ): Promise<Duel> {
     try {
-      console.log('test1', duel.players);
       duel.players.forEach(async (player) => {
         await this.dataSource
           .getRepository(DuelPlayer)
@@ -56,8 +55,7 @@ export class DuelService {
       delete duel.players;
       await this.dataSource.getRepository(Duel).update({ roomId }, duel);
       return await this.getDuelByRoomId(roomId);
-    } catch (error) {
-      console.log(error);
+    } catch {
       return null;
     }
   }

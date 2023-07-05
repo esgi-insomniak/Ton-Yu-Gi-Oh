@@ -736,7 +736,6 @@ export class WebsocketGateway
       type: ISocketEventType.INFO,
       data: createdExchangeResponse.item,
     };
-    console.log('socketEventResponse', body.userId);
     client.emit(eventName, socketEventResponse);
     this.io.to(body.userId).emit('exchange__request', socketEventResponse);
   }
