@@ -13,6 +13,7 @@ import { userCardSetsType } from "@/helpers/utils/schema/cards/card-set.schema";
 import { BiSolidCheckSquare, BiSolidSelectMultiple } from "react-icons/bi";
 import { useSocket } from "@/helpers/api/hooks";
 import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
+import { IDuelPlayer } from "@/helpers/types/duel";
 
 const SelectDeck = () => {
     const { me } = useMe();
@@ -22,8 +23,9 @@ const SelectDeck = () => {
     const navigate = useNavigate();
     const alert = useAlert();
     const { roomId } = useParams<{ roomId: string }>();
-    const { ioClient } = useSocket();
+    const { getIoClient } = useSocket();
     const [selectedDeck, setSelectedDeck] = React.useState<userCardSetsType>();
+    const [userIsWaiting, setUserIsWaiting] = React.useState<boolean>();
     const defaultCountDown = 60;
 
     interface CountDownStyle extends React.CSSProperties {
@@ -49,7 +51,7 @@ const SelectDeck = () => {
     const selectDeck = async () => {
         previewSelectDeckToggle();
         if (!selectedDeck) return;
-        ioClient?.emit('duel__select_deck', { userDeckId: selectedDeck.id, duelRoomId: roomId });
+        getIoClient()?.emit('duel__select_deck', { userDeckId: selectedDeck.id, duelRoomId: roomId });
     };
 
     React.useEffect(() => {
@@ -59,14 +61,22 @@ const SelectDeck = () => {
     }, [countDown]);
 
     React.useEffect(() => {
-        ioClient?.off('duel__deck_selected');
-        ioClient?.on('duel__deck_selected', (event: ISocketEvent) => {
+        getIoClient()?.off('duel__deck_selected');
+        getIoClient()?.on('duel__deck_selected', (event: ISocketEvent) => {
             if (event.event === 'duel__deck_selected_countdown') {
-                setCountDown(event.data.countDown);
+                return setCountDown(event.data.countDown);
             }
             if (event.type === ISocketEventType.DELETE) {
+                getIoClient()?.off('duel__deck_selected');
                 alert?.error('Aucun deck n\'a été sélectionné 😭');
-                navigate('/');
+                return navigate('/');
+            } else if (event.type === ISocketEventType.INFO) {
+                const haveDeck = event.data.players.find((player: IDuelPlayer) => player.userId === me?.id).deckId !== null ? true : false;
+                setUserIsWaiting(!haveDeck);
+                if (!event.data.hasStarted) return;
+                getIoClient()?.off('duel__deck_selected');
+                alert?.success('La partie va commencé !');
+                return navigate(`/duel/${roomId}`);
             }
         });
     }, []);

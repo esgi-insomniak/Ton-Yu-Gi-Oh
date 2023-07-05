@@ -28,6 +28,20 @@ export class DuelController {
     return result;
   }
 
+  @MessagePattern('get_duel_by_user_id')
+  public async getDuelByUserId(
+    params: ParamGetItemById,
+  ): Promise<GetResponseOne<Duel>> {
+    const duel = await this.duelService.getDuelByUserId(params.id);
+    const result: GetResponseOne<Duel> = {
+      status: duel ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: duel ? null : 'Duel not found',
+      item: duel,
+    };
+
+    return result;
+  }
+
   @MessagePattern('get_duel_by_id')
   public async getDuelById(
     params: ParamGetItemById,

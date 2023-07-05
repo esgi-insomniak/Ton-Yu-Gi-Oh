@@ -9,33 +9,33 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
-    const { ioClient } = useSocket()
+    const { getIoClient } = useSocket()
     const { me } = useMe()
     const logout = useLogout()
     const alert = useAlert()
     const router = useNavigate()
 
     const opponentSearch = React.useCallback(() => {
-        ioClient?.off('duel__queue');
-        ioClient?.off('duel__found');
+        getIoClient()?.off('duel__queue');
+        getIoClient()?.off('duel__found');
 
-        ioClient?.emit('duel__join_queue');
+        getIoClient()?.emit('duel__join_queue');
 
-        ioClient?.on('duel__queue', (event: ISocketEvent) => {
+        getIoClient()?.on('duel__queue', (event: ISocketEvent) => {
             if (event.type === ISocketEventType.ERROR) {
                 alert?.closeAll()
                 alert?.error(event.data.message)
             }
         })
-        ioClient?.on('duel__found', (event: ISocketEvent) => {
+        getIoClient()?.on('duel__found', (event: ISocketEvent) => {
             alert?.closeAll()
             alert?.success("Adversaire trouvé !")
-            ioClient?.off('duel__queue');
-            ioClient?.off('duel__found');
+            getIoClient()?.off('duel__queue');
+            getIoClient()?.off('duel__found');
             router(`/duel/select-deck/${event.data.roomId}`)
         })
         alert?.custom('Recherche d\'un adversaire en cours...')
-    }, [ioClient, alert])
+    }, [alert])
 
     const navs = React.useMemo(() => [
         { animatedBackground: "/bg-deck.gif", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },

@@ -36,8 +36,12 @@ export const SocketContextProvider = ({ children }: SocketContextProps) => {
         }
     }, [token, ioClient])
 
+    const getIoClient = () => {
+        return ioClient.current;
+    }
+
     return (
-        <SocketContext.Provider value={{ ioClient: ioClient.current }}>
+        <SocketContext.Provider value={{ ioClient: ioClient.current, getIoClient }}>
             {children}
         </SocketContext.Provider>
     )
