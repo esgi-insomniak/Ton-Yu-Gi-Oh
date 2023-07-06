@@ -8,15 +8,17 @@ import { IDuelCardInField } from "@/helpers/types/duel";
 export const MonsterZone = ({
   onCardHover,
   player,
+  setPositionField,
 }: {
   onCardHover: (card: IDuelCardInField | null) => void;
   player: boolean;
+  setPositionField: Dispatch<SetStateAction<IDuelCardInField[]>>;
 }) => {
   const [droppedCard, setDroppedCard] = React.useState<IDuelCardInField | null>(null);
   const [selectedPosition, setSelectedPosition] = React.useState("");
   const alert = useAlert();
 
-  const [{}, dropRef] = useDrop({
+  const [{ }, dropRef] = useDrop({
     accept: itemTypes.CARD,
     drop: (item: IDuelCardInField) => handleDrop(item),
     collect: (monitor) => ({
@@ -26,12 +28,14 @@ export const MonsterZone = ({
   });
 
   const handleDrop = (item: IDuelCardInField) => {
-    if(player) {
-    setDroppedCard(item);
-    console.log(item)
-    //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
-    setSelectedPosition("ATK");
-    }else{
+    if (player) {
+      setDroppedCard(item);
+      console.log(item)
+      //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
+      setSelectedPosition("ATK");
+      if (item !== null)
+        setPositionField((prev: IDuelCardInField[]) => [...prev, item]);
+    } else {
       alert?.error("Ce n'est pas votre terrain !");
     }
   };
@@ -64,9 +68,8 @@ export const MonsterZone = ({
 
   return (
     <div
-      className={`${
-        selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
-      } w-24 h-32`}
+      className={`${selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
+        } w-24 h-32`}
       ref={dropRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

@@ -16,7 +16,7 @@ export interface IDuelCardInField {
   userCardSet: IUserCardSet;
   placedAtTurn?: number;
   lifePoints?: number;
-  action: string;
+  action: 'ATK' | 'DEF' | 'PLR_ATK'
 }
 
 export interface IDuelPlayer {
