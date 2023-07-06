@@ -2,8 +2,8 @@ name: Deploy service "promo-service"
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+      # - main
     paths:
       - "server/promo-service/**"
       - ".github/workflows/promo-service.yml"
