@@ -2,8 +2,8 @@ name: Deploy "user-deck-service"
 
 on:
   push:
-    # branches:
-      # - main
+    branches:
+      - main
     paths:
       - "server/user-deck-service/**"
       - ".github/workflows/user-deck-service.yml"

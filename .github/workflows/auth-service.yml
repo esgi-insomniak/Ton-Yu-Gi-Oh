@@ -2,8 +2,8 @@ name: Deploy "auth-service"
 
 on:
   push:
-    # branches:
-      # - main
+    branches:
+      - main
     paths:
       - "server/auth-service/**"
       - ".github/workflows/auth-service.yml"
