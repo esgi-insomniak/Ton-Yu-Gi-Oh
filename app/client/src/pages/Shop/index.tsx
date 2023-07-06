@@ -100,7 +100,7 @@ const Shop = () => {
 
     return (
         <React.Fragment>
-            <div className="lg:flex-row flex-col flex justify-center items-center p-12 lg:space-y-0 lg:space-x-12 space-y-12 space-x-0">
+            <div className="lg:flex-row flex-col flex justify-start items-start p-12 lg:space-y-0 lg:space-x-12 space-y-12 space-x-0">
                 <div className="lg:w-3/4 w-full grid xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-8 overflow-y-auto h-auto">
                     {
                         boosters?.data?.map((booster) => (
