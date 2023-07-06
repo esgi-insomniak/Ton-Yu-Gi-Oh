@@ -1,47 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDrop } from "react-dnd";
 import { Dispatch, SetStateAction } from "react";
 import { itemTypes } from "@/pages/Duels";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
-import { IDuelCardInField } from "@/helpers/types/duel";
+import { IDuelCardInField, IDuelCardInFieldAction } from "@/helpers/types/duel";
+import { IUserCardSet } from "@/helpers/types/cards";
 
 export const MonsterZone = ({
   onCardHover,
   player,
+  positionField,
+  index,
   setPositionField,
 }: {
   onCardHover: (card: IDuelCardInField | null) => void;
   player: boolean;
+  positionField: IDuelCardInField[];
+  index: number;
   setPositionField: Dispatch<SetStateAction<IDuelCardInField[]>>;
 }) => {
-  const [droppedCard, setDroppedCard] = React.useState<IDuelCardInField | null>(null);
-  const [selectedPosition, setSelectedPosition] = React.useState("");
+  const [droppedCard, setDroppedCard] = useState<IDuelCardInField | null>(null);
+  const [currentPositionField, setCurrentPositionField] = useState<IDuelCardInField[]>(positionField);
   const alert = useAlert();
 
   const [{ }, dropRef] = useDrop({
     accept: itemTypes.CARD,
-    drop: (item: IDuelCardInField) => handleDrop(item),
+    drop: (userCardSet: IUserCardSet) => handleDrop(userCardSet),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
   });
 
-  const handleDrop = (item: IDuelCardInField) => {
+  const handleDrop = (userCardSet: IUserCardSet) => {
     if (player) {
-      setDroppedCard(item);
-      console.log(item)
-      //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
-      setSelectedPosition("ATK");
-      if (item !== null)
-        setPositionField((prev: IDuelCardInField[]) => [...prev, item]);
+      // cannot add the same card twice
+      const cardIsAlreadyExist = currentPositionField.find(
+        (fieldCard) => fieldCard && fieldCard?.userCardSet?.id === userCardSet?.id
+      );
+
+      if (cardIsAlreadyExist) return;
+      if (currentPositionField[index]) return;
+
+      const newCardInField: IDuelCardInField = {
+        position: index,
+        userCardSet: userCardSet,
+        actionSetAtTurn: -1,
+        action: "ATK",
+        lifePoints: -1,
+      };
+
+      setDroppedCard(newCardInField);
+
+      // update the positionField state
+      const newFieldState = [...currentPositionField];
+      newFieldState[index] = newCardInField;
+      setCurrentPositionField(newFieldState);
+      setPositionField(newFieldState);
     } else {
       alert?.error("Ce n'est pas votre terrain !");
     }
   };
 
-  const handlePositionSelection = (position: string) => {
-    setSelectedPosition(position);
+  const handlePositionSelection = (index: number, position: IDuelCardInFieldAction) => {
+    const newFieldState = [...currentPositionField];
+    newFieldState[index].action = position;
+    setCurrentPositionField(newFieldState);
+    setPositionField(newFieldState);
   };
 
   const handleMouseEnter = () => {
@@ -53,12 +78,12 @@ export const MonsterZone = ({
   };
 
   function handleChangePosition(
-    selectedPosition: string
+    card: IDuelCardInField,
   ): React.MouseEventHandler<HTMLLIElement> | undefined {
-    if (selectedPosition === "ATK") {
-      return () => handlePositionSelection("DEF");
+    if (card.action === "ATK") {
+      return () => handlePositionSelection(card.position as number, "DEF");
     } else {
-      return () => handlePositionSelection("ATK");
+      return () => handlePositionSelection(card.position as number, "ATK");
     }
   }
 
@@ -68,13 +93,12 @@ export const MonsterZone = ({
 
   return (
     <div
-      className={`${selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
-        } w-24 h-32`}
+      className={"shadow-inner shadow-black w-24 h-32"}
       ref={dropRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {droppedCard && selectedPosition && (
+      {droppedCard && (
         <>
           <div
             className="flex items-center"
@@ -94,7 +118,7 @@ export const MonsterZone = ({
                     width: "100%",
                     height: "100%",
                     transform:
-                      selectedPosition === "DEF" ? "rotate(90deg)" : "none",
+                      droppedCard.action === "DEF" ? "rotate(90deg)" : "none",
                   }}
                   alt={droppedCard.userCardSet.cardSet.card.name}
                 />
@@ -103,10 +127,10 @@ export const MonsterZone = ({
                 tabIndex={0}
                 className="dropdown-content menu p-2 shadow bg-base-100 rounded-box ml-2 cursor-pointer"
               >
-                {selectedPosition === "ATK" && (
+                {droppedCard.action === "ATK" && (
                   <li onClick={handleAttack}>Attaquer</li>
                 )}
-                <li onClick={handleChangePosition(selectedPosition)}>
+                <li onClick={handleChangePosition(droppedCard)}>
                   Changer de position
                 </li>
               </ul>

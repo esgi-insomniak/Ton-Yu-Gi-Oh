@@ -8,6 +8,7 @@ import { useMe } from "@/helpers/api/hooks/users";
 import Loader from "@/components/Loader";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { DuelProvider } from "@/helpers/providers/duels/DuelProvider";
 
 interface ProtectedRouteProps {
     redirect: string;
@@ -117,9 +118,11 @@ const Router: React.FC = () => {
                     <Route path="/decks/edit/:deckId" element={<EditDeckPage />} />
                     <Route path="/duel/select-deck/:roomId" element={<DuelSelectDeckPage />} />
                     <Route path="/duel/:roomId" element={
-                        <DndProvider backend={HTML5Backend}>
-                            <DuelPage />
-                        </DndProvider>
+                        <DuelProvider>
+                            <DndProvider backend={HTML5Backend}>
+                                <DuelPage />
+                            </DndProvider>
+                        </DuelProvider>
                     } />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
