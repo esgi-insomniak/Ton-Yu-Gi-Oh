@@ -22,8 +22,8 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: auth-service-config
+            - secretRef:
+                name: global-project-secrets
           resources:
             requests:
               memory: "270Mi"
@@ -47,19 +47,3 @@ spec:
       port: 8000
       targetPort: 8000
   type: ClusterIP # Can be accessed inside the cluster
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: auth-service-config
-data:
-  AUTH_SERVICE_PORT: "8000"
-  AUTH_SERVICE_JWT_SECRET: "secret"
-  AUTH_SERVICE_JWT_EXPIRATION: "2592000"
-  AUTH_SERVICE_POSTGRES_HOST: "auth-service-db"
-  AUTH_SERVICE_POSTGRES_PORT: "5432"
-  AUTH_SERVICE_POSTGRES_DB: "auth_service"
-  AUTH_SERVICE_POSTGRES_USER: "postgres"
-  AUTH_SERVICE_POSTGRES_PASSWORD: "postgres"
