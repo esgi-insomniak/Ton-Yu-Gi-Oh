@@ -1,4 +1,4 @@
-import { IUserCardSets } from "../cards";
+import { IUserCardSet } from "../cards";
 
 export interface IDuel {
   id: string;
@@ -11,6 +11,14 @@ export interface IDuel {
   players: IDuelPlayer[] | Partial<IDuelPlayer>[];
 }
 
+export interface IDuelCardInField {
+  position: number;
+  userCardSet: IUserCardSet;
+  placedAtTurn?: number;
+  lifePoints?: number;
+  action: 'ATK' | 'DEF' | 'PLR_ATK'
+}
+
 export interface IDuelPlayer {
   id: string;
   userId: string;
@@ -21,12 +29,6 @@ export interface IDuelPlayer {
   cardsInHand: string[] | number;
   cardsInDeck: number;
   cardsInGraveyard: string[];
-  cardsInField: {
-    position: number;
-    cardId: string;
-    placedAtTurn: number;
-    lifePoints: number;
-    action: string;
-  }
-  deckUserCardSets: IUserCardSets[];
+  cardsInField: IDuelCardInField[];
+  deckUserCardSets: IUserCardSet[];
 }

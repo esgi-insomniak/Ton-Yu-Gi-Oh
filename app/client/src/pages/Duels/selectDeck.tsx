@@ -47,6 +47,10 @@ const SelectDeck = () => {
         getIoClient()?.emit('duel__select_deck', { userDeckId: selectedDeck.id, duelRoomId: roomId });
     };
 
+    const duelCancel = () => {
+        getIoClient()?.emit("duel__cancel");
+    };
+
     React.useEffect(() => {
         getIoClient()?.off('duel__deck_selected');
         getIoClient()?.on('duel__deck_selected', (event: ISocketEvent) => {
@@ -132,6 +136,9 @@ const SelectDeck = () => {
                     ]}
                 />
             </div >
+            <div className="flex items-center justify-center">
+                <button className="btn btn-error" onClick={duelCancel}>Cancel le duel</button>
+            </div>
         </div>
     );
 };
