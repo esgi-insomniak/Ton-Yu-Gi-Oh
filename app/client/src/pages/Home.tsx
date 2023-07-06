@@ -47,11 +47,11 @@ const Home = () => {
     ], [me?.roles])
 
     return (
-        <div className="hero items-center min-h-screen text-gray-300">
-            <div className="absolute top-5 right-5 z-10 gradient-border">
+        <div className="hero items-center h-screen text-gray-300">
+            <div className="fixed top-5 right-5 z-10 gradient-border">
                 <button className="btn z-20 text-white" onClick={() => router('/auction')}>Rejoindre l'enchère !</button>
             </div>
-            <video autoPlay muted loop id="myVideo" className="object-fill w-full">
+            <video autoPlay muted loop id="myVideo" className="absolute z-0 w-auto min-w-full min-h-full max-h-screen object-cover">
                 <source src="/bg-home.mp4" type="video/mp4" />
             </video>
             <div className="hero-overlay bg-gray-900 opacity-60" />
@@ -61,7 +61,7 @@ const Home = () => {
                         Welcome <span className="text-yellow-500">{me?.username}</span>
                     </h1>
                 </div>
-                <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-3 grid-flow-dense gap-8">
+                <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-2 grid-flow-dense gap-8">
                     {navs.filter(auth => auth.condition === true).map((nav, index) => (
                         <NavItem
                             key={index}

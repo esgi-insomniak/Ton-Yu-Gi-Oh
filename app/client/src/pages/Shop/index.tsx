@@ -100,8 +100,8 @@ const Shop = () => {
 
     return (
         <React.Fragment>
-            <div className="h-[calc(100vh-5rem)] flex justify-center items-center p-12 space-x-12">
-                <div className="grid grid-cols-5 gap-8 w-3/4">
+            <div className="lg:flex-row flex-col flex justify-center items-center p-12 lg:space-y-0 lg:space-x-12 space-y-12 space-x-0">
+                <div className="lg:w-3/4 w-full grid xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-8 overflow-y-auto h-auto">
                     {
                         boosters?.data?.map((booster) => (
                             <div key={booster.code} className="h-full flex flex-col w-full relative group">
@@ -130,10 +130,10 @@ const Shop = () => {
                         ))
                     }
                 </div>
-                <div className="flex w-1/4 h-full justify-start flex-col items-center space-y-7">
+                <div className="lg:w-1/4 w-full flex justify-start flex-col items-center space-y-7">
                     <div className="btn" onClick={buyCoinsToggle}>Acheter des Insomniak Coins</div>
                     <form className="w-full bg-white p-5 rounded-lg space-y-3" onSubmit={handleSubmitPromoCode}>
-                        <span className="w-full flex justify-center">Code Promos</span>
+                        <span className="text-center">Code Promos</span>
                         <Input label="Ton code" name="code" uppercase />
                         <div className="w-full flex justify-end">
                             <button className="btn" type="submit">Valider</button>

@@ -93,9 +93,11 @@ const Router: React.FC = () => {
                 >
                     <Route path="/" element={<HomePage />} />
                     <Route path="/opening" element={
-                        <DndProvider backend={HTML5Backend}>
-                            <BoosterPage />
-                        </DndProvider>
+                        <GameCardProvider>
+                            <DndProvider backend={HTML5Backend}>
+                                <BoosterPage />
+                            </DndProvider>
+                        </GameCardProvider>
                     } />
                     <Route path="/collection" element={
                         <GameCardProvider>

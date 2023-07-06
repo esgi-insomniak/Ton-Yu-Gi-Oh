@@ -26,11 +26,11 @@ spec:
                 name: auth-service-config
           resources:
             requests:
-              memory: "126Mi"
-              cpu: "10m"
+              memory: "270Mi"
+              cpu: "30m"
             limits:
-              memory: "126Mi"
-              cpu: "10m"
+              memory: "270Mi"
+              cpu: "30m"
 ---
 
 apiVersion: v1

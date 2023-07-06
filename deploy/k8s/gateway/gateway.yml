@@ -26,10 +26,10 @@ spec:
                 name: gateway-config
           resources:
             requests:
-              memory: "126Mi"
+              memory: "300Mi"
               cpu: "30m"
             limits:
-              memory: "126Mi"
+              memory: "300Mi"
               cpu: "30m"
 
 ---

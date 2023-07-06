@@ -88,16 +88,16 @@ const NewDecks = () => {
 
     return (
         <div className="w-full flex flex-col h-full p-2">
-            <div className="text-md breadcrumbs">
+            <div className="text-md breadcrumbs hidden lg:block">
                 <ul>
                     <li><Link to={'/decks'}>Crafting zone</Link></li>
                     <li><Link to={'/decks/create'}>Mes decks</Link></li>
                     <li><span className="text-gray-400">Nouveau deck</span></li>
                 </ul>
             </div>
-            <div className="flex gap-2 overflow-scroll h-full">
+            <div className="flex gap-2 h-full">
                 <div className="w-9/12 h-full border rounded-md flex flex-col space-y-2 py-2">
-                    <div className="w-full h-full grid xl:grid-cols-6 lg:grid-cols-5 md:grid-cols-2 gap-2 px-2 overflow-scroll">
+                    <div className="w-full h-full grid xl:grid-cols-6 lg:grid-cols-5 md:grid-cols-2 gap-2 px-2 overflow-y-auto">
                         {isLoading ? <Loader /> : groupedCardsResponse?.data?.map((groupedCard) => (
                             <UserDeckCards
                                 key={groupedCard.cardSetId}
@@ -112,7 +112,7 @@ const NewDecks = () => {
                     </div>
                     <Pagination page={pageNumber} setter={setPageNumber} arr={groupedCardsResponse?.data?.length!} maxItemsPerPage={maxItemsPerPage} />
                 </div>
-                <div className="w-3/12 h-full border p-2 rounded-md space-y-2 overflow-scroll">
+                <div className="w-3/12 h-full border p-2 rounded-md space-y-2 overflow-y-auto">
                     <div className="flex gap-2 h-12">
                         <input className="w-full glass rounded-md focus:outline-none p-2 text-white" type="text" placeholder="Nom du deck" onChange={(e) => setDeckName(e.target.value)} />
                         <div className={`btn hover:btn-error group tooltip tooltip-up flex justify-center items-center`}

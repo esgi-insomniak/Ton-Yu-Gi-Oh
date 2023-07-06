@@ -11,8 +11,10 @@ import {
     OpenedBooster,
 } from "@/helpers/types/booster";
 import React from "react";
-import { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
+import GameCard from "@/components/GameCard/GameCard";
+import {useGameCard} from "@/helpers/context/cards/GameCardContext";
+import {IGameCard} from "@/helpers/types/cards";
 
 export const itemTypes = { BOOSTER: "booster" };
 
@@ -22,6 +24,7 @@ const Booster = () => {
     const [boosterData, setBoosterData] = React.useState<BoosterData[]>([]);
     const [droppedBooster, setDroppedBooster] = React.useState<DropBooster | null>(null);
     const openBooster = useOpeningBooster();
+    const { cardSets, setCardSets } = useGameCard();
     const [openedBooster, setOpenedBooster] = React.useState<OpenedBooster | null>(null);
     const [showButton, setShowButton] = React.useState<Boolean>(false);
 
@@ -66,6 +69,28 @@ const Booster = () => {
     };
 
     React.useEffect(() => { if (droppedBooster) handleOpenBooster(droppedBooster.id) }, [droppedBooster]);
+    React.useEffect(() => {
+        if (!openedBooster?.data) return;
+        const newCardSets = openedBooster.data.map<IGameCard>((userCardSet) => {
+            return {
+                ...userCardSet.cardSet,
+                userCardSetId: userCardSet.id,
+                isActive: false,
+                isHidden: false,
+                isFocused: false,
+                isLoaded: false,
+                isDraggable: false,
+                canPop: true,
+                displayCardInfoOnPop: false,
+                popScale: 1.75,
+                canFlip: false,
+                canActivate: true,
+                canInteract: true,
+            }
+        });
+        setCardSets(newCardSets);
+    }, [openedBooster]);
+
 
     const countBoosters = (data: BoosterGetAll) => {
         const boosterData: { [key: string]: any } = {};
@@ -102,10 +127,10 @@ const Booster = () => {
 
     return (
         <div className="flex w-full h-full">
-            <div className="flex flex-col w-1/3 overflow-scroll items-center space-y-3 py-5">
+            <div className="flex flex-col overflow-y-scroll scrollbar-none items-center space-y-3 py-5">
                 {boosterData.length > 0 ? (
                     boosterData.map((booster: BoosterData) => (
-                        <div key={booster.id} className="h-96 w-72 hover:scale-105 duration-150 transition-all relative">
+                        <div key={booster.id} className="hover:scale-105 duration-150 transition-all relative">
                             {booster.count > 0 && <BoosterItem booster={booster} />}
                         </div>
                     ))
@@ -122,25 +147,17 @@ const Booster = () => {
                     <div className="drop-zone cursor-grab">
                         <img
                             src={droppedBooster.set.image}
-                            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                            alt=""
-                            className="cursor-grab"
+                            alt="dropped-booster"
+                            className="cursor-grab w-full h-full object-contain"
                         />
                     </div>
                 )}
                 {openedBooster && (
                     <div className="booster-overlay">
                         <h2 className="text-xl">Cartes obtenues : </h2>
-                        <div className="card-container">
-                            {openedBooster.data.map((booster, index: number) => (
-                                <div className="card-item" key={index}>
-                                    <img
-                                        src={booster.cardSet.card.imageUrl}
-                                        style={{ width: "200px" }}
-                                        className="my-3"
-                                        alt=""
-                                    />
-                                </div>
+                        <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-3 justify-center gap-5 h-auto w-1/2 max-h-screen">
+                            {cardSets.map((cardSet, i) => (
+                                <GameCard key={i} {...cardSet} />
                             ))}
                         </div>
                         <div className="button-container">
@@ -161,9 +178,7 @@ const Booster = () => {
                 )}
 
                 {!droppedBooster && !openedBooster && (
-                    <div
-                        className={`${canDrop && isOver && "animate-pulse bg-white transition-colors duration-200"} h-96 w-64 shadow-inner shadow-black flex justify-center items-center rounded-md`}
-                    >
+                    <div className={`${canDrop && isOver && "animate-pulse bg-white transition-colors duration-200"} h-96 w-64 shadow-inner shadow-black flex justify-center items-center rounded-md`}>
                         <div className="text-center">
                             <h1>Déposez votre booster ici pour l'ouvrir</h1>
                         </div>

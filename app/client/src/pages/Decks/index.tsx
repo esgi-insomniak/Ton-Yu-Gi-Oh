@@ -15,10 +15,10 @@ const DeckHome = () => {
       <div className="hero-content text-center flex flex-col">
         <div className="max-w-md">
           <h1 className="-mt-20 text-5xl font-bold">
-            Crafting zone <span className="text-yellow-500">{ }</span>
+            Crafting zone
           </h1>
         </div>
-        <div className="grid grid-cols-3 grid-flow-dense gap-8">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
           {navs.filter(auth => auth.condition === true).map((nav, index) => (
             <NavItem
               key={index}
