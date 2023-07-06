@@ -45,21 +45,24 @@ const Auction = () => {
                 </div>
             </div>
             <div className="w-full h-full flex">
-                <div className="flex h-full w-3/4">
+                <div className="flex xl:w-3/4 md:w-full w-full">
 
                 </div>
-                <div className="h-full w-1/4 p-5 flex flex-col space-y-5 justify-end">
-
-                    {/** Laster Bider */}
-                    <div className="w-full bg-white/30 h-[32rem] rounded-lg shadow-xl overflow-scroll scrollbar-none p-5 flex space-x-2">
-                        <p className="text-green-500">Frozoxadazd :</p>
-                        <div className="space-x-2 flex">
-                            <p className="text-yellow-600">100</p>
-                            <p>ISM</p>
-                        </div>
+                <div className="flex xl:w-1/4 md:w-full w-full xl:p-5 md:p-0 p-0 flex-col space-y-5 justify-end xl:items-center">
+                    <div className="flex flex-col h-fit space-y-3 overflow-y-auto">
+                        {/** Laster Bider */}
+                        {[...Array(5)].map((x, i) => 
+                            <div className="bg-white/30 rounded-lg shadow-xl p-5 flex space-x-2">
+                                <p className="text-green-500 xl:block hidden">Frozoxadazd :</p>
+                                <div className="space-x-2 flex">
+                                    <p className="text-yellow-600">100</p>
+                                    <p>ISM</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <button className="btn btn-success">
-                        Renchérir de  <span className="text-yellow-600 mx-1 font-bold">100</span> ISM
+                        enchérir de  <span className="text-yellow-600 mx-1 font-bold">100</span> ISM
                     </button>
                 </div>
             </div>
