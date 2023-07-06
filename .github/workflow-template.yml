@@ -1,4 +1,4 @@
-name: Deploy "{{ROUTE}}"
+name: Deploy Service "{{ROUTE}}"
 
 on:
   push:
