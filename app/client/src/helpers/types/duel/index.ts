@@ -11,12 +11,14 @@ export interface IDuel {
   players: IDuelPlayer[] | Partial<IDuelPlayer>[];
 }
 
+export type IDuelCardInFieldAction = "ATK" | "DEF" | "PLR_ATK";
+
 export interface IDuelCardInField {
-  position: number;
+  position?: number;
   userCardSet: IUserCardSet;
-  placedAtTurn?: number;
+  actionSetAtTurn?: number;
+  action: IDuelCardInFieldAction;
   lifePoints?: number;
-  action: 'ATK' | 'DEF' | 'PLR_ATK'
 }
 
 export interface IDuelPlayer {

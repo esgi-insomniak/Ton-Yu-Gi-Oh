@@ -147,3 +147,19 @@ html {
     background-position: 100% 50%;
   }
 }
+
+@keyframes glowing {
+  0% {
+    box-shadow: 0 0 5px #fff;
+  }
+  50% {
+    box-shadow: 0 0 20px #00bfff;
+  }
+  100% {
+    box-shadow: 0 0 5px #fff;
+  }
+}
+
+.glow {
+  animation: glowing 1.5s infinite;
+}

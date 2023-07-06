@@ -1,10 +1,5 @@
-import {
-  ArrayMaxSize,
-  ArrayUnique,
-  IsArray,
-  IsNotEmpty,
-  IsUUID,
-} from 'class-validator';
+import { ArrayMaxSize, IsArray, IsNotEmpty, IsUUID } from 'class-validator';
+import { IUserCardSet } from 'src/interfaces/user-deck-service/userCardSet/user-card-set.interface';
 
 export class DuelSendActionDataBodyDto {
   @IsNotEmpty()
@@ -12,7 +7,10 @@ export class DuelSendActionDataBodyDto {
   roomId: string;
 
   @IsArray()
-  @ArrayUnique()
   @ArrayMaxSize(5)
-  cardsInField: { position: number; cardId: string; action: string }[];
+  cardsInField: {
+    position: number;
+    userCardSet: IUserCardSet;
+    action: string;
+  }[];
 }

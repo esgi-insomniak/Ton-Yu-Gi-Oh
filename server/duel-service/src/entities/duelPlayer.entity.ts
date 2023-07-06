@@ -33,7 +33,7 @@ export class DuelPlayer {
   @Column('jsonb', { nullable: false, default: {} })
   cardsInField: {
     position: number;
-    cardId: string;
+    userCardSet: string;
     actionSetAtTurn: number;
     action: string;
     lifePoints: number;
