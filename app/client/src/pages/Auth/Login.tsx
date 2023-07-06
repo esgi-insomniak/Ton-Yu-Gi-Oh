@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { loginSchema } from "@/helpers/utils/schema/Auth";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useLogin } from "@/helpers/api/hooks/auth";
+import { useLogin, useLogout } from "@/helpers/api/hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { MdAlternateEmail, MdPassword } from "react-icons/md";
 import { BiLockOpenAlt } from "react-icons/bi";
@@ -38,6 +38,10 @@ const Login = () => {
             }
         });
     }
+
+    React.useEffect(() => {
+        localStorage.removeItem('token')
+    }, [])
 
     return (
         <div className="w-full h-screen flex">

@@ -7,7 +7,7 @@ import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useGetAllAttributes, useGetAllRarities } from "@/helpers/api/hooks/cards/attribute.hook";
 import { Input, Select } from "@/components/Input";
 import { Pagination } from "@/components/Pagination";
-import {getScreenSize} from "@/helpers/utils/constants";
+import { getScreenSize } from "@/helpers/utils/constants";
 
 interface FiltersProps {
     search: string;
@@ -43,7 +43,7 @@ const Collection = () => {
                 isDraggable: false,
                 canPop: true,
                 displayCardInfoOnPop: true,
-                popScale: 1.75,
+                popScale: 1.5,
                 canFlip: false,
                 canActivate: true,
                 canInteract: true,
@@ -102,8 +102,8 @@ const Collection = () => {
             ) : (
                 <div className="grid xl:grid-cols-8 lg:grid-cols-5 md:grid-cols-4 grid-cols-3 px-3 w-full gap-2 container scrollbar-none mx-auto h-auto overflow-y-auto">
                     {cardSets.map((cardSet, i) => (
-                            <GameCard key={i} {...cardSet} />
-                        )
+                        <GameCard key={i} {...cardSet} />
+                    )
                     )}
                 </div>
             )}
