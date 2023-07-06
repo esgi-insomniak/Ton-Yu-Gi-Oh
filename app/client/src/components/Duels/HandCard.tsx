@@ -3,7 +3,7 @@ import { useDrag } from "react-dnd";
 import { ICard } from "@/helpers/types/cards";
 
 export const HandCard = ({ card, onCardHover, playerTurn = false }: { card: ICard, onCardHover: (card: ICard | null) => void, playerTurn: boolean }) => {
-  const [{}, dragRef] = useDrag(
+  const [{ }, dragRef] = useDrag(
     () => ({
       type: itemTypes.CARD,
       item: card,
@@ -28,8 +28,8 @@ export const HandCard = ({ card, onCardHover, playerTurn = false }: { card: ICar
       onMouseLeave={handleMouseLeave}
     >
       <img
-        src={card?.cardSet.card.imageUrlSmall}
-        alt={card?.cardSet.card.imageUrlSmall}
+        src={card?.imageUrlSmall}
+        alt={card?.imageUrlSmall}
         style={{
           width: "92px",
           height: "124px",

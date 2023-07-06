@@ -16,7 +16,7 @@ export const MonsterZone = ({
   const [selectedPosition, setSelectedPosition] = React.useState("");
   const alert = useAlert();
 
-  const [{}, dropRef] = useDrop({
+  const [{ }, dropRef] = useDrop({
     accept: itemTypes.CARD,
     drop: (item: ICard) => handleDrop(item),
     collect: (monitor) => ({
@@ -26,12 +26,12 @@ export const MonsterZone = ({
   });
 
   const handleDrop = (item: ICard) => {
-    if(player) {
-    setDroppedCard(item.cardSet.card);
-    console.log(item)
-    //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
-    setSelectedPosition("ATK");
-    }else{
+    if (player) {
+      setDroppedCard(item);
+      console.log(item)
+      //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
+      setSelectedPosition("ATK");
+    } else {
       alert?.error("Ce n'est pas votre terrain !");
     }
   };
@@ -64,9 +64,8 @@ export const MonsterZone = ({
 
   return (
     <div
-      className={`${
-        selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
-      } w-24 h-32`}
+      className={`${selectedPosition != "DEF" ? "shadow-inner shadow-black" : ""
+        } w-24 h-32`}
       ref={dropRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

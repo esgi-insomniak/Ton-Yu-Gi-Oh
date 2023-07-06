@@ -71,7 +71,7 @@ const Duel = () => {
         <div id="field" className="overflow-x-hidden">
           <div className="w-full">
             <div className="flex justify-center">
-              {Array.from({ length: opponentPlayer?.cardsInHand }, () => (
+              {/* {Array.from({ length: opponentPlayer?.cardsInHand }, () => (
                 <img
                   src={
                     "https://images.ygoprodeck.com/images/cards/back_high.jpg"
@@ -82,7 +82,7 @@ const Duel = () => {
                     height: "124px",
                   }}
                 />
-              ))}
+              ))} */}
             </div>
             <div id="life">{opponentPlayer?.lifePoints}</div>
           </div>
@@ -178,7 +178,7 @@ const Duel = () => {
           <div className="w-full flex justify-items-between">
             <div id="life">{currentPlayer?.lifePoints}</div>
             <div id="hand-player" className="flex justify-center mx-auto">
-              {currentPlayer?.cardsInHand.map((cardId: string) => {
+              {/* {currentPlayer?.cardsInHand.map((cardId: string) => {
                 const cardData = currentPlayer?.deckUserCardSets.find(
                   (card) => card.id === cardId
                 );
@@ -193,14 +193,14 @@ const Duel = () => {
                   );
                 }
                 return null; // handle the case where cardData is not found
-              })}
+              })} */}
             </div>
           </div>
         </div>
       </div>
       <div id="data-card" className="w-1/5 mx-auto">
         <p>Data des cartes</p>
-        {hoveredCard && (
+        {/* {hoveredCard && (
           <img
             src={hoveredCard?.cardSet?.card.imageUrl}
             alt={hoveredCard.name}
@@ -209,7 +209,7 @@ const Duel = () => {
               height: "50%",
             }}
           />
-        )}
+        )} */}
       </div>
     </div>
   );
