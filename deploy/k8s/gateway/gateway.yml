@@ -17,13 +17,13 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: maeljamin/ton-yugi-gateway:{{VERSION}}
+          image: maeljamin/ton-yugi-gateway:a695f459b15a30a0e07d1a590a2c4349c609e3b5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: global-project-secrets
+                name: global-project-secrets # name of the secret
           resources:
             requests:
               memory: "300Mi"
