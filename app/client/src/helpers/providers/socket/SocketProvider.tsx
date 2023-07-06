@@ -20,6 +20,7 @@ export const SocketContextProvider = ({ children }: SocketContextProps) => {
                 const socket = io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${token}` } });
                 socket.off('exchange__request')
                 socket.off('duel__is_started')
+                socket.off('duel__canceled')
                 socket.on('exchange__request', (event: ISocketEvent) => {
                     if (event.type === ISocketEventType.INFO) {
                         alert?.success(`${event.data.exchangeOwner.username} vous propose un échange !`)
@@ -28,6 +29,11 @@ export const SocketContextProvider = ({ children }: SocketContextProps) => {
                 socket.on('duel__is_started', (event: ISocketEvent) => {
                     if (event.type === ISocketEventType.INFO) {
                         // event.data.hasStarted ? navigate(`/duel/select-deck/${event.data.roomId}`) : navigate(`/duel/${event.data.roomId}}`)
+                    }
+                })
+                socket.on('duel__canceled', (event: ISocketEvent) => {
+                    if (event.type === ISocketEventType.INFO) {
+                        alert?.error(`Le duel a été annulé 😥`)
                     }
                 })
                 ioClient.current = socket;

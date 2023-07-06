@@ -23,7 +23,7 @@ import {
   BaseWsExceptionFilter,
   WsException,
 } from '@nestjs/websockets';
-import { Namespace, RemoteSocket } from 'socket.io';
+import { Namespace } from 'socket.io';
 import { IAuthorizedSocket } from './interfaces/websocket/socket/socket.interface';
 import { ISocketMessage } from './interfaces/websocket/socket-message/socket-message.interface';
 import { PermissionGuard } from './services/guard/permission.guard';
@@ -343,10 +343,11 @@ export class WebsocketGateway
     );
 
     if (updatedDuelResponse.status !== HttpStatus.OK) {
-      throw new WsException({
-        statusCode: updatedDuelResponse.status,
-        message: updatedDuelResponse.message,
-      } as ISocketMessage);
+      return;
+      // throw new WsException({
+      //   statusCode: updatedDuelResponse.status,
+      //   message: updatedDuelResponse.message,
+      // } as ISocketMessage);
     }
 
     return updatedDuelResponse.item;
@@ -899,6 +900,91 @@ export class WebsocketGateway
     });
 
     this.initDuelTurnTimer(updatedDuel);
+  }
+
+  // Duel Cancel routes
+  @SubscribeMessage('duel__cancel')
+  @UseFilters(new WebsocketExceptionsFilter('duel__canceled'))
+  async duelCancel(@ConnectedSocket() client: IAuthorizedSocket) {
+    // find duel room
+    const duelRoomResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_by_user_id', {
+        id: client.userId,
+      }),
+    );
+
+    if (duelRoomResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: duelRoomResponse.status,
+        message: duelRoomResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is in the duel room
+    const userFound = duelRoomResponse.item.players.find(
+      (user) => user.userId === client.userId,
+    );
+
+    if (!userFound) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You are not in the duel room.',
+      } as ISocketMessage);
+    }
+
+    // stop select deck timer
+    const selectDeckTimer = this.duelSelectedDeckCountdown.find(
+      (timer) => timer.roomId === duelRoomResponse.item.roomId,
+    );
+
+    if (selectDeckTimer) {
+      clearTimeout(selectDeckTimer.timeout);
+      clearInterval(selectDeckTimer.interval);
+      this.duelSelectedDeckCountdown = this.duelSelectedDeckCountdown.filter(
+        (timer) => timer.roomId !== duelRoomResponse.item.roomId,
+      );
+    }
+
+    // stop the duel timer
+    const duelTimer = this.duelCountdown.find(
+      (timer) => timer.roomId === duelRoomResponse.item.roomId,
+    );
+
+    if (duelTimer) {
+      clearTimeout(duelTimer.timeout);
+      clearInterval(duelTimer.interval);
+      this.duelCountdown = this.duelCountdown.filter(
+        (timer) => timer.roomId !== duelRoomResponse.item.roomId,
+      );
+    }
+
+    // delete the duel room
+    const deleteDuelResponse: GetResponseOne<boolean> = await firstValueFrom(
+      this.duelServiceClient.send('delete_duel_by_room_id', {
+        roomId: duelRoomResponse.item.roomId,
+      }),
+    );
+
+    if (deleteDuelResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: deleteDuelResponse.status,
+        message: deleteDuelResponse.message,
+      } as ISocketMessage);
+    }
+
+    if (deleteDuelResponse.item) {
+      const socketEventResponse: ISocketEvent = {
+        event: 'duel__canceled',
+        type: ISocketEventType.INFO,
+        data: {
+          message: 'Duel canceled.',
+        },
+      };
+
+      this.io
+        .to(duelRoomResponse.item.roomId)
+        .emit('duel__canceled', socketEventResponse);
+    }
   }
 
   // Exchange Create routes

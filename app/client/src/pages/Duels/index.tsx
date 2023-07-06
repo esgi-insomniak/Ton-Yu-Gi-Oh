@@ -35,6 +35,10 @@ const Duel = () => {
     getIoClient()?.emit("duel__finish_turn");
   };
 
+  const duelCancel = () => {
+    getIoClient()?.emit("duel__cancel");
+  };
+
   React.useEffect(() => {
     if (allUserCardSets.length > 0) return;
     getIoClient()?.off("duel__current");
@@ -208,6 +212,7 @@ const Duel = () => {
         </div>
       </div>
       <div id="data-card" className="w-1/5 mx-auto">
+        <button className="btn btn-error" onClick={duelCancel}>Cancel le duel</button>
         <p>Data des cartes</p>
         {hoveredCard && (
           <img
