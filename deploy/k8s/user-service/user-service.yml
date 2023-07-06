@@ -17,13 +17,13 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: maeljamin/ton-yugi-user-service:latest
+          image: maeljamin/ton-yugi-user-service:{{VERSION}}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: user-service-config
+            - secretRef:
+                name: global-project-secrets
           resources:
             requests:
               memory: "270Mi"
@@ -47,17 +47,3 @@ spec:
       port: 8000
       targetPort: 8000
   type: ClusterIP # Can be accessed from other pods in the cluster
-
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: user-service-config
-data:
-  USER_SERVICE_PORT: "8000"
-  USER_SERVICE_POSTGRES_HOST: "user-service-db"
-  USER_SERVICE_POSTGRES_PORT: "5432"
-  USER_SERVICE_POSTGRES_USER: "postgres"
-  USER_SERVICE_POSTGRES_PASSWORD: "postgres"
-  USER_SERVICE_POSTGRES_DB: "user_service"

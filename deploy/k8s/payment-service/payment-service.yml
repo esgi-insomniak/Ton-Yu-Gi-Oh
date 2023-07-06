@@ -22,14 +22,14 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: payment-service-config
+            - secretRef:
+                name: global-project-secrets
           resources:
             requests:
-              memory: "126Mi"
+              memory: "270Mi"
               cpu: "30m"
             limits:
-              memory: "126Mi"
+              memory: "270Mi"
               cpu: "30m"
 ---
 
@@ -45,19 +45,3 @@ spec:
       port: 8000
   type: ClusterIP # Can be accessed from outside the cluster
 
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: payment-service-config
-data:
-  PAYMENT_SERVICE_PORT: "8000"
-  # PAYMENT_SERVICE_STRIPE_SUCCESS_URL:
-  # PAYMENT_SERVICE_STRIPE_CANCEL_URL:
-  PAYMENT_SERVICE_STRIPE_SECRET: "sk_test_51McULVLgiVx31Cexflc85gOsDRwpP76yqmC8gDu6iczrAchN47mkUOcoZYHa4XvPQM3lbXtbab3rupBFiGpOD2OB00DI4S7S9R"
-  PAYMENT_SERVICE_POSTGRES_HOST: "payment-service-db"
-  PAYMENT_SERVICE_POSTGRES_PORT: "5432"
-  PAYMENT_SERVICE_POSTGRES_DB: "payment_service"
-  PAYMENT_SERVICE_POSTGRES_USER: "postgres"
-  PAYMENT_SERVICE_POSTGRES_PASSWORD: "postgres"

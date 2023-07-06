@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer-deployment
+  labels:
+    app: adminer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adminer-pod
+  template:
+    metadata:
+      labels:
+          app: adminer-pod
+    spec:
+      containers:
+        - name: adminer
+          image: adminer:4.8.1
+          imagePullPolicy: IfNotPresent
+          ports:
+              - containerPort: 8080
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "5m"
+            limits:
+              memory: "150Mi"
+              cpu: "5m"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminer-svc
+  labels:
+    app: adminer-svc
+spec:
+  selector:
+    app: adminer-pod # which pods will receive the traffic
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer # Can be accessed outside the cluster
+

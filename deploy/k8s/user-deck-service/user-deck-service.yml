@@ -22,14 +22,14 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: user-deck-service-config
+            - secretRef:
+                name: global-project-secrets
           resources:
             requests:
-              memory: "126Mi"
+              memory: "270Mi"
               cpu: "30m"
             limits:
-              memory: "126Mi"
+              memory: "270Mi"
               cpu: "30m"
 ---
 
@@ -44,17 +44,3 @@ spec:
     - protocol: TCP
       port: 8000
   type: ClusterIP # Can be accessed from other pods in the cluster
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: user-deck-service-config
-data:
-  USER_DECK_SERVICE_PORT: "8000"
-  USER_DECK_SERVICE_POSTGRES_HOST: "user-deck-service-db"
-  USER_DECK_SERVICE_POSTGRES_PORT: "5432"
-  USER_DECK_SERVICE_POSTGRES_USER: "postgres"
-  USER_DECK_SERVICE_POSTGRES_PASSWORD: "postgres"
-  USER_DECK_SERVICE_POSTGRES_DB: "user_deck_service"
