@@ -1,4 +1,4 @@
-name: Deploy Service "payment-service"
+name: Deploy service "payment-service"
 
 on:
   push:

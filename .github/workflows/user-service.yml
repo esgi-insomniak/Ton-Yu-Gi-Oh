@@ -1,4 +1,4 @@
-name: Deploy Service "user-service"
+name: Deploy service "user-service"
 
 on:
   push:

@@ -45,10 +45,10 @@ spec:
           resources:
             requests:
               memory: "40Mi"
-              cpu: "5m"
+              cpu: "10m"
             limits:
               memory: "40Mi"
-              cpu: "5m"
+              cpu: "10m"
       volumes:
         - name: duel-service-db
           persistentVolumeClaim:

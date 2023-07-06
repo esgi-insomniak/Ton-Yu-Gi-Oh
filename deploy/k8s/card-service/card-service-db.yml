@@ -45,10 +45,10 @@ spec:
           resources:
             requests:
               memory: "40Mi"
-              cpu: "5m"
+              cpu: "10m"
             limits:
               memory: "40Mi"
-              cpu: "5m"
+              cpu: "10m"
       volumes:
         - name: card-service-db
           persistentVolumeClaim:
@@ -75,7 +75,7 @@ metadata:
   name: card-service-db-data
 spec:
   accessModes:
-      - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
