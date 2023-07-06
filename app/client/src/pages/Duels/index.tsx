@@ -30,6 +30,10 @@ const Duel = () => {
     setHoveredCard(card!);
   };
 
+  const endTurn = () => {
+    getIoClient()?.emit("duel__finish_turn");
+  };
+
   React.useEffect(() => {
     if (allUserCardSets.length > 0) return;
     getIoClient()?.off("duel__current");
@@ -71,8 +75,9 @@ const Duel = () => {
         <div id="field" className="overflow-x-hidden">
           <div className="w-full">
             <div className="flex justify-center">
-              {Array.from({ length: opponentPlayer?.cardsInHand }, () => (
+              {Array.from({ length: (opponentPlayer?.cardsInHand ? opponentPlayer?.cardsInHand as number : 0) }, (_, i) => (
                 <img
+                  key={i}
                   src={
                     "https://images.ygoprodeck.com/images/cards/back_high.jpg"
                   }
@@ -84,7 +89,6 @@ const Duel = () => {
                 />
               ))}
             </div>
-            <div id="life">{opponentPlayer?.lifePoints}</div>
           </div>
           <div id="adversary-field" className="mb-10">
             <div
@@ -125,17 +129,22 @@ const Duel = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-between items-center">
-            <TimerDuel
-              countDown={countDown}
-              defaultCountDown={defaultCountDown}
-            />
-            {playerTurn && (
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-3 rounded w-1/5">
-                Fin de tour
-              </button>
-            )}
+          <div id="life" className="flex justify-center">{opponentPlayer?.lifePoints}</div>
+          <div className="py-10">
+            <div className="flex justify-center">{playerTurn ? 'Votre tour' : `Au tour de ${opponentPlayer?.username}`}</div>
+            <div className="flex justify-between items-center">
+              <TimerDuel
+                countDown={countDown}
+                defaultCountDown={defaultCountDown}
+              />
+              {playerTurn && (
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-3 rounded w-1/5" onClick={endTurn}>
+                  Fin de tour
+                </button>
+              )}
+            </div>
           </div>
+          <div id="life" className="flex justify-center">{currentPlayer?.lifePoints}</div>
           <div id="player-field" className="mt-10">
             <div
               id="player-monster-zone"
@@ -176,9 +185,8 @@ const Duel = () => {
             </div>
           </div>
           <div className="w-full flex justify-items-between">
-            <div id="life">{currentPlayer?.lifePoints}</div>
             <div id="hand-player" className="flex justify-center mx-auto">
-              {currentPlayer?.cardsInHand.map((cardId: string) => {
+              {currentPlayer?.cardsInHand && (currentPlayer?.cardsInHand as string[]).map((cardId: string) => {
                 const cardData = currentPlayer?.deckUserCardSets.find(
                   (card) => card.id === cardId
                 );
