@@ -126,8 +126,8 @@ export interface CardSet {
   card: ICard;
 }
 
-export interface IUserCardSets {
+export interface IUserCardSet {
   id: string;
   userId: string;
-  cardSet: CardSet[];
+  cardSet: CardSet;
 }

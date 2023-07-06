@@ -1,8 +1,8 @@
 import { itemTypes } from "@/pages/Duels";
 import { useDrag } from "react-dnd";
-import { ICard } from "@/helpers/types/cards";
+import { IUserCardSet } from "@/helpers/types/cards";
 
-export const HandCard = ({ card, onCardHover, playerTurn = false }: { card: ICard, onCardHover: (card: ICard | null) => void, playerTurn: boolean }) => {
+export const HandCard = ({ card, onCardHover, playerTurn = false }: { card: IUserCardSet, onCardHover: (card: IUserCardSet | null) => void, playerTurn: boolean }) => {
   const [{}, dragRef] = useDrag(
     () => ({
       type: itemTypes.CARD,

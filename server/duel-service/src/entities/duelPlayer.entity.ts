@@ -34,8 +34,8 @@ export class DuelPlayer {
   cardsInField: {
     position: number;
     cardId: string;
-    placedAtTurn: number;
-    lifePoints: number;
+    actionSetAtTurn: number;
     action: string;
+    lifePoints: number;
   }[];
 }
