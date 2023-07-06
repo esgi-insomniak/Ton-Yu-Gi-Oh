@@ -1,6 +1,5 @@
 import React from "react";
 import { useDrop } from "react-dnd";
-import { Dispatch, SetStateAction } from "react";
 import { itemTypes } from "@/pages/Duels";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { IDuelCardInField, IDuelCardInFieldAction } from "@/helpers/types/duel";
@@ -88,9 +87,61 @@ export const MonsterZone = ({
     }
   }
 
-  const handleAttack = () => {
-    console.log("attack");
+  const handleAttack = (droppedCard: IUserCardSets, index: number) => {
+    console.log(droppedCard)
+    console.log(index)
+    const
+    const monsterZone = document.querySelectorAll(`.adversary-zone`);
+  
+    if (monsterZone.length === 0) {
+      const lifepoint = document.querySelector(`#${adversary?.userId}-life`);
+      lifepoint?.classList.add("glow");
+      lifepoint?.addEventListener("click", handleAttackClick);
+    } else {
+      let isEmpty = true;
+      monsterZone.forEach((element) => {
+        if (element.childElementCount > 0) {
+          isEmpty = false;
+          element.classList.add("glow");
+          element.addEventListener("click", handleAttackClick);
+        }
+      });
+  
+      if (isEmpty) {
+        const lifepoint = document.getElementById(`${adversary?.userId}-life`);
+        lifepoint?.classList.add("glow");
+        lifepoint?.addEventListener("click", handleAttackClick);
+      }
+    }
   };
+  
+  const handleAttackClick = (event) => {
+    console.log("click")
+    const targetElement = event.currentTarget;
+    console.log(targetElement)
+    const card = targetElement?.querySelector(".card");
+    console.log(this)
+    if (card) {
+      const attackValue = card.getAttribute("data-attack");
+      const explosion = document.createElement("div");
+      explosion.className = "explosion";
+      explosion.textContent = attackValue;
+      targetElement.appendChild(explosion);
+  
+      const rect = targetElement.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+  
+      card.classList.add("animated");
+      card.style.transform = `translate(${rect.left - cardRect.left}px, ${rect.top - cardRect.top}px)`;
+  
+      setTimeout(() => {
+        targetElement.removeChild(explosion);
+        card.classList.remove("animated");
+        card.style.transform = "";
+      }, 2000);
+    }
+  };
+  
 
   return (
     <div
@@ -108,7 +159,10 @@ export const MonsterZone = ({
               height: "100%",
             }}
           >
-            <div className="dropdown dropdown-right dropdown-end">
+            <div
+              className="dropdown dropdown-right dropdown-end"
+              id={`${droppedCard.id}-${index}`}
+            >
               <label
                 tabIndex={0}
                 className="flex items-center justify-center cursor-pointer text-2xl"
