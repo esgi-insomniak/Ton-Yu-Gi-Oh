@@ -3,31 +3,31 @@ import { useDrop } from "react-dnd";
 import { Dispatch, SetStateAction } from "react";
 import { itemTypes } from "@/pages/Duels";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
-import { ICard } from "@/helpers/types/cards";
+import { IDuelCardInField } from "@/helpers/types/duel";
 
 export const MonsterZone = ({
   onCardHover,
   player,
 }: {
-  onCardHover: (card: ICard | null) => void;
+  onCardHover: (card: IDuelCardInField | null) => void;
   player: boolean;
 }) => {
-  const [droppedCard, setDroppedCard] = React.useState<ICard | null>(null);
+  const [droppedCard, setDroppedCard] = React.useState<IDuelCardInField | null>(null);
   const [selectedPosition, setSelectedPosition] = React.useState("");
   const alert = useAlert();
 
   const [{}, dropRef] = useDrop({
     accept: itemTypes.CARD,
-    drop: (item: ICard) => handleDrop(item),
+    drop: (item: IDuelCardInField) => handleDrop(item),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
   });
 
-  const handleDrop = (item: ICard) => {
+  const handleDrop = (item: IDuelCardInField) => {
     if(player) {
-    setDroppedCard(item.cardSet.card);
+    setDroppedCard(item);
     console.log(item)
     //setter((prev: ICard[]) => prev.filter((card) => card.id !== item.id));
     setSelectedPosition("ATK");
@@ -86,14 +86,14 @@ export const MonsterZone = ({
                 className="flex items-center justify-center cursor-pointer text-2xl"
               >
                 <img
-                  src={droppedCard.imageUrl}
+                  src={droppedCard.userCardSet.cardSet.card.imageUrl}
                   style={{
                     width: "100%",
                     height: "100%",
                     transform:
                       selectedPosition === "DEF" ? "rotate(90deg)" : "none",
                   }}
-                  alt={droppedCard.name}
+                  alt={droppedCard.userCardSet.cardSet.card.name}
                 />
               </label>
               <ul
@@ -111,10 +111,10 @@ export const MonsterZone = ({
           </div>
           <div className="relative">
             <span className="bg-blue-200 text-xs font-medium text-blue-800 text-center p-0.5 leading-none rounded-full px-2 dark:bg-blue-900 dark:text-blue-200 absolute translate-y-1/2 -translate-x-1/2 right-auto bottom-0 left-0">
-              {droppedCard.atk}
+              {droppedCard.userCardSet.cardSet.card.atk}
             </span>
             <span className="bg-blue-200 text-xs font-medium text-blue-800 text-center p-0.5 leading-none rounded-full px-2 dark:bg-blue-900 dark:text-blue-200 absolute translate-y-1/2 translate-x-1/2 left-auto bottom-0 right-0">
-              {droppedCard.def}
+              {droppedCard.userCardSet.cardSet.card.def}
             </span>
           </div>
         </>

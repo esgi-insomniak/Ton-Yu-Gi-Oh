@@ -4,9 +4,8 @@ import { HandCard } from "@/components/Duels/HandCard";
 import { MonsterZone } from "@/components/Duels/MonsterZone";
 import { useSocket } from "@/helpers/api/hooks";
 import { ISocketEvent } from "@/helpers/types/socket";
-import { IUserCardSets } from "@/helpers/types/cards";
-import { IDuelPlayer } from "@/helpers/types/duel";
-import { ICard } from "@/helpers/types/cards";
+import { IUserCardSet } from "@/helpers/types/cards";
+import { IDuelCardInField, IDuelPlayer } from "@/helpers/types/duel";
 import { useMe } from "@/helpers/api/hooks/users";
 import { TimerDuel } from "@/components/Duels/TimerDuel";
 
@@ -18,15 +17,17 @@ const Duel = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { me } = useMe();
   const { getIoClient } = useSocket();
-  const [hoveredCard, setHoveredCard] = React.useState<ICard>();
+  const [hoveredCard, setHoveredCard] = React.useState<IUserCardSet>();
   const [currentPlayer, setCurrentPlayer] = React.useState<IDuelPlayer>();
   const [opponentPlayer, setOpponentPlayer] = React.useState<IDuelPlayer>();
-  const [allUserCardSets, setAllUserCardSets] = React.useState<IUserCardSets[]>([]);
+  const [allUserCardSets, setAllUserCardSets] = React.useState<IUserCardSet[]>([]);
+  const [currentPlayerField, setCurrentPlayerField] = React.useState<IDuelCardInField[]>([]);
+  const [opponentPlayerField, setOpponentPlayerField] = React.useState<IDuelCardInField[]>([]);
   const [playerTurn, setPlayerTurn] = React.useState<boolean>(false);
   const defaultCountDown = 90;
 
   const [countDown, setCountDown] = React.useState<number>(defaultCountDown);
-  const handleCardHover = (card: ICard | null) => {
+  const handleCardHover = (card: IUserCardSet | null) => {
     setHoveredCard(card!);
   };
 
@@ -39,8 +40,8 @@ const Duel = () => {
     getIoClient()?.off("duel__current");
     getIoClient()?.on("duel__current", (event: ISocketEvent) => {
       if (event.event === "duel__current") {
-        const userCardSets: IUserCardSets[] = event.data.players.reduce(
-          (acc: IUserCardSets[], player: IDuelPlayer) => {
+        const userCardSets: IUserCardSet[] = event.data.players.reduce(
+          (acc: IUserCardSet[], player: IDuelPlayer) => {
             const cardSets = player.deckUserCardSets.map((card) => card.cardSet);
             return [...acc, ...cardSets];
           },
@@ -49,12 +50,12 @@ const Duel = () => {
         setAllUserCardSets(userCardSets);
         setOpponentPlayer(
           event.data.players.find(
-            (player: IUserCardSets) => player.userId != me?.id
+            (player: IUserCardSet) => player.userId != me?.id
           )
         );
         setCurrentPlayer(
           event.data.players.find(
-            (player: IUserCardSets) => player.userId == me?.id
+            (player: IUserCardSet) => player.userId == me?.id
           )
         );
         if (me?.id == event.data.playerToPlay) {
