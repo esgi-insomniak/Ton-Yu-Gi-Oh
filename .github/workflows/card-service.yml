@@ -2,8 +2,8 @@ name: Deploy Service "card-service"
 
 on:
   push:
-    # branches:
-      # - main
+    branches:
+      - main
     paths:
       - "server/card-service/**"
       - ".github/workflows/card-service.yml"

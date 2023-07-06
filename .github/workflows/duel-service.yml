@@ -2,8 +2,8 @@ name: Deploy Service "duel-service"
 
 on:
   push:
-    # branches:
-      # - main
+    branches:
+      - main
     paths:
       - "server/duel-service/**"
       - ".github/workflows/duel-service.yml"
