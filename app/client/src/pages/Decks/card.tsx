@@ -13,8 +13,7 @@ import { Link } from "react-router-dom";
 const CardCollection = () => {
     const { me, refetch: refetchUser } = useMe()
     const [page, setPage] = React.useState<number>(0)
-    const [itemsPerPage, setItemsPerPage] = React.useState<number>(24)
-    const { data: cardSetsResponse, refetch } = useGetUserCardSets(page, itemsPerPage, "", "", "", "")
+    const { data: cardSetsResponse, refetch } = useGetUserCardSets(page, 24, "", "", "", "")
     const { cardSets, setCardSets } = useGameCard()
     const [arrayOfCardDismantle, setArrayOfCardDismantle] = React.useState<string[]>([])
     const [coinsEarned, setCoinsEarned] = React.useState<number>(0)

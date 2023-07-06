@@ -29,7 +29,7 @@ const cardSetsKeys = {
     cardName,
   ],
   booster: (id: string) => [...cardSetsKeys.all, id],
-  getUserCardSets: () => [...cardSetsKeys.all, 'me'],
+  getUserCardSets: (pageNumber: number, itemPerPage: number) => [...cardSetsKeys.all, pageNumber, itemPerPage, 'me'],
   scrapCards: (arrayOfIds: string[]) => [...cardSetsKeys.all, arrayOfIds],
 } as const;
 
@@ -78,7 +78,7 @@ export const useGetCardSets = (pageNumber: number, itemPerPage: number, attribut
 
 export const useGetUserCardSets = (pageNumber: number, itemPerPage: number, attributeId?: string, rarityId?: string, archetypeId?: string, cardName?: string) => {
   const arrayOfCards = useQuery<ApiGetItemResponse<CardIUserCardSet[]>>(
-    cardSetsKeys.getUserCardSets(),
+    cardSetsKeys.getUserCardSets(pageNumber, itemPerPage),
     () => requestUserCardSets(pageNumber, itemPerPage),
     { refetchOnWindowFocus: false }
   );
