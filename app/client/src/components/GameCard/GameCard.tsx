@@ -347,7 +347,7 @@ const GameCard = (props: IGameCard) => {
             ref={thisCardElement as React.RefObject<HTMLDivElement>}>
             <div className="yugi-card__translater">
                 <div className="yugi-card__rotator" tabIndex={0} onClick={activate} onPointerMove={interact} onMouseOut={interactEnd} {...props.dragProvided?.dragHandleProps}>
-                    <img className="yugi-card__back" src={backImg} loading="lazy" width="660" height="921" alt="back_image"/>
+                    <img className="yugi-card__back" src={backImg} loading="lazy" width="660" height="921" alt="back_image" />
                     <div className="yugi-card__front" style={staticStyles}>
                         <img src={frontImg} onLoad={() => setIsLoaded(currentCardSet, true)} loading="lazy" width="660" height="921" alt="front_image" />
                         <div className="yugi-card__shine"></div>
