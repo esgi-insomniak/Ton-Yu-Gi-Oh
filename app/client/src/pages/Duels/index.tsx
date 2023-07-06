@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { HandCard } from "@/components/Duels/HandCard";
 import { MonsterZone } from "@/components/Duels/MonsterZone";
 import { useSocket } from "@/helpers/api/hooks";
-import { ISocketEvent } from "@/helpers/types/socket";
+import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
 import { IUserCardSet } from "@/helpers/types/cards";
 import { IDuelCardInField, IDuelPlayer } from "@/helpers/types/duel";
 import { useMe } from "@/helpers/api/hooks/users";
@@ -75,14 +75,22 @@ const Duel = () => {
     }, [allUserCardSets]);
 
     React.useEffect(() => {
-        console.log(currentPlayerField);
-    }, [currentPlayerField]);
+        if (!playerTurn) return;
+        getIoClient()?.emit("duel__send_action", {
+            roomId,
+            cardsInField: currentPlayerField,
+        });
+    }, [currentPlayerField, playerTurn]);
 
     React.useEffect(() => {
         if (allUserCardSets.length > 0) return;
         getIoClient()?.off("duel__current");
         getIoClient()?.on("duel__current", (event: ISocketEvent) => {
+            if (event.type === ISocketEventType.ERROR) {
+                console.log(event);
+            }
             if (event.event === "duel__current") {
+                console.log(event);
                 const userCardSets: IUserCardSet[] = event.data.players.reduce(
                     (acc: IUserCardSet[], player: IDuelPlayer) => {
                         const cardSets = player.deckUserCardSets.map((card) => card.cardSet);
@@ -102,8 +110,14 @@ const Duel = () => {
                     )
                 );
                 if (me?.id == event.data.playerToPlay) {
+                    setCurrentPlayerField(event.data.players.find(
+                        (player: IUserCardSet) => player.userId == me?.id
+                    ).cardsInField);
                     setPlayerTurn(true);
                 } else {
+                    setOpponentPlayerField(event.data.players.find(
+                        (player: IUserCardSet) => player.userId != me?.id
+                    ).cardsInField);
                     setPlayerTurn(false);
                 }
             } else if (event.event === "duel__deck_playtime_countdown") {
@@ -146,9 +160,11 @@ const Duel = () => {
                                 {opponentPlayerField.map((card, index) => (
                                     <MonsterZone
                                         key={index}
+                                        index={index}
                                         onCardHover={() => handleCardHover(card.userCardSet)}
                                         player={false}
                                         setPositionField={() => { }}
+                                        positionField={[]}
                                     />
                                 ))}
                             </div>
@@ -199,12 +215,14 @@ const Duel = () => {
                                 id="monster-zone-player"
                                 className="flex justify-around items-center w-4/5"
                             >
-                                {currentPlayerField.map((_, index) => (
+                                {currentPlayerField.map((cardInField, index) => (
                                     <MonsterZone
-                                        key={index}
+                                        key={cardInField?.position ? cardInField?.position : index}
+                                        index={cardInField?.position ? cardInField.position : index}
                                         onCardHover={() => { }}
                                         player
                                         setPositionField={setCurrentPlayerField}
+                                        positionField={currentPlayerField}
                                     />
                                 ))}
                             </div>

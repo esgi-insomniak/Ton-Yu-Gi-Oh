@@ -60,11 +60,16 @@ import { GetItemByIdDto } from './interfaces/common/common.params.dto';
 import { ICardCardSet } from './interfaces/card-service/cardSet/card-set.interface';
 import { IUserDeckPartial } from './interfaces/user-deck-service/userDeck/user-deck.interface';
 import { SelectedDeckBodyDto } from './interfaces/user-deck-service/userDeck/user-deck.body.dto';
-import { IDuelPlayer } from './interfaces/duel-service/duelPlayer/duel-player.interface';
+import {
+  IDuelCardInField,
+  IDuelPlayer,
+} from './interfaces/duel-service/duelPlayer/duel-player.interface';
 import { DuelSendActionDataBodyDto } from './interfaces/duel-service/duel/duel.body.dto';
 
 @Catch()
 export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
+  protected readonly logger = new Logger(WebsocketExceptionsFilter.name);
+
   constructor(private readonly eventName: string) {
     super();
   }
@@ -78,6 +83,7 @@ export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
       type: ISocketEventType.ERROR,
       data: null,
     };
+    this.logger.error(exception);
 
     // check if the exception is a HttpException or a WsException
     if (exception instanceof HttpException) {
@@ -343,11 +349,10 @@ export class WebsocketGateway
     );
 
     if (updatedDuelResponse.status !== HttpStatus.OK) {
-      return;
-      // throw new WsException({
-      //   statusCode: updatedDuelResponse.status,
-      //   message: updatedDuelResponse.message,
-      // } as ISocketMessage);
+      throw new WsException({
+        statusCode: updatedDuelResponse.status,
+        message: updatedDuelResponse.message,
+      } as ISocketMessage);
     }
 
     return updatedDuelResponse.item;
@@ -703,7 +708,8 @@ export class WebsocketGateway
             ...user,
             deckId: body.userDeckId,
             deckUserCardSets: userCardSets,
-          };
+            cardsInField: new Array(5).fill(null),
+          } as IDuelPlayer;
         }
         return user;
       }),
@@ -729,8 +735,10 @@ export class WebsocketGateway
       const countDownTimeout = this.duelSelectedDeckCountdown.find(
         (countDown) => countDown.roomId === body.duelRoomId,
       );
-      clearTimeout(countDownTimeout.timeout);
-      clearInterval(countDownTimeout.interval);
+      if (countDownTimeout) {
+        clearTimeout(countDownTimeout.timeout);
+        clearInterval(countDownTimeout.interval);
+      }
     }
 
     const socketEventResponse: ISocketEvent = {
@@ -837,7 +845,101 @@ export class WebsocketGateway
     client: IAuthorizedSocket,
     body: DuelSendActionDataBodyDto,
   ) {
-    return;
+    // find duel room
+    const duelRoomResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('get_duel_by_user_id', {
+        id: client.userId,
+      }),
+    );
+
+    if (duelRoomResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: duelRoomResponse.status,
+        message: duelRoomResponse.message,
+      } as ISocketMessage);
+    }
+
+    // check if user is in the duel room
+    const userFound = duelRoomResponse.item.players.find(
+      (user) => user.userId === client.userId,
+    );
+
+    if (!userFound) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'You are not in the duel room.',
+      } as ISocketMessage);
+    }
+
+    // check if duel is started
+    if (!duelRoomResponse.item.hasStarted) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Duel has not started yet.',
+      } as ISocketMessage);
+    }
+
+    // check if it is the user's turn
+    if (duelRoomResponse.item.playerToPlay !== client.userId) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'It is not your turn.',
+      } as ISocketMessage);
+    }
+
+    // check whats card has added to the field
+    // get only the cards actually in the player hand
+    const cardToAdd = body.cardsInField.find(
+      (cardInField) =>
+        cardInField !== null &&
+        (userFound.cardsInHand as string[]).includes(
+          cardInField.userCardSet.id,
+        ),
+    ) as IDuelCardInField;
+
+    if (cardToAdd === undefined) return;
+
+    const duelToUpdate: IDuel = {
+      ...duelRoomResponse.item,
+      players: duelRoomResponse.item.players.map((player: IDuelPlayer) => {
+        if (player.userId !== client.userId) return player;
+        const updatedCardsInField = player.cardsInField;
+        updatedCardsInField[cardToAdd.position] = cardToAdd;
+
+        const updatedPlayer: IDuelPlayer = {
+          ...player,
+          cardsInField: updatedCardsInField,
+          cardsInHand: (player.cardsInHand as string[]).filter(
+            (cardId) => cardId !== cardToAdd.userCardSet.id,
+          ),
+        };
+        return updatedPlayer;
+      }),
+    };
+
+    const updatedDuelResponse: GetResponseOne<IDuel> = await firstValueFrom(
+      this.duelServiceClient.send('update_duel_by_room_id', {
+        params: {
+          roomId: duelToUpdate.roomId,
+        },
+        body: duelToUpdate,
+      }),
+    );
+
+    if (updatedDuelResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updatedDuelResponse.status,
+        message: updatedDuelResponse.message,
+      } as ISocketMessage);
+    }
+
+    updatedDuelResponse.item.players.forEach((player) => {
+      this.io.to(player.userId).emit('duel__current', {
+        event: 'duel__current',
+        type: ISocketEventType.INFO,
+        data: this.filterDuelByUserId(player.userId, updatedDuelResponse.item),
+      });
+    });
   }
 
   // Duel Finish Turn routes
