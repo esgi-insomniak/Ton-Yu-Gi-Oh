@@ -42,7 +42,7 @@ const Home = () => {
     const navs = React.useMemo(() => [
         { animatedBackground: "/bg-deck.gif", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
         { animatedBackground: "/bg-collection.gif", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/yugi-bg-duel.gif", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
+        { animatedBackground: "/yugi-bg-duel.gif", path: "/duel", title: "Duel", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: true, action: () => opponentSearch() },
         { animatedBackground: "/opening.gif", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
         { animatedBackground: "/bg-shop.gif", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
         { animatedBackground: "/bg-admin.gif", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },

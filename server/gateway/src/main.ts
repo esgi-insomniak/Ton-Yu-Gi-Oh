@@ -18,8 +18,10 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
+  if (process.env.NODE_ENV !== 'production') {
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup('api', app, document);
+  }
   app.useGlobalPipes(
     new ValidationPipe(),
     new ValidationPipe({

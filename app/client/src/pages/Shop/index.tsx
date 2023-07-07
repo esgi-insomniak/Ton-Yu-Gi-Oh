@@ -146,7 +146,7 @@ const Shop = () => {
                 toggle={buyCoinsToggle}
                 title="Acheter des coins"
                 content={
-                    <div className="flex space-x-2 justify-center items-center w-full h-full">
+                    <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-3 h-auto grid-flow-dense gap-2 w-full h-full">
                         {Coins.map((coin, i) => (
                             <CardCoins {...coin} key={i} />
                         ))}
