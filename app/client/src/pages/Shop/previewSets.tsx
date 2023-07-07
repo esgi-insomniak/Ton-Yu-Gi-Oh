@@ -1,11 +1,33 @@
 import GameCard from "@/components/GameCard/GameCard";
-import { CardICardSet } from "@/helpers/types/cards";
+import { CardICardSet, IGameCard } from "@/helpers/types/cards";
 import { CardRarity } from "@/helpers/utils/enum/card";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import React from "react";
+import { useMe } from "@/helpers/api/hooks/users";
+import useModal from "@/helpers/api/hooks/modal";
+import { Modal } from "@/components/Modal";
+import { Input } from "@/components/Input";
+import { useForm } from "react-hook-form";
+import { useSocket } from "@/helpers/api/hooks";
 
 const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | undefined }) => {
     const { cardSets, setCardSets } = useGameCard()
+    const { register, handleSubmit } = useForm<{ duration: number, currentPrice: number }>();
+    const { me } = useMe();
+    const { getIoClient } = useSocket();
+    const { isShowing: isShowingAuction, toggle: toggleAuction } = useModal();
+    const [currentGameCard, setCurrentGameCard] = React.useState<IGameCard>();
+
+    const auctionSubmit = (formData: { duration: number, currentPrice: number }) => {
+        getIoClient()?.emit('auction__create', { ...formData, cardSetId: currentGameCard?.id });
+        toggleAuction();
+    }
+
+    React.useEffect(() => {
+        if (!currentGameCard) return;
+        toggleAuction();
+    }, [currentGameCard])
+
     React.useEffect(() => {
         if (!cardSetsProps?.length) return;
         const gameCardSets = cardSetsProps.map((cardSet) => {
@@ -18,6 +40,9 @@ const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | u
                 isDraggable: false,
                 canPop: true,
                 displayCardInfoOnPop: true,
+                showExchangeOnPop: true,
+                showAuctionOnPop: me?.roles && me?.roles.includes('admin') ? true : false,
+                submitAuction: setCurrentGameCard,
                 popScale: 1.75,
                 canFlip: false,
                 canActivate: true,
@@ -43,7 +68,21 @@ const PreviewSets = ({ cardSets: cardSetsProps }: { cardSets: CardICardSet[] | u
                     </div>
                 )
             })}
-
+            <Modal
+                isShowing={isShowingAuction}
+                toggle={toggleAuction}
+                title="Créer une enchère"
+                content={
+                    <form className="space-y-5 w-96" onSubmit={handleSubmit(auctionSubmit)}>
+                        <div>Carte: {currentGameCard?.card.name}</div>
+                        <Input label="Durée du timer" name="duration" type="number" defaultV={20} register={register} />
+                        <Input label="Prix initial" name="currentPrice" type="number" defaultV={100} register={register} />
+                        <div className="w-full flex justify-end">
+                            <button className="btn" type="submit">Créer une enchère</button>
+                        </div>
+                    </form>
+                }
+            />
         </div>
     )
 }

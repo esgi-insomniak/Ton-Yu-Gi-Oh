@@ -1,29 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsUUID, Min } from 'class-validator';
 
 export class CreateAuctionBodyDto {
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  @IsString()
-  userCardSetId: string;
+  @IsUUID(4)
+  cardSetId: string;
 
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  createdAt: Date;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
   duration: number;
 
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  minimalPrice: number;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
   currentPrice: number;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  isClosed: boolean;
 }

@@ -124,7 +124,11 @@ const Router: React.FC = () => {
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
                     <Route path="/exchange-history" element={<ExchangeHistoryPage />} />
-                    <Route path="/auction" element={<AuctionRoomPage />} />
+                    <Route path="/auction" element={
+                        <GameCardProvider>
+                            <AuctionRoomPage />
+                        </GameCardProvider>
+                    } />
                 </Route>
 
                 {/* Admin routes */}

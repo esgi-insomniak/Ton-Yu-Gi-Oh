@@ -5,7 +5,7 @@ import React from "react";
 import { IGameCard } from "@/helpers/types/cards";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useGetAllAttributes, useGetAllRarities } from "@/helpers/api/hooks/cards/attribute.hook";
-import { Input, Select } from "@/components/Input";
+import { Select } from "@/components/Input";
 import { Pagination } from "@/components/Pagination";
 import { getScreenSize } from "@/helpers/utils/constants";
 
@@ -43,6 +43,9 @@ const Collection = () => {
                 isDraggable: false,
                 canPop: true,
                 displayCardInfoOnPop: true,
+                showExchangeOnPop: false,
+                showAuctionOnPop: false,
+                submitAuction: () => {},
                 popScale: 1.5,
                 canFlip: false,
                 canActivate: true,

@@ -46,7 +46,10 @@ import {
   UpdateUserExchangeByIdDto,
 } from './interfaces/user-service/userExchange/user-exchange.body.dto';
 import { ICardSet } from './interfaces/card-service/set/set.interface';
-import { IUser } from './interfaces/user-service/user/user.interface';
+import {
+  IUser,
+  IUserRoles,
+} from './interfaces/user-service/user/user.interface';
 import {
   IUserExchange,
   IUserExchangePartial,
@@ -65,6 +68,9 @@ import {
   IDuelPlayer,
 } from './interfaces/duel-service/duelPlayer/duel-player.interface';
 import { DuelSendActionDataBodyDto } from './interfaces/duel-service/duel/duel.body.dto';
+import { CreateAuctionBodyDto } from './interfaces/user-service/userAuction/user-auction.body.dto';
+import { IAuction } from './interfaces/user-service/userAuction/user-auction.interface';
+import { IAuctionHistory } from './interfaces/user-service/userAuctionHistory/user-auction.interface';
 
 @Catch()
 export class WebsocketExceptionsFilter extends BaseWsExceptionFilter {
@@ -132,6 +138,9 @@ export class WebsocketGateway
     timeout?: NodeJS.Timeout;
     interval?: NodeJS.Timeout;
   }> = [];
+
+  protected auctionTimeout: NodeJS.Timeout;
+  protected auctionInterval: NodeJS.Timeout;
 
   constructor(
     @Inject('USER_SERVICE') protected readonly userServiceClient: ClientProxy,
@@ -349,13 +358,85 @@ export class WebsocketGateway
     );
 
     if (updatedDuelResponse.status !== HttpStatus.OK) {
-      throw new WsException({
-        statusCode: updatedDuelResponse.status,
-        message: updatedDuelResponse.message,
-      } as ISocketMessage);
+      this.logger.error(
+        `Error while updating duel ${duel.roomId} with new turn`,
+        updatedDuelResponse.message,
+      );
+      // throw new WsException({
+      //   statusCode: updatedDuelResponse.status,
+      //   message: updatedDuelResponse.message,
+      // } as ISocketMessage);
     }
 
     return updatedDuelResponse.item;
+  };
+
+  handleTimer = (auction: IAuction) => {
+    clearTimeout(this.auctionTimeout);
+    clearInterval(this.auctionInterval);
+
+    this.auctionTimeout = setTimeout(async () => {
+      const getLastHistoryResponse: GetResponseArray<IAuctionHistory> =
+        await firstValueFrom(
+          this.userServiceClient.send('get_auction_history_by_auction_id', {
+            params: {
+              id: auction.id,
+            },
+            query: {
+              limit: 1,
+              offset: 0,
+            },
+          }),
+        );
+
+      // give the card to the winner
+      this.userDeckServiceClient.emit('post_usercardset', {
+        userId: getLastHistoryResponse.items[0].user.id,
+        cardSetId: auction.cardSetId,
+      });
+
+      // disable the auction
+      const updateAuctionResponse: GetResponseOne<IAuction> =
+        await firstValueFrom(
+          this.userServiceClient.send('update_auction_by_id', {
+            params: {
+              id: auction.id,
+            },
+            body: {
+              isClosed: true,
+              winner: getLastHistoryResponse.items[0].user.id,
+            },
+          }),
+        );
+
+      if (updateAuctionResponse.status !== HttpStatus.OK) {
+        return;
+      }
+
+      const updatedAuctionSocketEvent: ISocketEvent = {
+        event: 'auction__closed',
+        type: ISocketEventType.UPDATE,
+        data: updateAuctionResponse.item,
+      };
+
+      this.io.emit('auction__bids', updatedAuctionSocketEvent);
+
+      clearTimeout(this.auctionTimeout);
+    }, auction.duration * 1000);
+
+    let defaultTime = auction.duration;
+    this.auctionInterval = setInterval(() => {
+      if (defaultTime === 0) {
+        clearInterval(this.auctionInterval);
+      }
+      const intervalSocketEvent: ISocketEvent = {
+        event: 'auction__interval',
+        type: ISocketEventType.UPDATE,
+        data: defaultTime,
+      };
+      defaultTime--;
+      this.io.emit('auction__bids', intervalSocketEvent);
+    }, 1000);
   };
 
   // Ping route for testing
@@ -1629,5 +1710,153 @@ export class WebsocketGateway
 
     client.emit(eventName, socketEventResponse);
     this.io.to(targetUserId).emit(eventName, socketEventResponse);
+  }
+
+  // Auction Create routes
+  @SetMetadata('permission', { roles: [IUserRoles.admin], areAuthorized: true })
+  @UseGuards(PermissionGuard)
+  @UseFilters(new WebsocketExceptionsFilter('auction__created'))
+  @SubscribeMessage('auction__create')
+  async createAuction(
+    @ConnectedSocket() client: IAuthorizedSocket,
+    @MessageBody() body: CreateAuctionBodyDto,
+  ) {
+    const createAuctionResponse: GetResponseOne<IAuction> =
+      await firstValueFrom(
+        this.userServiceClient.send('create_auction', {
+          body,
+        }),
+      );
+
+    if (createAuctionResponse.status !== HttpStatus.CREATED) {
+      throw new WsException({
+        statusCode: createAuctionResponse.status,
+        message: createAuctionResponse.message,
+      } as ISocketMessage);
+    }
+
+    this.io.emit('auction__created', createAuctionResponse.item);
+  }
+
+  // Auction Update routes
+  @SubscribeMessage('auction__make_bid')
+  @UseFilters(new WebsocketExceptionsFilter('auction__bids'))
+  async makeBid(@ConnectedSocket() client: IAuthorizedSocket) {
+    const getAuctionResponse: GetResponseOne<IAuction> = await firstValueFrom(
+      this.userServiceClient.send('get_actual_auction', {}),
+    );
+
+    if (getAuctionResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getAuctionResponse.status,
+        message: getAuctionResponse.message,
+      } as ISocketMessage);
+    }
+
+    const getUserResponse: GetResponseOne<IUser> = await firstValueFrom(
+      this.userServiceClient.send('get_user_by_id', {
+        id: client.userId,
+      }),
+    );
+
+    if (getUserResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getUserResponse.status,
+        message: getUserResponse.message,
+      } as ISocketMessage);
+    }
+    // if not history, start the timout
+    const getAuctionHistoryResponse: GetResponseArray<IAuctionHistory> =
+      await firstValueFrom(
+        this.userServiceClient.send('get_auction_history_by_auction_id', {
+          params: {
+            id: getAuctionResponse.item.id,
+          },
+          query: {
+            limit: 1,
+            offset: 0,
+          },
+        }),
+      );
+
+    if (getAuctionHistoryResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: getAuctionHistoryResponse.status,
+        message: getAuctionHistoryResponse.message,
+      } as ISocketMessage);
+    }
+
+    this.handleTimer(getAuctionResponse.item);
+
+    // check if user has enough money
+    if (
+      getUserResponse.item.coins <
+      parseInt(getAuctionResponse.item.currentPrice.toString()) + 120
+    ) {
+      throw new WsException({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Not enough money',
+      } as ISocketMessage);
+    }
+
+    // update the user coins
+    const updateUserResponse: GetResponseOne<IUser> = await firstValueFrom(
+      this.userServiceClient.send('update_user_by_id', {
+        params: {
+          id: client.userId,
+        },
+        body: {
+          coins:
+            parseInt(getUserResponse.item.coins.toString()) -
+            parseInt(getAuctionResponse.item.currentPrice.toString()) -
+            120,
+        },
+      }),
+    );
+
+    if (updateUserResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updateUserResponse.status,
+        message: updateUserResponse.message,
+      } as ISocketMessage);
+    }
+
+    const updateAuctionResponse: GetResponseOne<IAuction> =
+      await firstValueFrom(
+        this.userServiceClient.send('update_auction_by_id', {
+          params: {
+            id: getAuctionResponse.item.id,
+          },
+          body: {
+            currentPrice:
+              parseInt(getAuctionResponse.item.currentPrice.toString()) + 100,
+          },
+        }),
+      );
+
+    if (updateAuctionResponse.status !== HttpStatus.OK) {
+      throw new WsException({
+        statusCode: updateAuctionResponse.status,
+        message: updateAuctionResponse.message,
+      } as ISocketMessage);
+    }
+
+    const createAuctionHistoryResponse: GetResponseOne<IAuctionHistory> =
+      await firstValueFrom(
+        this.userServiceClient.send('create_auction_history', {
+          user: client.userId,
+          auction: getAuctionResponse.item.id,
+          price:
+            parseInt(getAuctionResponse.item.currentPrice.toString()) + 100,
+        }),
+      );
+
+    const socketEventResponse: ISocketEvent = {
+      event: 'auction__bids',
+      type: ISocketEventType.CREATE,
+      data: createAuctionHistoryResponse.item,
+    };
+
+    this.io.emit('auction__bids', socketEventResponse);
   }
 }

@@ -18,9 +18,14 @@ export const SocketContextProvider = ({ children }: SocketContextProps) => {
         if (token) {
             if (ioClient.current === null) {
                 const socket = io(SOCKET_URL, { path: '/socket.io', auth: { token: `Bearer ${token}` } });
+                socket.off('auction__created')
                 socket.off('exchange__request')
                 socket.off('duel__is_started')
                 socket.off('duel__canceled')
+
+                socket.on('auction__created', (event: ISocketEvent) => {
+                    alert?.success(`Une nouvelle enchère a été créée !`)
+                })
                 socket.on('exchange__request', (event: ISocketEvent) => {
                     if (event.type === ISocketEventType.INFO) {
                         alert?.success(`${event.data.exchangeOwner.username} vous propose un échange !`)

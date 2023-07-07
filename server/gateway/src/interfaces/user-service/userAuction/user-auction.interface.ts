@@ -1,9 +1,11 @@
+import { IUser } from '../user/user.interface';
+
 export interface IAuction {
   id: string;
-  userCardSetId: string;
+  cardSetId: string;
   createdAt: Date;
   duration: number;
-  minimalPrice: number;
   currentPrice: number;
   isClosed: boolean;
+  winner?: IUser;
 }
