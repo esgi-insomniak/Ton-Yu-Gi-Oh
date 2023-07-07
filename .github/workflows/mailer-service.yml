@@ -1,4 +1,4 @@
-name: Deploy service "mailer-service"
+name: Deploy Service "mailer-service"
 
 on:
   push:

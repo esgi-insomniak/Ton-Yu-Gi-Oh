@@ -44,10 +44,10 @@ spec:
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
-              memory: "40Mi"
+              memory: "70Mi"
               cpu: "10m"
             limits:
-              memory: "40Mi"
+              memory: "70Mi"
               cpu: "10m"
       volumes:
         - name: card-service-db

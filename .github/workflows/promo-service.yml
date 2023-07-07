@@ -1,4 +1,4 @@
-name: Deploy service "promo-service"
+name: Deploy Service "promo-service"
 
 on:
   push:

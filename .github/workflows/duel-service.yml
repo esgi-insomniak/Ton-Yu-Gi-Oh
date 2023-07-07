@@ -1,4 +1,4 @@
-name: Deploy service "duel-service"
+name: Deploy Service "duel-service"
 
 on:
   push:

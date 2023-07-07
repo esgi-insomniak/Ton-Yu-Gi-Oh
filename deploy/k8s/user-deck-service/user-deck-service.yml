@@ -26,10 +26,10 @@ spec:
                 name: global-project-secrets
           resources:
             requests:
-              memory: "270Mi"
+              memory: "279Mi"
               cpu: "30m"
             limits:
-              memory: "270Mi"
+              memory: "279Mi"
               cpu: "30m"
 ---
 

@@ -1,4 +1,4 @@
-name: Deploy service "gateway"
+name: Deploy Service "gateway"
 
 on:
   push:

@@ -44,10 +44,10 @@ spec:
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
-              memory: "40Mi"
+              memory: "55Mi"
               cpu: "10m"
             limits:
-              memory: "40Mi"
+              memory: "55Mi"
               cpu: "10m"
       volumes:
         - name: auth-service-db
