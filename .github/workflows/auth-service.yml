@@ -1,16 +1,22 @@
-name: Deploy "auth-service"
+name: Deploy Service "auth-service"
 
 on:
   push:
     branches:
       - main
+    paths:
+      - "server/auth-service/**"
+      - ".github/workflows/auth-service.yml"
+      - "deploy/k8s/auth-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
-    # paths:
-      # - "server/auth-service/**"
-      # - ".github/workflows/auth-service.yml"
-      # - "deploy/k8s/auth-service/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
 
 env:
   ## Docker Hub
@@ -68,7 +74,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region ${{ secrets.GKE_REGION }} --project ${{ secrets.PROJECT_ID }}
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }} --project ${{ secrets.PROJECT_ID }}
             gcloud auth --quiet configure-docker
             kubectl config current-context
 

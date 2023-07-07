@@ -20,9 +20,7 @@ export class SocketIoAdapter extends IoAdapter {
   }
 
   createIOServer(port: number, options?: ServerOptions): Server {
-    const cors = {
-      origin: '*',
-    };
+    const cors = { origin: new ConfigService().get('corsOrigin') };
 
     const optionsWithCORS: ServerOptions = {
       ...options,

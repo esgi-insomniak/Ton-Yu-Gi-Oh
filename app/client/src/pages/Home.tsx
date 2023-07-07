@@ -1,6 +1,7 @@
 import { NavItem } from "@/components/NavItem";
 import { useSocket } from "@/helpers/api/hooks";
 import { useLogout } from "@/helpers/api/hooks/auth";
+import { useGetActiveAuction } from "@/helpers/api/hooks/exchange";
 import { useMe } from "@/helpers/api/hooks/users";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
@@ -9,46 +10,54 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Home = () => {
-    const { ioClient } = useSocket()
+    const { getIoClient } = useSocket()
     const { me } = useMe()
+    const { isError: isAuctionError, isLoading } = useGetActiveAuction()
     const logout = useLogout()
     const alert = useAlert()
     const router = useNavigate()
 
     const opponentSearch = React.useCallback(() => {
-        ioClient?.off('duel__queue');
-        ioClient?.off('duel__found');
-        
-        ioClient?.emit('duel__join_queue');
+        getIoClient()?.off('duel__queue');
+        getIoClient()?.off('duel__found');
 
-        ioClient?.on('duel__queue', (event: ISocketEvent) => {
+        getIoClient()?.emit('duel__join_queue');
+
+        getIoClient()?.on('duel__queue', (event: ISocketEvent) => {
             if (event.type === ISocketEventType.ERROR) {
                 alert?.closeAll()
                 alert?.error(event.data.message)
             }
         })
-        ioClient?.on('duel__found', (event: ISocketEvent) => {
+        getIoClient()?.on('duel__found', (event: ISocketEvent) => {
             alert?.closeAll()
             alert?.success("Adversaire trouvé !")
-            ioClient?.off('duel__queue');
-            ioClient?.off('duel__found');
-            router(`/duel/${event.data.roomId}`)
+            getIoClient()?.off('duel__queue');
+            getIoClient()?.off('duel__found');
+            router(`/duel/select-deck/${event.data.roomId}`)
         })
         alert?.custom('Recherche d\'un adversaire en cours...')
-    }, [ioClient, alert])
+    }, [alert])
 
     const navs = React.useMemo(() => [
-        { animatedBackground: "/opening.mp4", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/duel", title: "Duel", condition: true, isBtn: true, action: () => opponentSearch() },
-        { animatedBackground: "/opening.mp4", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
-        { animatedBackground: "/opening.mp4", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-deck.gif", path: "/decks", title: "Mes decks", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-collection.gif", path: "/collection", title: "Collection", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/yugi-bg-duel.gif", path: "/duel", title: "Duel", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: true, action: () => opponentSearch() },
+        { animatedBackground: "/opening.gif", path: "/opening", title: "Booster", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-shop.gif", path: "/shop", title: "Boutique", condition: true, isBtn: false, action: () => { } },
+        { animatedBackground: "/bg-admin.gif", path: "/admin", title: "Admin", condition: me?.roles?.includes(ROLES.ADMIN)!, isBtn: false, action: () => { } },
     ], [me?.roles])
 
     return (
-        <div className="hero items-center min-h-screen text-gray-300">
-            <video autoPlay muted loop id="myVideo" className="object-cover w-full h-screen">
+        <div className="hero items-center h-screen text-gray-300">
+            {
+               !isLoading && !isAuctionError && (
+                    <div className="fixed top-5 right-5 z-10 gradient-border">
+                        <button className="btn z-20 text-white" onClick={() => router('/auction')}>Rejoindre l'enchère !</button>
+                    </div>
+                )
+            }
+            <video autoPlay muted loop id="myVideo" className="absolute z-0 w-auto min-w-full min-h-full max-h-screen object-cover">
                 <source src="/bg-home.mp4" type="video/mp4" />
             </video>
             <div className="hero-overlay bg-gray-900 opacity-60" />
@@ -58,7 +67,7 @@ const Home = () => {
                         Welcome <span className="text-yellow-500">{me?.username}</span>
                     </h1>
                 </div>
-                <div className="grid grid-cols-3 grid-flow-dense gap-8">
+                <div className="grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-2 grid-flow-dense gap-8">
                     {navs.filter(auth => auth.condition === true).map((nav, index) => (
                         <NavItem
                             key={index}
@@ -71,11 +80,10 @@ const Home = () => {
                     ))}
                 </div>
             </div>
-            <div className="h-20 w-full bottom-0 absolute flex px-5 items-center">
+            <div className="h-20 w-full bottom-0 fixed flex px-5 items-center">
                 <div className="dropdown dropdown-right dropdown-end">
                     <label tabIndex={0} className="w-16 h-10 p-2 rounded-full bg-white/20 flex items-center justify-center cursor-pointer text-2xl hover:bg-white/30">⚙️</label>
                     <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 ml-2">
-                        <li><Link to={`/me`}>{me?.username}</Link></li>
                         <li onClick={() => logout.mutate()}><p>Se déconnecter</p></li>
                     </ul>
                 </div>

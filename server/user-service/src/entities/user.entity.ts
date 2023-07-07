@@ -8,6 +8,8 @@ import {
 import { UserRelation } from './userRelation.entity';
 import { UserExchange } from './userExchange.entity';
 import { ProfilePicture } from './profilePicture.entity';
+import { AuctionHistory } from './userAuctionHistory.entity';
+import { Auction } from './userAuction.entity';
 
 @Entity()
 export class User {
@@ -43,6 +45,12 @@ export class User {
 
   @OneToMany(() => UserExchange, (userExchange) => userExchange.exchangeTarget)
   proposedExchanges: UserExchange[];
+
+  @OneToMany(() => AuctionHistory, (auctionHistories) => auctionHistories.user)
+  auctionHistories: AuctionHistory[];
+
+  @OneToMany(() => Auction, (auctionHistories) => auctionHistories.winner)
+  wonAuctions: Auction[];
 
   addRole(role: string) {
     if (!this.roles.includes(role)) {

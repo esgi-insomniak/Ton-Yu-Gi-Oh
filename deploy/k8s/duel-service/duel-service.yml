@@ -22,9 +22,15 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: duel-service-config
-
+            - secretRef:
+                name: global-project-secrets
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "30m"
+            limits:
+              memory: "250Mi"
+              cpu: "30m"
 ---
 
 apiVersion: v1
@@ -38,17 +44,3 @@ spec:
     - protocol: TCP
       port: 8000
   type: ClusterIP # Can be accessed only inside the cluster
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: duel-service-config
-data:
-  DUEL_SERVICE_PORT: "8000"
-  DUEL_SERVICE_POSTGRES_HOST: "duel-service-db"
-  DUEL_SERVICE_POSTGRES_PORT: "5432"
-  DUEL_SERVICE_POSTGRES_DB: "duel_service"
-  DUEL_SERVICE_POSTGRES_USER: "postgres"
-  DUEL_SERVICE_POSTGRES_PASSWORD: "postgres"

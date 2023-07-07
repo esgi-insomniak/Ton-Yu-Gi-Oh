@@ -1,16 +1,22 @@
-name: Deploy "payment-service"
+name: Deploy Service "payment-service"
 
 on:
   push:
     branches:
       - main
+    paths:
+      - "server/payment-service/**"
+      - ".github/workflows/payment-service.yml"
+      - "deploy/k8s/payment-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
-    # paths:
-      # - "server/payment-service/**"
-      # - ".github/workflows/payment-service.yml"
-      # - "deploy/k8s/payment-service/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
 
 env:
   ## Docker Hub
@@ -68,7 +74,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region ${{ secrets.GKE_REGION }} --project ${{ secrets.PROJECT_ID }}
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }} --project ${{ secrets.PROJECT_ID }}
             gcloud auth --quiet configure-docker
             kubectl config current-context
 

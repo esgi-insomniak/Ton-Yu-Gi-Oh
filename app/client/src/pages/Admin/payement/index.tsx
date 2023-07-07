@@ -2,6 +2,7 @@ import { Table, TableColumn } from "@/components/Table";
 import { ReportCard } from "../Layout";
 import { useGetAllPayements } from "@/helpers/api/hooks/admin/payement";
 import { BsCashCoin } from "react-icons/bs";
+import React from "react";
 
 interface TablePayementProps {
     id: string;
@@ -18,8 +19,8 @@ const columns: TableColumn<TablePayementProps>[] = [
 ]
 
 const PayementAdmin = () => {
-
-    const { data: arr } = useGetAllPayements()
+    const [page, setPage] = React.useState<number>(0);
+    const { data: arr } = useGetAllPayements(10, page)
 
     const formatedData = arr?.data?.map((payement) => ({
         ...payement,
@@ -34,6 +35,10 @@ const PayementAdmin = () => {
             <Table<TablePayementProps>
                 data={formatedData || []}
                 columns={columns}
+                page={page}
+                setter={setPage}
+                arr={formatedData?.length || 0}
+                maxItemsPerPage={10}
             />
         </div>
     )

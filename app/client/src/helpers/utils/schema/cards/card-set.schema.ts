@@ -2,6 +2,7 @@ import * as zod from "zod";
 import { cardSchema } from "./card.schema";
 import { setPartialSchema, setSchema } from "./set.schema";
 import { raritySchema } from "./rarity.schema";
+import { userCardSetSchema } from "../User";
 
 export const cardSetSchema = zod.object({
   id: zod.string(),
@@ -33,23 +34,36 @@ export const cardSetBuyableSchema = zod.object({
 export const deckSchema = zod.object({
   id: zod.string(),
   card: cardSchema,
-  set: setSchema,
+  set: zod.lazy(() => setSchema),
   price: zod.number(),
-  rarity: raritySchema
-})
+  rarity: raritySchema,
+});
+
+export const arrayOfCardSetsCompleteSchema = zod.object({
+  id: zod.string(),
+  userId: zod.string(),
+  cardSet: zod.lazy(() => userCardSetSchema),
+});
 
 export const arrayOfCardSetsSchema = zod.object({
   id: zod.string(),
   userId: zod.string(),
-  cardSet: deckSchema
-})
+  cardSet: deckSchema,
+});
+
+export const userCardSetsComplete = zod.object({
+  id: zod.string(),
+  userId: zod.string(),
+  name: zod.string(),
+  cardSets: zod.array(zod.lazy(() => userCardSetSchema)),
+});
 
 export const userCardSets = zod.object({
   id: zod.string(),
   userId: zod.string(),
   name: zod.string(),
-  cardSets: zod.array(arrayOfCardSetsSchema)
-})
+  cardSets: zod.array(arrayOfCardSetsSchema),
+});
 
 export const cardSetOneResponseSchema = zod.object({
   data: cardSetSchema,
@@ -61,7 +75,12 @@ export const cardSetArrayResponseSchema = zod.object({
 
 export const userCardSetsResponseSchema = zod.object({
   data: userCardSets.array(),
-})
+});
 
-export type userCardSetReponseType = zod.infer<typeof userCardSetsResponseSchema>;
+export type userCardSetReponseType = zod.infer<
+  typeof userCardSetsResponseSchema
+>;
+
+export type userCardSetsCompleteType = zod.infer<typeof userCardSetsComplete>;
 export type userCardSetsType = zod.infer<typeof userCardSets>;
+export type arrayOfCardSetsSchemaType = zod.infer<typeof arrayOfCardSetsSchema>;

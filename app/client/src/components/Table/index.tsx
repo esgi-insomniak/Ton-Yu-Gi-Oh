@@ -1,4 +1,5 @@
 import React from 'react';
+import { Pagination } from '../Pagination';
 
 interface TableRowProps<T> {
     data: T;
@@ -32,9 +33,13 @@ export interface TableColumn<T> {
 interface TableProps<T> {
     data: T[];
     columns: TableColumn<T>[];
+    page: number;
+    setter: React.Dispatch<React.SetStateAction<number>>;
+    arr: number;
+    maxItemsPerPage: number;
 }
 
-export const Table = <T extends object>({ data, columns }: TableProps<T>) => {
+export const Table = <T extends object>({ data, columns, page, setter, arr, maxItemsPerPage }: TableProps<T>) => {
     return (
         <div className='p-5 bg-white rounded-md'>
             <table className="min-w-full bg-white">
@@ -61,6 +66,7 @@ export const Table = <T extends object>({ data, columns }: TableProps<T>) => {
                     ))}
                 </tbody>
             </table>
+            <Pagination page={page} setter={setter} arr={arr} maxItemsPerPage={maxItemsPerPage} />
         </div>
     );
 };

@@ -32,7 +32,7 @@ export class MailerService {
         html: message.htmlBody,
       });
 
-      return info.accepted.length > 0;
+      return true
     } catch (e) {
       throw e;
     }

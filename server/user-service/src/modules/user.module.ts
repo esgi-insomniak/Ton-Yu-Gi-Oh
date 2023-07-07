@@ -9,6 +9,10 @@ import { ProfilePictureService } from 'src/services/profile-picture.service';
 import { UserRelationService } from 'src/services/user-relation.service';
 import { ProfilePictureController } from 'src/controllers/profile-picture.controller';
 import { UserRelationController } from 'src/controllers/user-relation.controller';
+import { AuctionController } from 'src/controllers/user-auction.controller';
+import { AuctionService } from 'src/services/user-auction.service';
+import { AuctionHistoryService } from 'src/services/user-auction-history.service';
+import { AuctionHistoryController } from 'src/controllers/user-auction-history.controller';
 
 @Module({
   imports: [PostgresModule],
@@ -17,6 +21,8 @@ import { UserRelationController } from 'src/controllers/user-relation.controller
     UserExchangeController,
     ProfilePictureController,
     UserRelationController,
+    AuctionController,
+    AuctionHistoryController,
   ],
   providers: [
     UserService,
@@ -24,6 +30,8 @@ import { UserRelationController } from 'src/controllers/user-relation.controller
     ProfilePictureService,
     UserRelationService,
     ConfigService,
+    AuctionService,
+    AuctionHistoryService,
   ],
 })
 export class UserModule {}

@@ -21,30 +21,16 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /ping
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 20
-          readinessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /ping
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 20
+          envFrom:
+            - secretRef:
+                name: global-project-secrets # name of the secret
           resources:
-            limits:
-              cpu: 500m
-              memory: 512Mi
             requests:
-              cpu: 250m
-              memory: 256Mi
-          env:
-            - name: API_GATEWAY_PORT
-              value: "8000"
+              memory: "300Mi"
+              cpu: "30m"
+            limits:
+              memory: "300Mi"
+              cpu: "30m"
 
 ---
 
@@ -75,7 +61,8 @@ metadata:
   namespace: default
   annotations:
       kubernetes.io/ingress.class: "gce"
-      kubernetes.io/ingress.allow-http: "true"
+      kubernetes.io/ingress.allow-http: "false"
+      kubernetes.io/ingress.global-static-ip-name: "gateway-ip"
 spec:
   rules:
   - http:
@@ -87,27 +74,3 @@ spec:
             name: gateway-svc
             port:
               number: 8000
-
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: gateway-config
-data:
-  API_GATEWAY_PORT: "8000"
-  CARD_SERVICE_PORT: "8000"
-  USER_DECK_SERVICE_PORT: "8000"
-  USER_SERVICE_PORT: "8000"
-  AUTH_SERVICE_PORT: "8000"
-  PAYMENT_SERVICE_PORT: "8000"
-  MAILER_SERVICE_PORT: "8000"
-  AUTH_SERVICE_HOST: "auth-service"
-  CARD_SERVICE_HOST: "card-service"
-  DUEL_SERVICE_HOST: "duel-service"
-  MAILER_SERVICE_HOST: "mailer-service"
-  PAYMENT_SERVICE_HOST: "payment-service"
-  PROMO_SERVICE_HOST: "promo-service"
-  USER_DECK_SERVICE_HOST: "user-deck-service"
-  USER_SERVICE_HOST: "user-service"

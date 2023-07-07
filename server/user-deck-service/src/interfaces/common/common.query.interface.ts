@@ -9,4 +9,6 @@ export interface UserCardSetsQuery extends QueryGetItems {
   raceId: string;
   typeId: string;
   rarityId: string;
+  limit: number;
+  offset: number;
 }

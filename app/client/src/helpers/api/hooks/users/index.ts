@@ -1,17 +1,18 @@
 import { apiRequest, getToken } from "@/helpers/api";
 import { ApiGetItemResponse } from "@/helpers/types/common";
-import { Card, MyCards, MyObj, SameCards } from "@/helpers/types/decks";
 import { UserMe } from "@/helpers/types/users";
 import { userSchemaType } from "@/helpers/utils/schema/Admin";
 import { responseRegisterSchema } from "@/helpers/utils/schema/Auth";
+import { groupedUserCardSetPartialResponseSchema, groupedUserCardSetType } from "@/helpers/utils/schema/User";
+import { arrayOfCardSetsSchemaType } from "@/helpers/utils/schema/cards/card-set.schema";
 import React from "react";
 import { useQuery } from "react-query";
-import { useNavigate, useHref } from "react-router-dom";
 
 const QUERY_URLS = {
   me: () => `/users/me`,
-  userCardSets: (userId: string) => `/users/${userId}/user_card_sets?limit=100`,
+  userCardSets: (limit: number, pageNumber: number) => `/users/me/user_card_sets?limit=${limit}&offset=${pageNumber}`,
   getUsers: (cardSetId: string, itemPerPage?: number, pageNumber?: number) => `/users?limit=${itemPerPage}&offset=${pageNumber}&cardSetId=${cardSetId}`,
+  groupedUserCardSets: (limit: number, pageNumber: number) => `/users/me/grouped_user_card_sets?limit=${limit}&offset=${pageNumber}`,
 } as const;
 
 const userKeys = {
@@ -28,9 +29,9 @@ const requestMe = () =>
     responseRegisterSchema
   );
 
-const requestUserCardSets = (userId: string) =>
+const requestUserCardSets = (limit: number, pageNumber: number) =>
   apiRequest({
-    url: QUERY_URLS.userCardSets(userId),
+    url: QUERY_URLS.userCardSets(limit, pageNumber),
     method: "GET",
     token: getToken(),
   });
@@ -42,6 +43,13 @@ const requestGetUsers = (cardSetId: string, itemPerPage?: number, pageNumber?: n
     token: getToken(),
   });
 
+const requestGroupeUserCardSets = (limit: number, pageNumber: number) =>
+  apiRequest({
+    url: QUERY_URLS.groupedUserCardSets(limit, pageNumber),
+    method: "GET",
+    token: getToken(),
+  }, groupedUserCardSetPartialResponseSchema);
+
 export const useMe = () => {
   const { data, isLoading, error, refetch } = useQuery<ApiGetItemResponse<userSchemaType>>(userKeys.me(), () => requestMe(), {
     refetchOnReconnect: "always",
@@ -51,7 +59,7 @@ export const useMe = () => {
   })
 
   if (error) {
-    localStorage.removeItem("token")
+    //localStorage.removeItem("token")
     window.location.reload()
   }
 
@@ -61,12 +69,12 @@ export const useMe = () => {
 }
 
 
-export const useGetAllMyUserCardSets = (userId: string) => {
-  const myCards = useQuery(["userCardSets", userId], () =>
-    requestUserCardSets(userId)
+export const useGetAllMyUserCardSets = (limit: number, pageNumber: number) => {
+  const { data, isLoading } = useQuery<ApiGetItemResponse<arrayOfCardSetsSchemaType[]>>(["userCardSets", limit, pageNumber], () =>
+    requestUserCardSets(limit, pageNumber)
   );
 
-  return myCards;
+  return React.useMemo(() => ({ data, isLoading }), [data, isLoading]);
 };
 
 export const useGetUserWithCardSetId = (cardSetId: string, itemPerPage?: number, pageNumber?: number) => {
@@ -77,24 +85,10 @@ export const useGetUserWithCardSetId = (cardSetId: string, itemPerPage?: number,
   return React.useMemo(() => ({ users }), [users, cardSetId, itemPerPage, pageNumber]);
 };
 
-export const getAllCardInDoubleAndIncrement = (
-  myCards: MyCards
-): Array<SameCards> => {
-  let myObj: MyObj = {};
-  Object.values(myCards || {}).forEach((cards: Card[]) => {
-    cards.forEach((card: Card) => {
-      const cardSetId = card.cardSet.id;
-      if (myObj[cardSetId]) {
-        myObj[cardSetId].count++;
-        myObj[cardSetId].userCardSetIds.push(card.id);
-      } else {
-        myObj[cardSetId] = {
-          item: card,
-          count: 1,
-          userCardSetIds: [card.id],
-        };
-      }
-    });
-  });
-  return Object.values(myObj);
-};
+export const useGetAllMyGroupedUserCardSets = (limit: number, pageNumber: number) => {
+  const { data, isLoading } = useQuery<ApiGetItemResponse<groupedUserCardSetType[]>>(["groupedUserCardSets", limit, pageNumber], () =>
+    requestGroupeUserCardSets(limit, pageNumber)
+  );
+
+  return React.useMemo(() => ({ data, isLoading }), [data, isLoading]);
+}

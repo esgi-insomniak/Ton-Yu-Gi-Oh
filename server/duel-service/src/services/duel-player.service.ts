@@ -9,6 +9,15 @@ export class DuelPlayerService {
   async getDuelPlayerById(id: string): Promise<DuelPlayer> {
     const duelPlayer = await this.dataSource.getRepository(DuelPlayer).findOne({
       where: { id },
+      relations: ['duel'],
+    });
+    return duelPlayer;
+  }
+
+  async getDuelPlayerByUserId(userId: string): Promise<DuelPlayer> {
+    const duelPlayer = await this.dataSource.getRepository(DuelPlayer).findOne({
+      where: { userId },
+      relations: ['duel'],
     });
     return duelPlayer;
   }

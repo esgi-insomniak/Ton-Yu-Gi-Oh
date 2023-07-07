@@ -10,6 +10,7 @@ import {
 import { UserCardSet } from 'src/entities/user-card-set.entity';
 import { UserCardSetService } from 'src/services/user-card-set.service';
 import { UserCardSetsQuery } from 'src/interfaces/common/common.query.interface';
+import { GroupedUserCardSet } from 'src/interfaces/user-card-set.interface';
 
 @Controller('user_card_set')
 export class UserCardSetController {
@@ -65,8 +66,28 @@ export class UserCardSetController {
   }): Promise<GetResponseArray<UserCardSet>> {
     const userCardSets = await this.userCardSetService.getUserCardSetsByUserId(
       request.params.id,
+      request.query,
     );
     const result: GetResponseArray<UserCardSet> = {
+      status: userCardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
+      message: userCardSets ? null : 'UserCardSets not found',
+      items: userCardSets,
+    };
+
+    return result;
+  }
+
+  @MessagePattern('get_grouped_usercardsets_by_user_id')
+  public async getGroupedUserCardSetsByUserId(request: {
+    params: ParamGetItemById;
+    query: QueryGetItems;
+  }): Promise<GetResponseArray<GroupedUserCardSet>> {
+    const userCardSets =
+      await this.userCardSetService.getGroupedUserCardSetsByUserId(
+        request.params.id,
+        request.query,
+      );
+    const result: GetResponseArray<GroupedUserCardSet> = {
       status: userCardSets ? HttpStatus.OK : HttpStatus.NOT_FOUND,
       message: userCardSets ? null : 'UserCardSets not found',
       items: userCardSets,

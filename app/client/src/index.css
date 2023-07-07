@@ -53,27 +53,18 @@ html {
 }
 
 .booster-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.card-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  max-width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    box-sizing: border-box;
 }
 
 .card-item {
@@ -102,6 +93,7 @@ html {
   justify-content: center;
   text-align: center;
   margin: auto 0;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0);
 }
 
 .drop-zone-hover {
@@ -113,10 +105,61 @@ html {
   align-items: center;
   justify-content: center;
   text-align: center;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0);
 }
 
 .drop-zone-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.gradient-border {
+  --border-width: 3px;
+}
+
+.gradient-border::after {
+   position: absolute;
+   content: "";
+   top: calc(-1 * var(--border-width));
+   left: calc(-1 * var(--border-width));
+   z-index: -2;
+   width: calc(100% + var(--border-width) * 2);
+   height: calc(100% + var(--border-width) * 2);
+   background-size: 300% 300%;
+   background: linear-gradient(
+           60deg,
+           hsl(224, 85%, 66%),
+           hsl(269, 85%, 66%),
+           hsl(314, 85%, 66%),
+           hsl(359, 85%, 66%),
+           hsl(44, 85%, 66%),
+           hsl(89, 85%, 66%),
+           hsl(134, 85%, 66%),
+           hsl(179, 85%, 66%)
+   ) 0 50%;
+   border-radius: calc(2 * var(--border-width));
+   animation: moveGradient 2s alternate infinite;
+ }
+
+@keyframes moveGradient {
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glowing {
+  0% {
+    box-shadow: 0 0 5px #fff;
+  }
+  50% {
+    box-shadow: 0 0 20px #00bfff;
+  }
+  100% {
+    box-shadow: 0 0 5px #fff;
+  }
+}
+
+.glow {
+  animation: glowing 1.5s infinite;
 }

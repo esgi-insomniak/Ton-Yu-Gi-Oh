@@ -22,9 +22,15 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: card-service-config
-
+            - secretRef:
+                name: global-project-secrets
+          resources:
+            requests:
+              memory: "280Mi"
+              cpu: "30m"
+            limits:
+              memory: "280Mi"
+              cpu: "30m"
 ---
 
 apiVersion: v1
@@ -38,19 +44,3 @@ spec:
     - protocol: TCP
       port: 8000
   type: ClusterIP # Can be accessed from other pods in the cluster
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: card-service-config
-data:
-  CARD_SERVICE_PORT: "8000"
-  CARD_SERVICE_POSTGRES_HOST: "card-service-db"
-  CARD_SERVICE_POSTGRES_PORT: "5432"
-  CARD_SERVICE_POSTGRES_USER: "postgres"
-  CARD_SERVICE_POSTGRES_PASSWORD: "postgres"
-  CARD_SERVICE_POSTGRES_DB: "card_service"
-  CARD_SERVICE_YUGIOH_API: "https://db.ygoprodeck.com/api/v7"
-  CARD_SERVICE_YUGIOH_LANGUAGE: "fr"

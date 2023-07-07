@@ -5,7 +5,10 @@ export interface IDuel {
   roomId: string;
   hasStarted: boolean;
   isOver: boolean;
+  turn: number;
   timePerTurn: number;
-  winnerId: string;
+  timeToSelectDeck: number;
+  playerToPlay: string;
+  winner: string;
   players: IDuelPlayer[] | Partial<IDuelPlayer>[];
 }

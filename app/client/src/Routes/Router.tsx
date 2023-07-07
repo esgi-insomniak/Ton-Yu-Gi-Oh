@@ -6,7 +6,6 @@ import { ROLES } from "@/helpers/utils/enum/roles";
 import { LayoutAdmin } from "@/pages/Admin/Layout";
 import { useMe } from "@/helpers/api/hooks/users";
 import Loader from "@/components/Loader";
-import { SocketContextProvider } from "@/helpers/providers/socket/SocketProvider";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -47,18 +46,20 @@ const CollectionPage = React.lazy(() => import('@/pages/Collection'));
 const ShopPage = React.lazy(() => import('@/pages/Shop'));
 const DecksPage = React.lazy(() => import('@/pages/Decks'));
 const NewDecksPage = React.lazy(() => import('@/pages/Decks/NewDeck'));
-//const EditDecksPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
+const EditDeckPage = React.lazy(() => import('@/pages/Decks/EditDeck'));
 const AdminUserPage = React.lazy(() => import('@/pages/Admin/user'));
 const AdminExchangePage = React.lazy(() => import('@/pages/Admin/exchange'));
 const AdminPayementPage = React.lazy(() => import('@/pages/Admin/payement'));
 const AdminAuthPage = React.lazy(() => import('@/pages/Admin/auth'));
 const AdminPromoPage = React.lazy(() => import('@/pages/Admin/promos'));
+const DuelSelectDeckPage = React.lazy(() => import('@/pages/Duels/selectDeck'));
 const DuelPage = React.lazy(() => import('@/pages/Duels'));
 const CreateDeckPage = React.lazy(() => import('@/pages/Decks/deck'));
 const MyCardCollectionPage = React.lazy(() => import('@/pages/Decks/card'));
 const ExchangePage = React.lazy(() => import('@/pages/Exchange'));
-const UserProfilPage = React.lazy(() => import('@/pages/User'));
 const ExchangeRoomPage = React.lazy(() => import('@/pages/Exchange/exchangeRoom'));
+const ExchangeHistoryPage = React.lazy(() => import('@/pages/Exchange/ExchangeHistory'));
+const AuctionRoomPage = React.lazy(() => import('@/pages/Auction'));
 
 /**
  * @returns Render the routes based on the condition (ex: if user is logged in or not) and redirect to error page if condition is false
@@ -67,7 +68,7 @@ const Router: React.FC = () => {
     const { me, isLoading } = useMe()
     const router = useLocation().pathname
 
-    const routesWithoutLayout = React.useMemo(() => ['/', '/admin'], [])
+    const routesWithoutLayout = React.useMemo(() => ['/', '/admin', '/decks'], [])
 
     React.useEffect(() => {
         if (isLoading) return
@@ -86,17 +87,17 @@ const Router: React.FC = () => {
                             withLayout={!routesWithoutLayout.includes(router)}
                             isLoading={isLoading}
                         >
-                            <SocketContextProvider>
-                                <Outlet />
-                            </SocketContextProvider>
+                            <Outlet />
                         </ProtectedRoute>
                     }
                 >
                     <Route path="/" element={<HomePage />} />
                     <Route path="/opening" element={
-                        <DndProvider backend={HTML5Backend}>
-                            <BoosterPage />
-                        </DndProvider>
+                        <GameCardProvider>
+                            <DndProvider backend={HTML5Backend}>
+                                <BoosterPage />
+                            </DndProvider>
+                        </GameCardProvider>
                     } />
                     <Route path="/collection" element={
                         <GameCardProvider>
@@ -113,11 +114,21 @@ const Router: React.FC = () => {
                         </GameCardProvider>
                     } />
                     <Route path="/decks/new" element={<NewDecksPage />} />
-                    {/* <Route path="/decks/edit/:id" element={<EditDecksPage />} /> */}
-                    <Route path="/duel/:roomId" element={<DuelPage />} />
+                    <Route path="/decks/edit/:deckId" element={<EditDeckPage />} />
+                    <Route path="/duel/select-deck/:roomId" element={<DuelSelectDeckPage />} />
+                    <Route path="/duel/:roomId" element={
+                        <DndProvider backend={HTML5Backend}>
+                            <DuelPage />
+                        </DndProvider>
+                    } />
                     <Route path="/exchange/:cardId" element={<ExchangePage />} />
                     <Route path="/exchange-room/:roomId" element={<ExchangeRoomPage />} />
-                    <Route path="/me" element={<UserProfilPage />} />
+                    <Route path="/exchange-history" element={<ExchangeHistoryPage />} />
+                    <Route path="/auction" element={
+                        <GameCardProvider>
+                            <AuctionRoomPage />
+                        </GameCardProvider>
+                    } />
                 </Route>
 
                 {/* Admin routes */}

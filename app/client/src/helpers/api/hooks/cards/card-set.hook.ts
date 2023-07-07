@@ -10,7 +10,7 @@ const QUERY_URLS = {
   cardSets: (pageNumber: number, itemPerPage: number, attributeId?: string, rarityId?: string, archetypeId?: string, cardName?: string) =>
     `/card_sets?limit=${itemPerPage}&offset=${pageNumber}${attributeId && `&attributeId=${attributeId}`}${rarityId && `&rarityId=${rarityId}`}${archetypeId && `&archetypeId=${archetypeId}`}${cardName && `&cardName=${cardName}`}`,
   getBooster: (id: string) => `/card_sets?setId=${id}&limit=150`,
-  getUserCardSets: (id: string, pageNumber: number, itemPerPage: number) => `/users/${id}/user_card_sets?limit=${itemPerPage}&offset=${pageNumber}`,
+  getUserCardSets: (pageNumber: number, itemPerPage: number) => `/users/me/user_card_sets?limit=${itemPerPage}&offset=${pageNumber}`,
   scrapCards: () => `/user_card_sets/scrap`,
   getCardById: (id: string) => `/card_sets/${id}`,
 } as const;
@@ -29,7 +29,7 @@ const cardSetsKeys = {
     cardName,
   ],
   booster: (id: string) => [...cardSetsKeys.all, id],
-  getUserCardSets: (id: string) => [...cardSetsKeys.all, id],
+  getUserCardSets: (pageNumber: number, itemPerPage: number) => [...cardSetsKeys.all, pageNumber, itemPerPage, 'me'],
   scrapCards: (arrayOfIds: string[]) => [...cardSetsKeys.all, arrayOfIds],
 } as const;
 
@@ -42,9 +42,9 @@ const requestCardSets = (pageNumber: number, itemPerPage: number, attributeId?: 
     cardSetArrayResponseSchema
   );
 
-const requestUserCardSets = (id: string, pageNumber: number, itemPerPage: number) =>
+const requestUserCardSets = (pageNumber: number, itemPerPage: number) =>
   apiRequest({
-    url: QUERY_URLS.getUserCardSets(id, pageNumber, itemPerPage),
+    url: QUERY_URLS.getUserCardSets(pageNumber, itemPerPage),
     method: "GET",
     token: !!token ? token : undefined
   });
@@ -76,14 +76,14 @@ export const useGetCardSets = (pageNumber: number, itemPerPage: number, attribut
   return React.useMemo(() => arrayOfCards, [arrayOfCards, attributeId, rarityId, archetypeId, cardName]);
 };
 
-export const useGetUserCardSets = (id: string, pageNumber: number, itemPerPage: number, attributeId?: string, rarityId?: string, archetypeId?: string, cardName?: string) => {
+export const useGetUserCardSets = (pageNumber: number, itemPerPage: number, attributeId?: string, rarityId?: string, archetypeId?: string, cardName?: string) => {
   const arrayOfCards = useQuery<ApiGetItemResponse<CardIUserCardSet[]>>(
-    cardSetsKeys.getUserCardSets(id),
-    () => requestUserCardSets(id, pageNumber, itemPerPage),
+    cardSetsKeys.getUserCardSets(pageNumber, itemPerPage),
+    () => requestUserCardSets(pageNumber, itemPerPage),
     { refetchOnWindowFocus: false }
   );
 
-  return React.useMemo(() => arrayOfCards, [arrayOfCards, attributeId, rarityId, archetypeId, cardName, id, pageNumber, itemPerPage]);
+  return React.useMemo(() => arrayOfCards, [arrayOfCards, attributeId, rarityId, archetypeId, cardName, pageNumber, itemPerPage]);
 };
 
 

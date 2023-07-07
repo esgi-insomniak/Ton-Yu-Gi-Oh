@@ -1,16 +1,22 @@
-name: Deploy "user-deck-service"
+name: Deploy Service "user-deck-service"
 
 on:
   push:
     branches:
       - main
+    paths:
+      - "server/user-deck-service/**"
+      - ".github/workflows/user-deck-service.yml"
+      - "deploy/k8s/user-deck-service/**"
+      - "deploy/scripts/**"
+      - "deploy/docker/**"
 
-    # paths:
-      # - "server/user-deck-service/**"
-      # - ".github/workflows/user-deck-service.yml"
-      # - "deploy/k8s/user-deck-service/**"
-      # - "deploy/scripts/**"
-      # - "deploy/docker/**"
+  workflow_dispatch:
+    inputs:
+      route:
+        description: 'Route'
+        required: true
+        default: 'user-service'
 
 env:
   ## Docker Hub
@@ -68,7 +74,7 @@ jobs:
         #
       - name: Configure Kubernetes cluster
         run: |
-            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --region ${{ secrets.GKE_REGION }} --project ${{ secrets.PROJECT_ID }}
+            gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }} --project ${{ secrets.PROJECT_ID }}
             gcloud auth --quiet configure-docker
             kubectl config current-context
 

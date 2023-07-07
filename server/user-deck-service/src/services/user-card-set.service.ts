@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UserCardSet } from 'src/entities/user-card-set.entity';
+import { UserCardSetsQuery } from 'src/interfaces/common/common.query.interface';
 import { QueryGetItems } from 'src/interfaces/common/common.response.interface';
+import { GroupedUserCardSet } from 'src/interfaces/user-card-set.interface';
 import { DataSource, DeepPartial, In } from 'typeorm';
 
 @Injectable()
@@ -9,8 +11,8 @@ export class UserCardSetService {
 
   async getUserCardSets(query: QueryGetItems): Promise<UserCardSet[]> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
-      take: query.limit || 10,
-      skip: query.offset * query.limit || 0,
+      take: query && query.limit ? query.limit : 10,
+      skip: query && query.offset ? query.offset * query.limit : 0,
     });
     return userCardSets;
   }
@@ -24,10 +26,41 @@ export class UserCardSetService {
     return userCardSet;
   }
 
-  async getUserCardSetsByUserId(userId: string): Promise<UserCardSet[]> {
+  async getUserCardSetsByUserId(
+    userId: string,
+    query?: UserCardSetsQuery,
+  ): Promise<UserCardSet[]> {
     const userCardSets = await this.dataSource.getRepository(UserCardSet).find({
       where: { userId },
+      take: query && query.limit ? query.limit : 10,
+      skip: query && query.offset ? query.offset * query.limit : 0,
     });
+    return userCardSets;
+  }
+
+  async getGroupedUserCardSetsByUserId(
+    userId: string,
+    query: QueryGetItems,
+  ): Promise<GroupedUserCardSet[]> {
+    const userCardSetsPartial = await this.dataSource
+      .getRepository(UserCardSet)
+      .createQueryBuilder('userCardSet')
+      .select('userCardSet.cardSetId, COUNT(*) count')
+      .where('userCardSet.userId = :userId', { userId })
+      .groupBy('userCardSet.cardSetId')
+      .take(query && query.limit ? query.limit : 10)
+      .skip(query && query.offset ? query.offset * query.limit : 0)
+      .getRawMany();
+
+    const userCardSets: GroupedUserCardSet[] = await Promise.all(
+      userCardSetsPartial.map(async (userCardSet) => ({
+        cardSetId: userCardSet.cardSetId,
+        userCardSets: await this.dataSource.getRepository(UserCardSet).find({
+          where: { userId, cardSetId: userCardSet.cardSetId },
+        }),
+      })),
+    );
+
     return userCardSets;
   }
 
@@ -43,8 +76,8 @@ export class UserCardSetService {
       .select('userCardSet.userId userId')
       .where('userCardSet.cardSetId = :cardSetId', { cardSetId })
       .groupBy('userCardSet.userId')
-      .take(query.limit || 10)
-      .skip(query.offset * query.limit || 0)
+      .take(query && query.limit ? query.limit : 10)
+      .skip(query && query.offset ? query.offset * query.limit : 0)
       .getRawMany();
 
     return userQuery.map((userCardSet) => userCardSet.userid);

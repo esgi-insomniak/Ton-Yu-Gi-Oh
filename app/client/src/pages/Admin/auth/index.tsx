@@ -4,6 +4,7 @@ import { ReportCard } from "../Layout";
 import { AuthLogSchemaType } from "@/helpers/utils/schema/Admin";
 import { useGetAuthLogs } from "@/helpers/api/hooks/admin/auth";
 import { MdError } from "react-icons/md";
+import React from "react";
 
 type TableAuthProps = Omit<AuthLogSchemaType, 'isSuccess' | 'user'> & {
     isSuccess: string;
@@ -18,8 +19,9 @@ const columns: TableColumn<TableAuthProps>[] = [
 ]
 
 const AuthAdmin = () => {
-
-    const { data } = useGetAuthLogs()
+    const [page, setPage] = React.useState<number>(0);
+    
+    const { data } = useGetAuthLogs(10, page)
 
     const hours = (time: string) => new Date(time).getHours();
 
@@ -52,6 +54,10 @@ const AuthAdmin = () => {
             <Table<TableAuthProps>
                 data={formatedData || []}
                 columns={columns}
+                page={page}
+                setter={setPage}
+                arr={formatedData?.length || 0}
+                maxItemsPerPage={10}
             />
         </div>
     )

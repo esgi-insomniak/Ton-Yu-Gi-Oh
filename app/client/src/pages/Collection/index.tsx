@@ -5,7 +5,9 @@ import React from "react";
 import { IGameCard } from "@/helpers/types/cards";
 import { useGameCard } from "@/helpers/context/cards/GameCardContext";
 import { useGetAllAttributes, useGetAllRarities } from "@/helpers/api/hooks/cards/attribute.hook";
-import { Input, Select } from "@/components/Input";
+import { Select } from "@/components/Input";
+import { Pagination } from "@/components/Pagination";
+import { getScreenSize } from "@/helpers/utils/constants";
 
 interface FiltersProps {
     search: string;
@@ -41,7 +43,10 @@ const Collection = () => {
                 isDraggable: false,
                 canPop: true,
                 displayCardInfoOnPop: true,
-                popScale: 1.75,
+                showExchangeOnPop: false,
+                showAuctionOnPop: false,
+                submitAuction: () => {},
+                popScale: 1.5,
                 canFlip: false,
                 canActivate: true,
                 canInteract: true,
@@ -81,34 +86,30 @@ const Collection = () => {
     }
 
     return (
-        <div className="flex gap-5 w-full overflow-scroll p-5 flex-col h-full">
-            <form className="flex w-full space-x-2 items-center justify-center" onSubmit={handleSearch}>
-                <input type="text" className="input input-bordered" name="searchBar" placeholder="Rechercher" />
-                <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" theme="dark" />
-                <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" theme="dark" />
-                <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" theme="dark" />
-                <button className="btn" type="submit">Rechercher</button>
-                <button className="btn" onClick={handleClear}>Vider</button>
-            </form>
+        <div className="lg:flex-col md:flex-row flex-row flex gap-5 w-full p-5 h-full">
+            <div>
+                <form className="lg:flex-row md:flex-col flex-col flex w-full lg:space-x-2 md:space-x-0 space-x-0 lg:space-y-0 md:space-y-2 space-y-2 items-center justify-center" onSubmit={handleSearch}>
+                    <input type="text" className="input input-bordered lg:w-auto md:w-full w-full" name="searchBar" placeholder="Rechercher" />
+                    <Select name="archetype" options={archetypes?.data} placeholder="Choisir un Archetype" theme="dark" wfull={getScreenSize(window) !== "lg" && getScreenSize(window) !== "xl"} />
+                    <Select name="rarities" options={rarities?.data} placeholder="Choisir une rareté" theme="dark" wfull={getScreenSize(window) !== "lg" && getScreenSize(window) !== "xl"} />
+                    <Select name="attributeId" options={attributes?.data} placeholder="Choisir un attribut" theme="dark" wfull={getScreenSize(window) !== "lg" && getScreenSize(window) !== "xl"} />
+                    <button className="btn lg:w-auto md:w-full w-full" type="submit">Rechercher</button>
+                    <button className="btn lg:w-auto md:w-full w-full" onClick={handleClear}>Vider</button>
+                </form>
+                <Pagination page={page} setter={setPage} arr={cardSetsResponse?.data.length!} maxItemsPerPage={24} />
+            </div>
             {cardSets.length === 0 ? (
                 <div className="flex items-center justify-center w-full h-full">
                     <iframe allow="fullscreen" frameBorder="0" height="370" src="https://giphy.com/embed/Z8Py9bJGWHhCBtmjJk/video" width="480"></iframe>
                 </div>
             ) : (
-                <div className="grid grid-cols-8 px-3 w-full gap-2 scrollbar-none container mx-auto h-full">
-                    {cardSets
-                        .map((cardSet, i) => (
-                            <GameCard key={i} {...cardSet} />
-                        ))}
+                <div className="grid xl:grid-cols-8 lg:grid-cols-5 md:grid-cols-4 grid-cols-3 px-3 w-full gap-2 container scrollbar-none mx-auto h-auto overflow-y-auto">
+                    {cardSets.map((cardSet, i) => (
+                        <GameCard key={i} {...cardSet} />
+                    )
+                    )}
                 </div>
             )}
-            <div className="w-full flex items-end justify-center h-fit">
-                <div className="btn-group">
-                    <button className="btn" onClick={() => setPage((prev) => prev - 1)} disabled={page - 1 < 0}>«</button>
-                    <button className="btn">{page + 1}</button>
-                    <button className="btn" onClick={() => setPage((prev) => prev + 1)}>»</button>
-                </div>
-            </div>
         </div>
     )
 }

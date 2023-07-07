@@ -22,9 +22,15 @@ spec:
           ports:
             - containerPort: 8000
           envFrom:
-            - configMapRef:
-                name: mailer-service-config
-
+            - secretRef:
+                name: global-project-secrets
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "8m"
+            limits:
+              memory: "64Mi"
+              cpu: "8m"
 ---
 
 apiVersion: v1
@@ -38,15 +44,3 @@ spec:
     - protocol: TCP
       port: 8000
   type: ClusterIP # Can be accessed from outside the cluster
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mailer-service-config
-data:
-  MAILER_SERVICE_PORT: "8000"
-  WEBSITE_URL: ""
-  MAILER_SERVICE_API_KEY: "MAILER_SERVICE_API_KEY=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"
-  MAILER_SERVICE_USER: "yugioh-insomniak@no-reply.fr"

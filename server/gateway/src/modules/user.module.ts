@@ -10,6 +10,8 @@ import {
   UserRelationController,
   UserRelationUserController,
 } from 'src/controllers/users/user-relation.controller';
+import { AuctionController } from 'src/controllers/users/user-auction.controller';
+import { AuctionHistoryController } from 'src/controllers/users/user-auction-history.controller';
 
 @Module({
   imports: [forwardRef(() => AppModule)],
@@ -20,6 +22,8 @@ import {
     UserExchangeUserController,
     UserRelationController,
     UserRelationUserController,
+    AuctionController,
+    AuctionHistoryController,
   ],
 })
 export class UserModule {}
