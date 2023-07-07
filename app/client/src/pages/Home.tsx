@@ -1,6 +1,7 @@
 import { NavItem } from "@/components/NavItem";
 import { useSocket } from "@/helpers/api/hooks";
 import { useLogout } from "@/helpers/api/hooks/auth";
+import { useGetActiveAuction } from "@/helpers/api/hooks/exchange";
 import { useMe } from "@/helpers/api/hooks/users";
 import { useAlert } from "@/helpers/providers/alerts/AlertProvider";
 import { ISocketEvent, ISocketEventType } from "@/helpers/types/socket";
@@ -11,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Home = () => {
     const { getIoClient } = useSocket()
     const { me } = useMe()
+    const { isError: isAuctionError, isLoading } = useGetActiveAuction()
     const logout = useLogout()
     const alert = useAlert()
     const router = useNavigate()
@@ -48,9 +50,13 @@ const Home = () => {
 
     return (
         <div className="hero items-center h-screen text-gray-300">
-            <div className="fixed top-5 right-5 z-10 gradient-border">
-                <button className="btn z-20 text-white" onClick={() => router('/auction')}>Rejoindre l'enchère !</button>
-            </div>
+            {
+               !isLoading && !isAuctionError && (
+                    <div className="fixed top-5 right-5 z-10 gradient-border">
+                        <button className="btn z-20 text-white" onClick={() => router('/auction')}>Rejoindre l'enchère !</button>
+                    </div>
+                )
+            }
             <video autoPlay muted loop id="myVideo" className="absolute z-0 w-auto min-w-full min-h-full max-h-screen object-cover">
                 <source src="/bg-home.mp4" type="video/mp4" />
             </video>

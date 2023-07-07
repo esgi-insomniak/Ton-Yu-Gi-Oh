@@ -1,4 +1,3 @@
-
 import { IGameCard } from '@/helpers/types/cards';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,8 +42,17 @@ const GameCardInfos = (props: IGameCard) => {
         }
       </div>
       <p className="overflow-y-auto max-h-[75px] scrollbar-none text-justify">Description : {props.card.description}</p>
-      <div className="flex justify-center align-center">
-        <button className='btn w-fit' onClick={() => navigate(`/exchange/${props.id}`)}>Trouver un échange</button>
+      <div className="flex justify-center align-center gap-4 flex-wrap">
+        {
+          props.showExchangeOnPop && (
+            <button className='btn w-fit' onClick={() => navigate(`/exchange/${props.id}`)}>Trouver un échange</button>
+          )
+        }
+        {
+          props.showAuctionOnPop && (
+            <button className='btn w-fit' onClick={() => props.submitAuction(props)}>Créer une enchère</button>
+          )
+        }
       </div>
     </div >
   )

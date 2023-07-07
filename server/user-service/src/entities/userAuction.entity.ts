@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
+import { AuctionHistory } from './userAuctionHistory.entity';
 import { User } from './user.entity';
 
 @Entity()
@@ -7,38 +14,23 @@ export class Auction {
   id: string;
 
   @Column('uuid')
-  userCardSetId: string;
+  cardSetId: string;
 
-  @Column('date')
+  @OneToMany(() => AuctionHistory, (auctionHistory) => auctionHistory.auction)
+  auctionHistories: AuctionHistory[];
+
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @Column('numeric')
   duration: number;
 
   @Column('numeric')
-  minimalPrice: number;
-
-  @Column('numeric')
   currentPrice: number;
 
-  @Column('boolean')
+  @ManyToOne(() => User, (user) => user.wonAuctions)
+  winner: User;
+
+  @Column('boolean', { default: false })
   isClosed: boolean;
-}
-
-@Entity()
-export class AuctionHistory{
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-
-    @ManyToOne(() => User, (user) => user.auctionHistories, { onDelete: 'CASCADE' })
-    userId: User;
-
-    @OneToOne(() => Auction, (auction) => auction.id)
-    auctionId: Auction;
-
-    @Column('numeric')
-    price: number;
-
-    @Column('date')
-    createdAt: Date;
 }

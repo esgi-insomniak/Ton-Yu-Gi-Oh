@@ -13,8 +13,8 @@ import {
 import React from "react";
 import { useDrop } from "react-dnd";
 import GameCard from "@/components/GameCard/GameCard";
-import {useGameCard} from "@/helpers/context/cards/GameCardContext";
-import {IGameCard} from "@/helpers/types/cards";
+import { useGameCard } from "@/helpers/context/cards/GameCardContext";
+import { IGameCard } from "@/helpers/types/cards";
 
 export const itemTypes = { BOOSTER: "booster" };
 
@@ -82,6 +82,9 @@ const Booster = () => {
                 isDraggable: false,
                 canPop: true,
                 displayCardInfoOnPop: false,
+                showExchangeOnPop: false,
+                showAuctionOnPop: false,
+                submitAuction: () => {},
                 popScale: 1.75,
                 canFlip: false,
                 canActivate: true,

@@ -1,6 +1,6 @@
 export interface StatProps {
     title: string;
-    value: string;
+    value: number
     desc: string;
     icon: React.ReactNode;
 }

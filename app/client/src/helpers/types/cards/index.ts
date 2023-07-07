@@ -97,6 +97,9 @@ export interface IGameCard extends CardICardSet {
   isLoaded: boolean;
   canPop: boolean;
   displayCardInfoOnPop: boolean;
+  showExchangeOnPop: boolean;
+  showAuctionOnPop: boolean;
+  submitAuction: (props: IGameCard) => void;
   popScale: number;
   canFlip: boolean;
   canActivate: boolean;

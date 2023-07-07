@@ -11,17 +11,37 @@ export class AuctionService {
   }
 
   async createAuction(auction: DeepPartial<Auction>): Promise<Auction> {
-    const newAuction = await this.AuctionRepository.save(auction);
-    return newAuction;
+    try {
+      return await this.AuctionRepository.save(auction);
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async updateAuctionById(
+    id: string,
+    auction: DeepPartial<Auction>,
+  ): Promise<Auction> {
+    try {
+      await this.AuctionRepository.update(id, auction);
+      return await this.AuctionRepository.findOne({
+        where: {
+          id,
+        },
+        relations: ['winner'],
+      });
+    } catch {
+      return null;
+    }
   }
 
   async getActualAuction(): Promise<Auction> {
     const actualAction = await this.AuctionRepository.findOne({
-      where: [
-        {
-          isClosed: false,
-        },
-      ],
+      where: {
+        isClosed: false,
+      },
+      relations: ['winner'],
     });
 
     return actualAction;
