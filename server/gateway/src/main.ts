@@ -18,8 +18,10 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
+  if (process.env.NODE_ENV !== 'production') {
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup('api', app, document);
+  }
   app.useGlobalPipes(
     new ValidationPipe(),
     new ValidationPipe({
@@ -29,7 +31,7 @@ async function bootstrap() {
   app.use(compression());
   app.use(helmet());
   app.use(requestIp.mw());
-  app.enableCors({ origin: [new ConfigService().get('corsOrigin')] });
+  app.enableCors({ origin: new ConfigService().get('corsOrigin') });
   app.useWebSocketAdapter(new SocketIoAdapter(app));
   await app.listen(new ConfigService().get('port'));
 }
