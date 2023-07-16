@@ -33,7 +33,6 @@ const Dashboard = () => {
   const [optionsGraph, setOptionsGraph] = React.useState<EChartsOption>({});
 
   const userId = localStorage.getItem("id");
-
   React.useEffect(() => {
     axios
       .get(`http://localhost:3000/users/${userId}`)
@@ -46,6 +45,7 @@ const Dashboard = () => {
   }, [userId]);
 
   React.useEffect(() => {
+    if (userData === undefined) return;
     if (userData.length > 0) {
       axios
         .get(`http://localhost:3000/mouse-track/distinct/${userData}`)
@@ -108,6 +108,7 @@ const Dashboard = () => {
   }, [clickData]);
 
   React.useEffect(() => {
+    if (userData === undefined) return;
     if (userData.length > 0) {
       axios
         .get(`http://localhost:3000/session/${userData}`)
@@ -134,6 +135,7 @@ const Dashboard = () => {
   }, [sessionData]);
 
   React.useEffect(() => {
+    if (userData === undefined) return;
     if (userData.length > 0) {
       axios
         .get(`http://localhost:3000/user-page-urls/${userData}`)
@@ -239,8 +241,8 @@ const Dashboard = () => {
         const bounceRate =
           totalSessions > 0
             ? Math.round(
-                (totalSessionsWithSinglePageView / totalSessions) * 100
-              )
+              (totalSessionsWithSinglePageView / totalSessions) * 100
+            )
             : 0;
 
         return bounceRate;

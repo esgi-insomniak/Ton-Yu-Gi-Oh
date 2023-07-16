@@ -13,7 +13,6 @@ const Login = () => {
     }
 
     axios.post('http://localhost:3000/login', body).then((res) => {
-      console.log(res.data.user._id)
       localStorage.setItem('id', res.data.user._id);
       navigate('/dashboard');
     }).catch((err) => {
