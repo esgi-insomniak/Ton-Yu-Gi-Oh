@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const swagger = require("./swagger");
 const bcrypt = require("bcrypt");
+const env = require("dotenv").config().parsed;
 
 const app = express();
 
@@ -25,9 +26,8 @@ let corsOptions = {
 };
 
 // MongoDB configuration
-console.log(process.env.MONGO_CON_STRING);
 mongoose
-  .connect(process.env.MONGO_CON_STRING, { useNewUrlParser: true })
+  .connect(env.MONGO_CON_STRING, { useNewUrlParser: true })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
@@ -528,5 +528,5 @@ app.get("/analytics/average-session-time", async (req, res) => {
 swagger(app);
 
 // Start server
-const port = process.env.PORT || 3000;
+const port = env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
